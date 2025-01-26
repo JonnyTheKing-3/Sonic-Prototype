@@ -12,30 +12,33 @@ public class SonicMovement : MonoBehaviour
     public KeyCode jumpKey = KeyCode.Space;
 
     [Header("VALUES FOR MOVEMENT")]
-    public float moveSpeed;
     public float acceleration;
     public float deceleration;
     public float jumpForce;
-    
+    public float NormaleSpeedCap;
+
     [Header("JUMP RELATED")]
     public float jumpCooldown;
-    bool readyToJump;
+    private bool readyToJump;
+    public float gravity;
     
-    [Header("GROUND CHECK")]
+    [Header("GROUND")]
     public float playerHeight;
     public LayerMask whatIsGround;
+    public RaycastHit surfaceHit;
 
-    [Header("REFERENCES")]
-    public Transform orientation;
-    public Rigidbody rb;
-    public ConstantForce cf;
-    
     [Header("STATUS")]
     public bool grounded;
     public float horizontalInput;
     public float verticalInput;
     public Vector3 moveDirection;
 
+    [Header("REFERENCES")]
+    public Transform orientation;
+    public Rigidbody rb;
+    public ConstantForce cf;
+    
+    
     private void Start()
     {
         // getting references
@@ -44,16 +47,24 @@ public class SonicMovement : MonoBehaviour
 
         // initiating values
         readyToJump = true;
+        cf.enabled = true;
+        cf.force = Vector3.down * gravity;
+        cf.enabled = false;
     }
 
     private void Update()
     {
-        // Status on player
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
-
+        grounded = Physics.Raycast(transform.position, Vector3.down, out surfaceHit, playerHeight * 0.5f + 0.2f, whatIsGround);
         MyInput();
-        
+        ApplyGravity();
+    }
+
+    private void ApplyGravity()
+    {
         cf.enabled = !grounded;
+        
+        // Update the gravity in case we change it during play
+        if (cf.enabled) { cf.force = Vector3.down * gravity; }
     }
     
     private void MyInput()
@@ -65,9 +76,7 @@ public class SonicMovement : MonoBehaviour
         if(Input.GetKeyDown(jumpKey) && readyToJump && grounded)
         {
             readyToJump = false;
-
             Jump();
-
             Invoke(nameof(ResetJump), jumpCooldown);
         }
     }
@@ -86,66 +95,50 @@ public class SonicMovement : MonoBehaviour
     
     private void FixedUpdate()
     {
+        
         MovePlayer();
+        CapSpeed(NormaleSpeedCap);
+        Debug.Log(rb.velocity.sqrMagnitude);
     }
     
     private void MovePlayer()
     {
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        // Calculate move direction based on input
+        moveDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
 
-        moveDirection = orientation.forward * verticalInput * CalculateMovementZ() + orientation.right * horizontalInput * CalculateMovementX();
-        
-        rb.AddForce(moveDirection);
+        // Get current velocity
+        Vector3 currentVelocity = rb.velocity;
+
+        // Project the current velocity onto the move direction
+        Vector3 velocityInMoveDirection = Vector3.Project(currentVelocity, moveDirection);
+
+        // Calculate the force required to align the velocity with the move direction
+        Vector3 alignmentForce = (moveDirection * NormaleSpeedCap - velocityInMoveDirection);
+
+        // Apply force for sharp directional change
+        if (moveDirection.magnitude > 0)
+        {
+            rb.AddForce(alignmentForce * acceleration, ForceMode.Acceleration);
+        }
+
+        // Apply deceleration when no input and grounded
+        if (grounded && moveDirection.magnitude == 0 && currentVelocity.magnitude > 0.1f)
+        {
+            Vector3 decelerationForce = -currentVelocity.normalized * deceleration;
+            rb.AddForce(decelerationForce, ForceMode.Acceleration);
+        }
     }
 
-    private float CalculateMovementX()
+
+    
+    private void CapSpeed(float limit)
     {
-        // Speed of player
-        float targetSpeed = horizontalInput * moveSpeed;
         
-        // Calculate the difference of the speed the player wants to go by
-        // how fast the player is already going
-        float speedDif = targetSpeed - rb.velocity.x;
-        
-        // If the player is going the same direction as the one they pressed, accelerate. Else, decelerate
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
-        
-        // Applied acceleration to speed difference, AND THEN, raised to something so that
-        // speed increases and decreases depending on the current movement status of the player.
-        // Lastly, preserve the direction
-        return Mathf.Pow(Mathf.Abs(speedDif) * accelRate, .9f) * Math.Sign(speedDif);
+        if (rb.velocity.sqrMagnitude > limit && grounded)
+        {
+           rb.velocity = Vector3.ClampMagnitude(rb.velocity, limit);
+        }
     }
-    private float CalculateMovementZ()
-    {
-        // Speed of player
-        float targetSpeed = verticalInput * moveSpeed;
-        
-        // Calculate the difference of the speed the player wants to go by
-        // how fast the player is already going
-        float speedDif = targetSpeed - rb.velocity.z;
-        
-        // If the player is going the same direction as the one they pressed, accelerate. Else, decelerate
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
-        
-        // Applied acceleration to speed difference, AND THEN, raised to something so that
-        // speed increases and decreases depending on the current movement status of the player.
-        // Lastly, preserve the direction
-        return Mathf.Pow(Mathf.Abs(speedDif) * accelRate, .9f) * Math.Sign(speedDif);
-    }
-
-    // private bool OnSlope()
-    // {
-    //     if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
-    //     {
-    //         angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-    //         return angle < maxSlopeAngle && angle != 0;
-    //     }
-    //
-    //     return false;
-    // }
-    //
-    // private Vector3 GetSlopeMoveDirection()
-    // {
-    //     return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
-    // }
+    
+    
 }
