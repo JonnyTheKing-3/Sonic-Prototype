@@ -14092,10 +14092,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpKey: 32
-  acceleration: 65
-  deceleration: 65
-  jumpForce: 20
-  NormaleSpeedCap: 30
+  speed: 140
+  acceleration: 60
+  deceleration: 100
+  turnSpeed: 5
+  jumpForce: 30
   jumpCooldown: 0.25
   gravity: 20
   playerHeight: 2.72

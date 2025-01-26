@@ -8,9 +8,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/terrains.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/terrains/New Terrain.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/terrains/New Terrain.asset.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +88,8 @@
       <option name="presentableId" value="Default" />
       <updated>1737784208673</updated>
       <workItem from="1737784214714" duration="7150000" />
-      <workItem from="1737833506420" duration="14517000" />
+      <workItem from="1737833506420" duration="14519000" />
+      <workItem from="1737913167864" duration="13028000" />
     </task>
     <servers />
   </component>

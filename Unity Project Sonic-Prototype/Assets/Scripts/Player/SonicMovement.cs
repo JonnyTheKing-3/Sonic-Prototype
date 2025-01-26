@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Unity.VisualScripting.ReorderableList;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UIElements;
 
 public class SonicMovement : MonoBehaviour
@@ -12,10 +13,11 @@ public class SonicMovement : MonoBehaviour
     public KeyCode jumpKey = KeyCode.Space;
 
     [Header("VALUES FOR MOVEMENT")]
+    public float speed;
     public float acceleration;
     public float deceleration;
+    public float turnSpeed;
     public float jumpForce;
-    public float NormaleSpeedCap;
 
     [Header("JUMP RELATED")]
     public float jumpCooldown;
@@ -95,50 +97,25 @@ public class SonicMovement : MonoBehaviour
     
     private void FixedUpdate()
     {
-        
         MovePlayer();
-        CapSpeed(NormaleSpeedCap);
-        Debug.Log(rb.velocity.sqrMagnitude);
     }
     
     private void MovePlayer()
     {
-        // Calculate move direction based on input
+        // Calculate move direction and targetVelocity based on input and camera orientation
         moveDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
-
-        // Get current velocity
-        Vector3 currentVelocity = rb.velocity;
-
-        // Project the current velocity onto the move direction
-        Vector3 velocityInMoveDirection = Vector3.Project(currentVelocity, moveDirection);
-
-        // Calculate the force required to align the velocity with the move direction
-        Vector3 alignmentForce = (moveDirection * NormaleSpeedCap - velocityInMoveDirection);
-
-        // Apply force for sharp directional change
-        if (moveDirection.magnitude > 0)
-        {
-            rb.AddForce(alignmentForce * acceleration, ForceMode.Acceleration);
-        }
-
-        // Apply deceleration when no input and grounded
-        if (grounded && moveDirection.magnitude == 0 && currentVelocity.magnitude > 0.1f)
-        {
-            Vector3 decelerationForce = -currentVelocity.normalized * deceleration;
-            rb.AddForce(decelerationForce, ForceMode.Acceleration);
-        }
-    }
-
-
-    
-    private void CapSpeed(float limit)
-    {
+        Vector3 targetVelocity = moveDirection * speed;
         
-        if (rb.velocity.sqrMagnitude > limit && grounded)
+        if (moveDirection != Vector3.zero)
         {
-           rb.velocity = Vector3.ClampMagnitude(rb.velocity, limit);
+            float rad = turnSpeed * Mathf.PI * Time.deltaTime;
+            rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, transform.up), targetVelocity, rad, acceleration * Time.deltaTime) + Vector3.Project(rb.velocity, transform.up);
+        }
+        else
+        {
+            float rad = turnSpeed * Mathf.PI * Time.deltaTime;
+            rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, transform.up), Vector3.zero, rad, deceleration * Time.deltaTime) + Vector3.Project(rb.velocity, transform.up);
         }
     }
-    
-    
+
 }
