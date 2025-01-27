@@ -19,8 +19,6 @@ public class SonicMovement : MonoBehaviour
     public float deceleration;
     public float turnSpeed;
     public float jumpForce;
-    public float rotationSpeedForSurfaceAlignment = 0f;
-    public float rotationDamping = 0f;
 
     [Header("JUMP RELATED")]
     public float jumpCooldown;
@@ -31,6 +29,7 @@ public class SonicMovement : MonoBehaviour
     public float playerHeight;
     public LayerMask whatIsGround;
     public RaycastHit surfaceHit;
+    public float threshold;
 
     [Header("STATUS")]
     public bool grounded;
@@ -43,8 +42,8 @@ public class SonicMovement : MonoBehaviour
     public Rigidbody rb;
     public ConstantForce cf;
     private Quaternion defaultRotation;
-    
-    
+
+
     private void Start()
     {
         // getting references
@@ -58,13 +57,13 @@ public class SonicMovement : MonoBehaviour
         cf.enabled = false;
         defaultRotation = transform.rotation;
     }
-
+    
     private void Update()
     {
         grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
-        MyInput();
         ApplyGravity();
         StickPlayerToGround();
+        MyInput();
     }
 
     private void MyInput()
@@ -91,12 +90,11 @@ public class SonicMovement : MonoBehaviour
     
     private void StickPlayerToGround()
     {
-        if (grounded)
-        {
-            // Stick character to the ground
-            Vector3 AppropriateY = new Vector3(transform.position.x, surfaceHit.point.y + playerHeight - .1f, transform.position.z);
-            transform.position = AppropriateY;
-        }
+        if (!grounded) {return;}
+
+        Vector3 targetPosition = new Vector3(transform.position.x, surfaceHit.point.y + playerHeight -.1f, transform.position.z);
+        transform.position = targetPosition;
+        
     }
     
     private void Jump()
@@ -127,7 +125,7 @@ public class SonicMovement : MonoBehaviour
 
         Vector3 targetVelocity = SurfaceAppliedDirection.normalized * speed;
         
-        Debug.DrawRay(transform.position, targetVelocity, Color.green);
+        // Debug.DrawRay(transform.position, targetVelocity, Color.green);
         
         // preparing specs for moving the character. Turn speed is to make sure when massively changing directions, the player loses speed
         float rad = turnSpeed * Mathf.PI * Time.deltaTime;
@@ -135,15 +133,17 @@ public class SonicMovement : MonoBehaviour
      
         // move character
         // Clamp speed when the player stops and is grounded to make sure small bursts don't happen. I might erase this if check
-        if (rb.velocity.magnitude < 1f && grounded && moveDirection.magnitude < .1f)
+        if (rb.velocity.magnitude < threshold && grounded && moveDirection.magnitude < .1f)
         {
-            Debug.Log("If statement reached: " + Time.time);
+            // Debug.Log("If statement reached: " + Time.time);
             rb.velocity = Vector3.zero;
+            // Debug.DrawRay(transform.position, Vector3.up * 8f, Color.red);
         }
         else
         {
             rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad,
                     appropriateAcceleration * Time.deltaTime) + Vector3.Project(rb.velocity, Surface);
+            Debug.DrawRay(transform.position, rb.velocity, Color.green);
         }
     }
 }
