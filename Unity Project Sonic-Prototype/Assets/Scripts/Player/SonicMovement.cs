@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 using Unity.VisualScripting.ReorderableList;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UIElements;
@@ -18,6 +19,8 @@ public class SonicMovement : MonoBehaviour
     public float deceleration;
     public float turnSpeed;
     public float jumpForce;
+    public float rotationSpeedForSurfaceAlignment = 0f;
+    public float rotationDamping = 0f;
 
     [Header("JUMP RELATED")]
     public float jumpCooldown;
@@ -39,6 +42,7 @@ public class SonicMovement : MonoBehaviour
     public Transform orientation;
     public Rigidbody rb;
     public ConstantForce cf;
+    private Quaternion defaultRotation;
     
     
     private void Start()
@@ -52,23 +56,17 @@ public class SonicMovement : MonoBehaviour
         cf.enabled = true;
         cf.force = Vector3.down * gravity;
         cf.enabled = false;
+        defaultRotation = transform.rotation;
     }
 
     private void Update()
     {
-        grounded = Physics.Raycast(transform.position, Vector3.down, out surfaceHit, playerHeight * 0.5f + 0.2f, whatIsGround);
+        grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
         MyInput();
         ApplyGravity();
+        StickPlayerToGround();
     }
 
-    private void ApplyGravity()
-    {
-        cf.enabled = !grounded;
-        
-        // Update the gravity in case we change it during play
-        if (cf.enabled) { cf.force = Vector3.down * gravity; }
-    }
-    
     private void MyInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -80,6 +78,24 @@ public class SonicMovement : MonoBehaviour
             readyToJump = false;
             Jump();
             Invoke(nameof(ResetJump), jumpCooldown);
+        }
+    }
+    
+    private void ApplyGravity()
+    {
+        cf.enabled = !grounded;
+        
+        // Update the gravity in case we change it during play
+        if (cf.enabled) { cf.force = Vector3.down * gravity; }
+    }
+    
+    private void StickPlayerToGround()
+    {
+        if (grounded)
+        {
+            // Stick character to the ground
+            Vector3 AppropriateY = new Vector3(transform.position.x, surfaceHit.point.y + playerHeight - .1f, transform.position.z);
+            transform.position = AppropriateY;
         }
     }
     
@@ -106,16 +122,12 @@ public class SonicMovement : MonoBehaviour
         moveDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
         Vector3 targetVelocity = moveDirection * speed;
         
-        if (moveDirection != Vector3.zero)
-        {
-            float rad = turnSpeed * Mathf.PI * Time.deltaTime;
-            rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, transform.up), targetVelocity, rad, acceleration * Time.deltaTime) + Vector3.Project(rb.velocity, transform.up);
-        }
-        else
-        {
-            float rad = turnSpeed * Mathf.PI * Time.deltaTime;
-            rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, transform.up), Vector3.zero, rad, deceleration * Time.deltaTime) + Vector3.Project(rb.velocity, transform.up);
-        }
+        // preparing specs for moving the character. Turn speed is to make sure when massively changing directions, the player loses speed
+        float rad = turnSpeed * Mathf.PI * Time.deltaTime;
+        float appropriateAcceleration = moveDirection != Vector3.zero ? acceleration : deceleration;
+     
+        // move character
+        rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, transform.up), targetVelocity, rad, appropriateAcceleration * Time.deltaTime) + Vector3.Project(rb.velocity, transform.up);
     }
-
+    
 }
