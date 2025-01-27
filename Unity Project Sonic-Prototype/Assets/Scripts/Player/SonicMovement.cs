@@ -118,16 +118,32 @@ public class SonicMovement : MonoBehaviour
     
     private void MovePlayer()
     {
-        // Calculate move direction and targetVelocity based on input and camera orientation
+        // Calculate move direction based on input and camera orientation
         moveDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
-        Vector3 targetVelocity = moveDirection * speed;
+
+        Vector3 Surface = grounded ? surfaceHit.normal : transform.up;
+        // Get the correct force to apply according to the surface to player is in
+        Vector3 SurfaceAppliedDirection = Vector3.ProjectOnPlane(moveDirection, Surface);
+
+        Vector3 targetVelocity = SurfaceAppliedDirection.normalized * speed;
+        
+        Debug.DrawRay(transform.position, targetVelocity, Color.green);
         
         // preparing specs for moving the character. Turn speed is to make sure when massively changing directions, the player loses speed
         float rad = turnSpeed * Mathf.PI * Time.deltaTime;
         float appropriateAcceleration = moveDirection != Vector3.zero ? acceleration : deceleration;
      
         // move character
-        rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, transform.up), targetVelocity, rad, appropriateAcceleration * Time.deltaTime) + Vector3.Project(rb.velocity, transform.up);
+        // Clamp speed when the player stops and is grounded to make sure small bursts don't happen. I might erase this if check
+        if (rb.velocity.magnitude < 1f && grounded && moveDirection.magnitude < .1f)
+        {
+            Debug.Log("If statement reached: " + Time.time);
+            rb.velocity = Vector3.zero;
+        }
+        else
+        {
+            rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad,
+                    appropriateAcceleration * Time.deltaTime) + Vector3.Project(rb.velocity, Surface);
+        }
     }
-    
 }
