@@ -64,6 +64,7 @@ public class SonicMovement : MonoBehaviour
         ApplyGravity();
         StickPlayerToGround();
         MyInput();
+        Debug.DrawRay(transform.position, rb.velocity, Color.red);
     }
 
     private void MyInput()
@@ -124,7 +125,7 @@ public class SonicMovement : MonoBehaviour
         Vector3 SurfaceAppliedDirection = Vector3.ProjectOnPlane(moveDirection, Surface);
 
         Vector3 targetVelocity = SurfaceAppliedDirection.normalized * speed;
-        
+
         // Debug.DrawRay(transform.position, targetVelocity, Color.green);
         
         // preparing specs for moving the character. Turn speed is to make sure when massively changing directions, the player loses speed
@@ -143,7 +144,7 @@ public class SonicMovement : MonoBehaviour
         {
             rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad,
                     appropriateAcceleration * Time.deltaTime) + Vector3.Project(rb.velocity, Surface);
-            Debug.DrawRay(transform.position, rb.velocity, Color.green);
+            // Debug.DrawRay(transform.position, rb.velocity, Color.green);
         }
     }
 }
