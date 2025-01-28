@@ -43,6 +43,13 @@ public class SonicMovement : MonoBehaviour
     public ConstantForce cf;
     private Quaternion defaultRotation;
 
+    [Header("DEBUG RAYS")] 
+    [SerializeField] private bool FixedUpdateRay;
+    [SerializeField] private bool UpdateRay;
+    [SerializeField] private bool targetVelocityRay;
+    [SerializeField] private bool ProjectRay;
+    [SerializeField] private bool ProjectOnPlaneRay;
+
 
     private void Start()
     {
@@ -61,10 +68,9 @@ public class SonicMovement : MonoBehaviour
     private void Update()
     {
         grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
-        ApplyGravity();
         StickPlayerToGround();
+        ApplyGravity();
         MyInput();
-        Debug.DrawRay(transform.position, rb.velocity, Color.red);
     }
 
     private void MyInput()
@@ -78,6 +84,27 @@ public class SonicMovement : MonoBehaviour
             readyToJump = false;
             Jump();
             Invoke(nameof(ResetJump), jumpCooldown);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            FixedUpdateRay = !FixedUpdateRay;
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad2))
+        {  
+            UpdateRay = !UpdateRay;
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad3))
+        {  
+            targetVelocityRay = !targetVelocityRay;
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad4))
+        {  
+            ProjectRay = !ProjectRay;
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad5))
+        {  
+            ProjectOnPlaneRay = !ProjectOnPlaneRay;
         }
     }
     
@@ -125,26 +152,15 @@ public class SonicMovement : MonoBehaviour
         Vector3 SurfaceAppliedDirection = Vector3.ProjectOnPlane(moveDirection, Surface);
 
         Vector3 targetVelocity = SurfaceAppliedDirection.normalized * speed;
-
-        // Debug.DrawRay(transform.position, targetVelocity, Color.green);
         
         // preparing specs for moving the character. Turn speed is to make sure when massively changing directions, the player loses speed
         float rad = turnSpeed * Mathf.PI * Time.deltaTime;
         float appropriateAcceleration = moveDirection != Vector3.zero ? acceleration : deceleration;
      
         // move character
-        // Clamp speed when the player stops and is grounded to make sure small bursts don't happen. I might erase this if check
-        if (rb.velocity.magnitude < threshold && grounded && moveDirection.magnitude < .1f)
-        {
-            // Debug.Log("If statement reached: " + Time.time);
-            rb.velocity = Vector3.zero;
-            // Debug.DrawRay(transform.position, Vector3.up * 8f, Color.red);
-        }
-        else
-        {
-            rb.velocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad,
+        rb.velocity += Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad,
                     appropriateAcceleration * Time.deltaTime) + Vector3.Project(rb.velocity, Surface);
-            // Debug.DrawRay(transform.position, rb.velocity, Color.green);
-        }
+        
+        if (ProjectRay) {Debug.DrawRay(transform.position, Vector3.Project(rb.velocity, Surface), Color.blue);}
     }
 }

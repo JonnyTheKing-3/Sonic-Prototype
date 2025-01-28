@@ -14103,7 +14103,7 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  threshold: 5
+  threshold: 0
   grounded: 0
   horizontalInput: 0
   verticalInput: 0
@@ -14111,6 +14111,9 @@ MonoBehaviour:
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
   cf: {fileID: 1575560306}
+  FixedUpdateRay: 0
+  UpdateRay: 0
+  MovePlayerRay: 0
 --- !u!75 &1575560306
 ConstantForce:
   m_ObjectHideFlags: 0
