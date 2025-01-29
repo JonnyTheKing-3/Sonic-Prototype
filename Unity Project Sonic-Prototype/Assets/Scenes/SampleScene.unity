@@ -7926,7 +7926,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -8}
+  m_LocalPosition: {x: 0, y: 0, z: -11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7945,7 +7945,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minDistance: 0.2
-  maxDistance: 8
+  maxDistance: 11
   smooth: 5
   dollyDirAdjusted: {x: 0, y: 0, z: 0}
   distance: 0
@@ -14026,7 +14026,6 @@ GameObject:
   - component: {fileID: 1575560302}
   - component: {fileID: 1575560305}
   - component: {fileID: 1575560304}
-  - component: {fileID: 1575560306}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -14096,36 +14095,20 @@ MonoBehaviour:
   acceleration: 40
   deceleration: 100
   turnSpeed: 5
-  jumpForce: 55
-  jumpCooldown: 0.25
-  gravity: 90
+  jumpForce: 30
+  jumpCooldown: 0.5
+  gravity: 50
   playerHeight: 1.02
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  threshold: 0
   grounded: 0
   horizontalInput: 0
   verticalInput: 0
   moveDirection: {x: 0, y: 0, z: 0}
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
-  cf: {fileID: 1575560306}
-  FixedUpdateRay: 0
-  UpdateRay: 0
-  MovePlayerRay: 0
---- !u!75 &1575560306
-ConstantForce:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1575560301}
-  m_Enabled: 0
-  m_Force: {x: 0, y: 0, z: 0}
-  m_RelativeForce: {x: 0, y: 0, z: 0}
-  m_Torque: {x: 0, y: 0, z: 0}
-  m_RelativeTorque: {x: 0, y: 0, z: 0}
+  Ray: 0
 --- !u!1 &1576205938
 GameObject:
   m_ObjectHideFlags: 0

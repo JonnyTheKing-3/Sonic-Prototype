@@ -16,6 +16,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Camera/ThirdPersonCam.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Scrollbar.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="2s6m2wC0XgoA53m0ykl2WrXCfYq" />
   <component name="ProjectViewState">
@@ -95,6 +96,8 @@
       <workItem from="1737960630143" duration="5025000" />
       <workItem from="1738004306257" duration="8330000" />
       <workItem from="1738091106374" duration="5502000" />
+      <workItem from="1738111556792" duration="5804000" />
+      <workItem from="1738125534531" duration="2619000" />
     </task>
     <servers />
   </component>
