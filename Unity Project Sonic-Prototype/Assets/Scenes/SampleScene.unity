@@ -13936,7 +13936,7 @@ Transform:
   m_GameObject: {fileID: 1575560301}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6, z: 0}
+  m_LocalPosition: {x: 73.5, y: 67.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13992,16 +13992,16 @@ MonoBehaviour:
   jumpForce: 30
   jumpCooldown: 0.5
   gravity: 50
-  playerHeight: 1.02
+  playerHeight: 1.8
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
+  GroundStickingOffset: 1
   grounded: 0
   horizontalInput: 0
   verticalInput: 0
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
-  Ray: 0
 --- !u!1 &1576205938
 GameObject:
   m_ObjectHideFlags: 0
@@ -14626,7 +14626,7 @@ Transform:
   m_GameObject: {fileID: 1654380325}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 77.3, y: -18.9, z: -0.10000038}
+  m_LocalPosition: {x: 77.3, y: 38.5, z: -0.10000038}
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children: []

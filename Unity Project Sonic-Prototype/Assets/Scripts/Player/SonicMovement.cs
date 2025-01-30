@@ -28,7 +28,9 @@ public class SonicMovement : MonoBehaviour
     [Header("GROUND")]
     public float playerHeight;
     public LayerMask whatIsGround;
+    public float GroundStickingOffset = 1f;
     public RaycastHit surfaceHit;
+    public RaycastHit AlignmentHit;
 
     [Header("STATUS")]
     public bool grounded;
@@ -39,10 +41,7 @@ public class SonicMovement : MonoBehaviour
     [Header("REFERENCES")]
     public Transform orientation;
     public Rigidbody rb;
-    private Quaternion defaultRotation;
-
-    [Header("DEBUG RAYS")] 
-    [SerializeField] private bool Ray;
+    
 
     private void Start()
     {
@@ -51,12 +50,13 @@ public class SonicMovement : MonoBehaviour
 
         // initiating values
         readyToJump = true;
-        defaultRotation = transform.rotation;
     }
     
     private void Update()
     {
         grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
+        transform.up = surfaceHit.normal;
+        
         MyInput();
         StickPlayerToGround();
     }
@@ -72,11 +72,6 @@ public class SonicMovement : MonoBehaviour
             readyToJump = false;
             Jump();
             Invoke(nameof(ResetJump), jumpCooldown);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Keypad1))
-        {
-            Ray = !Ray;
         }
     }
 
@@ -97,7 +92,8 @@ public class SonicMovement : MonoBehaviour
         // Only stick player to the ground when the player is on the ground
         if (!grounded || !readyToJump) {return;}
 
-        Vector3 targetPosition = new Vector3(transform.position.x, surfaceHit.point.y + playerHeight -.1f, transform.position.z);
+        // This works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in slopes than in the ground. So when I put the model in, make sure it's good on slopes
+        Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
         transform.position = targetPosition;
     }
     
@@ -138,5 +134,4 @@ public class SonicMovement : MonoBehaviour
         // Combine horizontal and vertical velocity
         rb.velocity = horizontalVelocity + Vector3.up * verticalVelocity;
     }
-
 }
