@@ -14096,15 +14096,16 @@ MonoBehaviour:
   speed: 100
   acceleration: 40
   deceleration: 100
+  rotationSpeed: 0
   turnSpeed: 5
   jumpForce: 30
   jumpCooldown: 0.5
   gravity: 50
-  playerHeight: 1.8
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  GroundStickingOffset: 1
+  playerHeight: 8
+  GroundStickingOffset: 2
   grounded: 0
   horizontalInput: 0
   verticalInput: 0

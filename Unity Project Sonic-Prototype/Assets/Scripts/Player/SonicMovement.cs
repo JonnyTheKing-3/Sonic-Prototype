@@ -17,6 +17,7 @@ public class SonicMovement : MonoBehaviour
     public float speed;
     public float acceleration;
     public float deceleration;
+    public float rotationSpeed;
     public float turnSpeed;
     public float jumpForce;
 
@@ -26,8 +27,8 @@ public class SonicMovement : MonoBehaviour
     public float gravity;
     
     [Header("GROUND")]
-    public float playerHeight;
     public LayerMask whatIsGround;
+    public float playerHeight;
     public float GroundStickingOffset = 1f;
     public RaycastHit surfaceHit;
     public RaycastHit AlignmentHit;
@@ -94,6 +95,8 @@ public class SonicMovement : MonoBehaviour
 
         // This works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in slopes than in the ground. So when I put the model in, make sure it's good on slopes
         Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
+
+        // Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, rotationSpeed * Time.deltaTime);
         transform.position = targetPosition;
     }
     
