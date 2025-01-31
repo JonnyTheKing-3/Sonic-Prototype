@@ -100,6 +100,7 @@ public class SonicMovement : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+        Debug.Log(rb.velocity.magnitude);
     }
     
     private void MovePlayer()
