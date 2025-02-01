@@ -2,20 +2,19 @@ using UnityEngine;
 
 public class TimeControl : MonoBehaviour
 {
+    public float timeScale;
     void Update()
     {
         // Set the time scale to the value of the timeScale variable.
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Time.timeScale = .05f;
+            timeScale += .1f;
         }
         if (Input.GetKeyDown(KeyCode.O))
         {
-            Time.timeScale = .1f;
+            timeScale -= .1f;
         }
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            Time.timeScale = 1;
-        }
+
+        Time.timeScale = timeScale;
     }
 }

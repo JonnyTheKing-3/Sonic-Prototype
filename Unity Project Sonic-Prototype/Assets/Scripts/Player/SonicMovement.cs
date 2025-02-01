@@ -17,12 +17,11 @@ public class SonicMovement : MonoBehaviour
     public float speed;
     public float acceleration;
     public float deceleration;
-    public float rotationSpeed;
-    public float turnSpeed;
+    public float turnSpeed; // How fast the player can change direction while running
     public float jumpForce;
 
     [Header("JUMP RELATED")]
-    public float jumpCooldown;
+    public float jumpCooldown; // time to reset readyToJump
     private bool readyToJump;
     public float gravity;
     
@@ -31,13 +30,13 @@ public class SonicMovement : MonoBehaviour
     public float playerHeight;
     public float GroundStickingOffset = 1f;
     public RaycastHit surfaceHit;
-    public RaycastHit AlignmentHit;
 
     [Header("STATUS")]
     public bool grounded;
     public float horizontalInput;
     public float verticalInput;
     private Vector3 moveDirection;
+    public Vector3 horizontalVelocity;
 
     [Header("REFERENCES")]
     public Transform orientation;
@@ -56,7 +55,7 @@ public class SonicMovement : MonoBehaviour
     private void Update()
     {
         grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
-        transform.up = surfaceHit.normal;
+        transform.up = surfaceHit.normal; // rotate player so it matches the surface normal
         
         MyInput();
         StickPlayerToGround();
@@ -64,12 +63,14 @@ public class SonicMovement : MonoBehaviour
 
     private void MyInput()
     {
+        // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
-        // when to jump
+        // Jump when the player is on the ground and presses the jump key
         if(Input.GetKeyDown(jumpKey) && readyToJump && grounded)
         {
+            // The ground check is still true for a few frames after the jump, so this readyToJump check makes sure the player can't get another jump right after the first
             readyToJump = false;
             Jump();
             Invoke(nameof(ResetJump), jumpCooldown);
@@ -78,7 +79,7 @@ public class SonicMovement : MonoBehaviour
 
     private void Jump()
     {
-        // reset y velocity
+        // reset y velocity and apply upward impulse
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
     }
@@ -93,10 +94,12 @@ public class SonicMovement : MonoBehaviour
         // Only stick player to the ground when the player is on the ground
         if (!grounded || !readyToJump) {return;}
 
-        // This works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in slopes than in the ground. So when I put the model in, make sure it's good on slopes
+        // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
+        // If it's not, just make sure to scale the offset by an accurate 
+        
+        // Get the target position, which is right above the surface the player is standing on, stick the player to that positionn
         Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
 
-        // Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, rotationSpeed * Time.deltaTime);
         transform.position = targetPosition;
     }
     
@@ -114,7 +117,7 @@ public class SonicMovement : MonoBehaviour
         // Get surface normal based on grounding status
         Vector3 Surface = grounded ? surfaceHit.normal : Vector3.up;
     
-        // Apply movement on the slope by projecting onto the surface
+        // Apply movement on the slope by projecting onto the surface. In other words, get the move direction considering the surface the player is on
         Vector3 SurfaceAppliedDirection = Vector3.ProjectOnPlane(moveDirection, Surface);
 
         // Calculate target velocity
@@ -123,11 +126,21 @@ public class SonicMovement : MonoBehaviour
         // Smoothly rotate towards target velocity and apply acceleration or deceleration
         float rad = turnSpeed * Mathf.PI * Time.deltaTime;
         float appropriateAcceleration = moveDirection != Vector3.zero ? acceleration : deceleration;
-        
-        // Move our current velocity towards our desired velocity
-        Vector3 horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad,
-            appropriateAcceleration * Time.deltaTime);
 
+        float prevSpeed = horizontalVelocity.magnitude; // Store previous velocity
+        // Move our current velocity towards our desired velocity
+        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad, 
+            appropriateAcceleration * Time.deltaTime);
+        float currentSpeed = horizontalVelocity.magnitude; // Store current velocity
+        
+        // If we want to move, make sure the magnitude of the speed doesn't abruptly change. When entering different surfaces, the transition hindered the magnitude
+        // This check makes sure the speed is kept at where it's supposed to be
+        if (moveDirection != Vector3.zero)
+        {
+            horizontalVelocity.Normalize();
+            horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
+        }
+        
         // Preserve vertical velocity
         float verticalVelocity = rb.velocity.y;
 

@@ -4266,6 +4266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31ecec706c0695f4b8946a9042cf650b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeScale: 1
 --- !u!4 &663323177
 Transform:
   m_ObjectHideFlags: 0
@@ -14141,9 +14142,10 @@ MonoBehaviour:
   grounded: 0
   horizontalInput: 0
   verticalInput: 0
+  prevHorizontalVelocity: {x: 0, y: 0, z: 0}
+  horizontalVelocity: {x: 0, y: 0, z: 0}
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
-  GFX: {fileID: 1458668199}
 --- !u!1 &1576205938
 GameObject:
   m_ObjectHideFlags: 0
