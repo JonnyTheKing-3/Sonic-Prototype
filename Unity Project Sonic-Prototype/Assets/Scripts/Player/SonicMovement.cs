@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using Unity.VisualScripting.ReorderableList;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UIElements;
@@ -15,6 +16,8 @@ public class SonicMovement : MonoBehaviour
 
     [Header("VALUES FOR MOVEMENT")]
     public float speed;
+    public float GoingDownHillSpeed;
+    public float GoingUpHillSpeed;
     public float acceleration;
     public float deceleration;
     public float turnSpeed; // How fast the player can change direction while running
@@ -30,13 +33,20 @@ public class SonicMovement : MonoBehaviour
     public float playerHeight;
     public float GroundStickingOffset = 1f;
     public RaycastHit surfaceHit;
-
+    public float groundHeight;
+    public float airHeight;
+    
+    public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
+    
     [Header("STATUS")]
     public bool grounded;
     public float horizontalInput;
     public float verticalInput;
     private Vector3 moveDirection;
-    public Vector3 horizontalVelocity;
+    private Vector3 horizontalVelocity;
+    public float DesiredSpeed;
+    public SurfaceState surfaceState;
+    public SurfaceState lastSurfaceState;
 
     [Header("REFERENCES")]
     public Transform orientation;
@@ -50,12 +60,16 @@ public class SonicMovement : MonoBehaviour
 
         // initiating values
         readyToJump = true;
+        playerHeight = groundHeight;
     }
     
     private void Update()
     {
         grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
         transform.up = surfaceHit.normal; // rotate player so it matches the surface normal
+        
+        // Make the ray for ground info detection big if the player is on the ground. Otherwise, make it small so it doesn't snap the player to the ground
+        playerHeight = grounded ? groundHeight : airHeight;
         
         MyInput();
         StickPlayerToGround();
@@ -86,14 +100,13 @@ public class SonicMovement : MonoBehaviour
     
     private void ResetJump()
     {
+        playerHeight = airHeight;
         readyToJump = true;
     }
     
     private void StickPlayerToGround()
     {
-        // Only stick player to the ground when the player is on the ground
-        if (!grounded || !readyToJump) {return;}
-
+        if (!grounded || !readyToJump) { return;}
         // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
         // If it's not, just make sure to scale the offset by an accurate 
         
@@ -106,7 +119,7 @@ public class SonicMovement : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
-        // Debug.Log(rb.velocity.magnitude);
+        //Debug.Log(rb.velocity.magnitude);
     }
     
     private void MovePlayer()
@@ -120,8 +133,11 @@ public class SonicMovement : MonoBehaviour
         // Apply movement on the slope by projecting onto the surface. In other words, get the move direction considering the surface the player is on
         Vector3 SurfaceAppliedDirection = Vector3.ProjectOnPlane(moveDirection, Surface);
 
+        // Get the current surface, which also updates the desired speed (in the ground for now. Later I'll adjust air movement)
+        surfaceState = SurfacePlayerIsStandingOn();
+        
         // Calculate target velocity
-        Vector3 targetVelocity = SurfaceAppliedDirection.normalized * speed;
+        Vector3 targetVelocity = SurfaceAppliedDirection.normalized * DesiredSpeed;
 
         // Smoothly rotate towards target velocity and apply acceleration or deceleration
         float rad = turnSpeed * Mathf.PI * Time.deltaTime;
@@ -137,8 +153,50 @@ public class SonicMovement : MonoBehaviour
         // This check makes sure the speed is kept at where it's supposed to be
         if (moveDirection != Vector3.zero)
         {
-            horizontalVelocity.Normalize();
-            horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
+            if (surfaceState == lastSurfaceState)
+            {
+                switch (surfaceState)
+                {
+                    
+                    case SurfaceState.Flat:
+                        // If our current speed is greater than our surface desired speed, simply move towards it normally. Otherwise, always keep the max speed
+                        if (currentSpeed > DesiredSpeed)
+                        {
+                            horizontalVelocity.Normalize();
+                            horizontalVelocity *= currentSpeed;
+                        }
+                        else
+                        {
+                            horizontalVelocity.Normalize();
+                            horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
+                        }
+                        break;
+                
+                    case SurfaceState.GoingUpHill:
+                        if (currentSpeed > DesiredSpeed)
+                        {
+                            horizontalVelocity.Normalize();
+                            horizontalVelocity *= currentSpeed;
+                        }
+                        else
+                        {
+                            horizontalVelocity.Normalize();
+                            horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
+                        }
+                        break;
+                
+                    case SurfaceState.GoingDownHill:
+                        horizontalVelocity.Normalize();
+                        horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
+                        break;
+                }   
+            }
+            else
+            {
+                // Debug.Log("LAST: " + lastSurfaceState + " --- CURRENT: " + surfaceState);
+                horizontalVelocity.Normalize();
+                horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
+            }
         }
         
         // Preserve vertical velocity
@@ -148,7 +206,33 @@ public class SonicMovement : MonoBehaviour
         if (grounded && readyToJump) { verticalVelocity = 0f; }
         else { verticalVelocity += -gravity * Time.fixedDeltaTime;}
 
+        // Update last surface
+        lastSurfaceState = surfaceState;
+        
         // Combine horizontal and vertical velocity
         rb.velocity = horizontalVelocity + Vector3.up * verticalVelocity;
+    }
+
+    // Returns the surface the player is standing on based on surface and speed direction, as well as updates DesiredSpeed
+    private SurfaceState SurfacePlayerIsStandingOn()
+    {
+        if (!grounded) { DesiredSpeed = speed; return SurfaceState.Air; }
+
+        // Check the angle of the surface. 0 = flat surface, > 0 = slope
+        float angle = Vector3.Angle(transform.up, Vector3.up);
+        switch (angle)
+        {
+            case 0:
+                DesiredSpeed = speed;
+                return SurfaceState.Flat;
+            
+            case > 0:
+                // Check the direction the player is running in to see how they are running in the slope
+                if (rb.velocity.y > .01f) { DesiredSpeed = GoingUpHillSpeed; return SurfaceState.GoingUpHill; }
+                if (rb.velocity.y < -.01f) { DesiredSpeed = GoingDownHillSpeed; return SurfaceState.GoingDownHill; }
+                return SurfaceState.Flat;
+        }
+        
+        return SurfaceState.Flat;
     }
 }
