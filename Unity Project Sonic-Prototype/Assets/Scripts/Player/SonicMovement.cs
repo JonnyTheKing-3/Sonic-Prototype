@@ -40,6 +40,8 @@ public class SonicMovement : MonoBehaviour
     
     [Header("STATUS")]
     public bool grounded;
+    public bool groundIncoming;
+    public float groundIncomingRayOffset;
     public float horizontalInput;
     public float verticalInput;
     private Vector3 moveDirection;
@@ -65,8 +67,11 @@ public class SonicMovement : MonoBehaviour
     
     private void Update()
     {
+        groundIncoming = Physics.Raycast(transform.position + transform.forward * groundIncomingRayOffset, -transform.up, playerHeight, whatIsGround);
         grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
         transform.up = surfaceHit.normal; // rotate player so it matches the surface normal
+        
+        Debug.DrawRay(transform.position + transform.forward * groundIncomingRayOffset, -transform.up * 5f, Color.blue);
         
         // Make the ray for ground info detection big if the player is on the ground. Otherwise, make it small so it doesn't snap the player to the ground
         playerHeight = grounded ? groundHeight : airHeight;

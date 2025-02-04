@@ -15139,8 +15139,9 @@ MonoBehaviour:
   playerHeight: 1.1
   GroundStickingOffset: 1
   groundHeight: 6.5
-  airHeight: 1.1
+  airHeight: 1.4
   grounded: 0
+  LowRay: 0
   horizontalInput: 0
   verticalInput: 0
   DesiredSpeed: 0
