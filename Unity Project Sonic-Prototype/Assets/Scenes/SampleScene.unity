@@ -15137,10 +15137,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   playerHeight: 1.1
-  stickHeight: 6.5
   GroundStickingOffset: 1
+  groundHeight: 6.5
+  airHeight: 1.1
   grounded: 0
-  groundStick: 0
   horizontalInput: 0
   verticalInput: 0
   DesiredSpeed: 0
