@@ -29,24 +29,25 @@ public class SonicMovement : MonoBehaviour
     public float gravity;
     
     [Header("GROUND")]
+    public float surfaceHitRay;
+    public float groundStickingDistance;
+    public float distancePlayerToGround;
+    [Space]
     public LayerMask whatIsGround;
-    public float playerHeight;
     public float GroundStickingOffset = 1f;
     public RaycastHit surfaceHit;
-    public float groundHeight;
-    public float airHeight;
-    
+
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
     
     [Header("STATUS")]
     public bool grounded;
-    public bool groundIncoming;
-    public float groundIncomingRayOffset;
+    public bool rayHit;
     public float horizontalInput;
     public float verticalInput;
     private Vector3 moveDirection;
     private Vector3 horizontalVelocity;
     public float DesiredSpeed;
+    public float CurrentSpeedMagnitude;
     public SurfaceState surfaceState;
     public SurfaceState lastSurfaceState;
 
@@ -54,7 +55,6 @@ public class SonicMovement : MonoBehaviour
     public Transform orientation;
     public Rigidbody rb;
     
-
     private void Start()
     {
         // getting references
@@ -62,22 +62,11 @@ public class SonicMovement : MonoBehaviour
 
         // initiating values
         readyToJump = true;
-        playerHeight = groundHeight;
     }
     
     private void Update()
     {
-        groundIncoming = Physics.Raycast(transform.position + transform.forward * groundIncomingRayOffset, -transform.up, playerHeight, whatIsGround);
-        grounded = Physics.Raycast(transform.position, -transform.up, out surfaceHit, playerHeight, whatIsGround);
-        transform.up = surfaceHit.normal; // rotate player so it matches the surface normal
-        
-        Debug.DrawRay(transform.position + transform.forward * groundIncomingRayOffset, -transform.up * 5f, Color.blue);
-        
-        // Make the ray for ground info detection big if the player is on the ground. Otherwise, make it small so it doesn't snap the player to the ground
-        playerHeight = grounded ? groundHeight : airHeight;
-        
         MyInput();
-        StickPlayerToGround();
     }
 
     private void MyInput()
@@ -105,26 +94,45 @@ public class SonicMovement : MonoBehaviour
     
     private void ResetJump()
     {
-        playerHeight = airHeight;
         readyToJump = true;
+    }
+
+    private void FixedUpdate()
+    {
+        // Shoot a ray downwards and get the info of the surface it hits, assuming it hits a suface
+        rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
+        UpdateGroundedStatus(); // update ground state and distance from player to ground
+        
+        transform.up = grounded ? surfaceHit.normal : Vector3.up; // rotate the player towards the surface
+        if (grounded && readyToJump) { StickPlayerToGround(); }   
+
+        MovePlayer();
+        CurrentSpeedMagnitude = rb.velocity.magnitude;
+    }
+
+    private void UpdateGroundedStatus()
+    {
+        if (rayHit)
+        {
+            // Calculate the distance to the ground, and determine if the player is grounded
+            distancePlayerToGround = Vector3.Distance(transform.position, surfaceHit.point);
+            grounded = distancePlayerToGround <= groundStickingDistance;
+        }
+        else
+        {
+            grounded = false;
+        }
     }
     
     private void StickPlayerToGround()
     {
-        if (!grounded || !readyToJump) { return;}
         // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
         // If it's not, just make sure to scale the offset by an accurate 
         
-        // Get the target position, which is right above the surface the player is standing on, stick the player to that positionn
+        // Get the target position, which is right above the surface the player is standing on, stick the player to that position
         Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
 
         transform.position = targetPosition;
-    }
-    
-    private void FixedUpdate()
-    {
-        MovePlayer();
-        //Debug.Log(rb.velocity.magnitude);
     }
     
     private void MovePlayer()

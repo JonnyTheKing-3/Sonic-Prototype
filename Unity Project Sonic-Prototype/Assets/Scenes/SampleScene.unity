@@ -12068,7 +12068,7 @@ Transform:
   m_GameObject: {fileID: 1306131068}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 83.3, y: 174.3, z: -41.1}
+  m_LocalPosition: {x: 83.3, y: 181.4, z: -41.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15128,24 +15128,24 @@ MonoBehaviour:
   GoingDownHillSpeed: 210
   GoingUpHillSpeed: 115
   acceleration: 40
-  deceleration: 100
+  deceleration: 150
   turnSpeed: 5
   jumpForce: 30
   jumpCooldown: 0.5
   gravity: 50
+  surfaceHitRay: 10
+  groundStickingDistance: 2.5
+  distancePlayerToGround: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  playerHeight: 1.1
   GroundStickingOffset: 1
-  groundHeight: 6.5
-  airHeight: 1.4
   grounded: 0
-  groundIncoming: 0
-  groundIncomingRayOffset: 0
+  rayHit: 0
   horizontalInput: 0
   verticalInput: 0
   DesiredSpeed: 0
+  CurrentSpeedMagnitude: 0
   surfaceState: 0
   lastSurfaceState: 0
   orientation: {fileID: 1142633062}
