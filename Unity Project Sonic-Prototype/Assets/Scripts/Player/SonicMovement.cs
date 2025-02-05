@@ -18,15 +18,19 @@ public class SonicMovement : MonoBehaviour
     public float speed;
     public float GoingDownHillSpeed;
     public float GoingUpHillSpeed;
+    [Range(0,1)]public float airSpeedMultiplier;
     public float acceleration;
     public float deceleration;
     public float turnSpeed; // How fast the player can change direction while running
-    public float jumpForce;
 
     [Header("JUMP RELATED")]
+    public float jumpForce;
+    public float shortHopForce;
     public float jumpCooldown; // time to reset readyToJump
     private bool readyToJump;
     public float gravity;
+    public float TimeAllowedToPerformShortHop;
+    public bool ShortHopping = false;
     
     [Header("GROUND")]
     public float surfaceHitRay;
@@ -62,6 +66,7 @@ public class SonicMovement : MonoBehaviour
 
         // initiating values
         readyToJump = true;
+        ShortHopping = false;
     }
     
     private void Update()
@@ -76,20 +81,46 @@ public class SonicMovement : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
 
         // Jump when the player is on the ground and presses the jump key
-        if(Input.GetKeyDown(jumpKey) && readyToJump && grounded)
-        {
-            // The ground check is still true for a few frames after the jump, so this readyToJump check makes sure the player can't get another jump right after the first
-            readyToJump = false;
-            Jump();
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
+        if(Input.GetKeyDown(jumpKey) && readyToJump && grounded) { StartCoroutine(JumpRoutine()); }
     }
-
-    private void Jump()
+    
+    private IEnumerator JumpRoutine()
     {
+        // Record the start time.
+        float startTime = Time.time;
+        ShortHopping = false; // reset short hopping just in case
+    
+        // Run a timer. If the player releases the jump key before the timer is done, they want to short hop. Otherwise, they want to full hop
+        while (Time.time - startTime < TimeAllowedToPerformShortHop)
+        {
+            if (Input.GetKeyUp(jumpKey))
+            {
+                ShortHopping = true;
+                break;
+            }
+            yield return null;
+        }
+    
+        /*
+            * The ground check is still true for a few frames after the jump
+            * so this readyToJump check makes sure the player can't get another jump
+            * a few moments after the first
+           */
+        readyToJump = false;
+        Jump(ShortHopping);     // Call jump knowing if we're gonna full hop or short hop
+    
+        // Wait for jump cooldown before allowing the next jump.
+        yield return new WaitForSeconds(jumpCooldown);
+        ResetJump();
+    }
+    
+    private void Jump(bool ShortHop)
+    {
+        float forceToUse = ShortHop ? shortHopForce : jumpForce;
+        
         // reset y velocity and apply upward impulse
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(transform.up * forceToUse, ForceMode.Impulse);
     }
     
     private void ResetJump()
@@ -99,13 +130,14 @@ public class SonicMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Shoot a ray downwards and get the info of the surface it hits, assuming it hits a suface
+        // Shoot a ray downwards and get the info of the surface it hits, assuming it hits a suface and update ground state and distance from player to ground
         rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
-        UpdateGroundedStatus(); // update ground state and distance from player to ground
-        
+        UpdateGroundedStatus();
         transform.up = grounded ? surfaceHit.normal : Vector3.up; // rotate the player towards the surface
-        if (grounded && readyToJump) { StickPlayerToGround(); }   
-
+        
+        // reset short hopping and stick the player to the ground if they are in the ground
+        if (grounded && readyToJump) { ShortHopping = false; StickPlayerToGround(); }
+        
         MovePlayer();
         CurrentSpeedMagnitude = rb.velocity.magnitude;
     }
@@ -148,6 +180,9 @@ public class SonicMovement : MonoBehaviour
 
         // Get the current surface, which also updates the desired speed (in the ground for now. Later I'll adjust air movement)
         surfaceState = SurfacePlayerIsStandingOn();
+
+        // If the player is in the air, slow down the speed. Also, reward the player if they short hopped by letting them keep there speed
+        DesiredSpeed = grounded || ShortHopping ? DesiredSpeed : DesiredSpeed * airSpeedMultiplier;
         
         // Calculate target velocity
         Vector3 targetVelocity = SurfaceAppliedDirection.normalized * DesiredSpeed;

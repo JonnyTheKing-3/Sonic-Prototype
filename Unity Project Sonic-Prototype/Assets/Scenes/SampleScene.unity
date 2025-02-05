@@ -15487,12 +15487,16 @@ MonoBehaviour:
   speed: 150
   GoingDownHillSpeed: 210
   GoingUpHillSpeed: 115
+  airSpeedMultiplier: 0.7
   acceleration: 40
   deceleration: 170
   turnSpeed: 5
   jumpForce: 30
+  shortHopForce: 15
   jumpCooldown: 0.5
   gravity: 50
+  TimeAllowedToPerformShortHop: 0.058
+  ShortHopping: 0
   surfaceHitRay: 10
   groundStickingDistance: 2
   distancePlayerToGround: 0
