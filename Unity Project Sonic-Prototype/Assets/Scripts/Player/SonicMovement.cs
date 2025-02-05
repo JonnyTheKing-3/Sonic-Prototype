@@ -26,16 +26,13 @@ public class SonicMovement : MonoBehaviour
     [Header("JUMP RELATED")]
     public float jumpForce;
     public float shortHopForce;
-    public float jumpCooldown; // time to reset readyToJump
-    private bool readyToJump;
-    public float gravity;
     public float TimeAllowedToPerformShortHop;  //.058 (2-5 frames) is around the average time for most games
-    public bool ShortHopping = false;
+    public float jumpCooldown; // time to reset readyToJump
+    public float gravity;
     
     [Header("GROUND")]
     public float surfaceHitRay;
     public float groundStickingDistance;
-    public float distancePlayerToGround;
     [Space]
     public LayerMask whatIsGround;
     public float GroundStickingOffset = 1f;
@@ -46,6 +43,9 @@ public class SonicMovement : MonoBehaviour
     [Header("STATUS")]
     public bool grounded;
     public bool rayHit;
+    public bool ShortHopping = false;
+    private bool readyToJump;
+    public float distancePlayerToGround;
     public float horizontalInput;
     public float verticalInput;
     private Vector3 moveDirection;
