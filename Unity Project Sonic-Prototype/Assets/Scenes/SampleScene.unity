@@ -15128,7 +15128,7 @@ MonoBehaviour:
   GoingDownHillSpeed: 210
   GoingUpHillSpeed: 115
   acceleration: 40
-  deceleration: 150
+  deceleration: 170
   turnSpeed: 5
   jumpForce: 30
   jumpCooldown: 0.5
