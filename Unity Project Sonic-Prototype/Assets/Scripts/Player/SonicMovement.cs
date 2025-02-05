@@ -29,7 +29,7 @@ public class SonicMovement : MonoBehaviour
     public float jumpCooldown; // time to reset readyToJump
     private bool readyToJump;
     public float gravity;
-    public float TimeAllowedToPerformShortHop;
+    public float TimeAllowedToPerformShortHop;  //.058 (2-5 frames) is around the average time for most games
     public bool ShortHopping = false;
     
     [Header("GROUND")]
@@ -114,9 +114,9 @@ public class SonicMovement : MonoBehaviour
         ResetJump();
     }
     
-    private void Jump(bool ShortHop)
+    private void Jump(bool shortHop)
     {
-        float forceToUse = ShortHop ? shortHopForce : jumpForce;
+        float forceToUse = shortHop ? shortHopForce : jumpForce;
         
         // reset y velocity and apply upward impulse
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
