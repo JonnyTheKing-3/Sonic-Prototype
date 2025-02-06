@@ -18,7 +18,7 @@ public class SonicMovement : MonoBehaviour
     public float speed;
     public float GoingDownHillSpeed;
     public float GoingUpHillSpeed;
-    [Range(0,1)]public float airSpeedMultiplier;
+    [Range(0,2)]public float airSpeedMultiplier;
     public float acceleration;
     public float deceleration;
     public float turnSpeed; // How fast the player can change direction while running
@@ -26,9 +26,14 @@ public class SonicMovement : MonoBehaviour
     [Header("JUMP RELATED")]
     public float jumpForce;
     public float shortHopForce;
+    public float gravity;
     public float TimeAllowedToPerformShortHop;  //.058 (2-5 frames) is around the average time for most games
     public float jumpCooldown; // time to reset readyToJump
-    public float gravity;
+    [Range(0,1)]public float blendFactorJumpingUpHill = .5f;
+    [Space] // below is for jump locking
+    public float jumpIgnoreDuration = 0.15f;
+    private float jumpStartTime;
+    private Vector3 jumpNormal;
     
     [Header("GROUND")]
     public float surfaceHitRay;
@@ -44,7 +49,8 @@ public class SonicMovement : MonoBehaviour
     public bool grounded;
     public bool rayHit;
     public bool ShortHopping = false;
-    private bool readyToJump;
+    public bool readyToJump;
+    public bool DecidingHowToJump = false;
     public float distancePlayerToGround;
     public float horizontalInput;
     public float verticalInput;
@@ -58,7 +64,7 @@ public class SonicMovement : MonoBehaviour
     [Header("REFERENCES")]
     public Transform orientation;
     public Rigidbody rb;
-    
+
     private void Start()
     {
         // getting references
@@ -86,6 +92,9 @@ public class SonicMovement : MonoBehaviour
     
     private IEnumerator JumpRoutine()
     {
+        // Process to know how the player wants to jump has started
+        DecidingHowToJump = true;
+        
         // Record the start time.
         float startTime = Time.time;
         ShortHopping = false; // reset short hopping just in case
@@ -106,7 +115,6 @@ public class SonicMovement : MonoBehaviour
             * so this readyToJump check makes sure the player can't get another jump
             * a few moments after the first
            */
-        readyToJump = false;
         Jump(ShortHopping);     // Call jump knowing if we're gonna full hop or short hop
     
         // Wait for jump cooldown before allowing the next jump.
@@ -118,11 +126,34 @@ public class SonicMovement : MonoBehaviour
     {
         float forceToUse = shortHop ? shortHopForce : jumpForce;
         
-        // reset y velocity and apply upward impulse
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-        rb.AddForce(transform.up * forceToUse, ForceMode.Impulse);
-    }
+        // Record the ground normal at the moment of jump
+        jumpNormal = surfaceHit.normal;
+        jumpStartTime = Time.time;
+
+        // Remove any velocity component in the jump direction.
+        // This prevents any unwanted buildup from the ground movement.
+        Vector3 velocityWithoutJumpComponent = Vector3.ProjectOnPlane(rb.velocity, jumpNormal);
+        rb.velocity = velocityWithoutJumpComponent;
+
+        // mark as not grounded so that the ground adjustments in FixedUpdate won’t interfere with the jump.
+        grounded = false;
     
+        // Reset jump state and apply force along the stored jump normal
+        grounded = false;
+        readyToJump = false;
+        DecidingHowToJump = false;
+        
+        // If moving upward (e.g. running uphill), blend the jump direction toward world up to be able to make jumps bigger and cooler
+        Vector3 jumpDirection = jumpNormal;
+        if (surfaceState == SurfaceState.GoingUpHill)
+        {
+            // Adjust the blend factor (0.5f) to taste.
+            jumpDirection = Vector3.Lerp(jumpNormal, Vector3.up, blendFactorJumpingUpHill);
+        }
+        
+        rb.AddForce(jumpDirection * forceToUse, ForceMode.Impulse);
+    }
+
     private void ResetJump()
     {
         readyToJump = true;
@@ -130,13 +161,41 @@ public class SonicMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Shoot a ray downwards and get the info of the surface it hits, assuming it hits a suface and update ground state and distance from player to ground
-        rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
-        UpdateGroundedStatus();
-        transform.up = grounded ? surfaceHit.normal : Vector3.up; // rotate the player towards the surface
+        /*
+         * With this check, we make sure that when the player jumps,
+         * the vertical velocity in move-player doesn't interfere with the jump.
+         * We make ground false for a small fraction, that way, the vertical velcoity
+         * doesn't get affected by the few frames the character remains in grounded after jumping
+        */
+        if (Time.time - jumpStartTime < jumpIgnoreDuration)
+        {
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit surfaceBelow, surfaceHitRay, whatIsGround))
+            {
+                grounded = surfaceBelow.normal != jumpNormal;
+            }
+            else
+            {
+                Debug.Log("ELSE CASE");
+                readyToJump = true;
+                jumpStartTime = jumpIgnoreDuration;
+            }
+        }
+        else
+        {
+            // Otherwise, perform the raycast and update grounded status normally.
+            rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
+            UpdateGroundedStatus();
+        }
+        
+        transform.up = grounded ? surfaceHit.normal : Vector3.up;
         
         // reset short hopping and stick the player to the ground if they are in the ground
-        if (grounded && readyToJump) { ShortHopping = false; StickPlayerToGround(); }
+        if (grounded && readyToJump)
+        {
+            DecidingHowToJump = false; 
+            ShortHopping = false; 
+            StickPlayerToGround();
+        }
         
         MovePlayer();
         CurrentSpeedMagnitude = rb.velocity.magnitude;
@@ -251,14 +310,14 @@ public class SonicMovement : MonoBehaviour
         float verticalVelocity = rb.velocity.y;
 
         // If grounded, reset vertical velocity. Otherwise, apply gravity to it
-        if (grounded && readyToJump) { verticalVelocity = 0f; }
+        if (grounded && readyToJump)  { verticalVelocity = 0f; }
         else { verticalVelocity += -gravity * Time.fixedDeltaTime;}
 
         // Update last surface
         lastSurfaceState = surfaceState;
         
         // Combine horizontal and vertical velocity
-        rb.velocity = horizontalVelocity + Vector3.up * verticalVelocity;
+        rb.velocity = horizontalVelocity + transform.up * verticalVelocity;
     }
 
     // Returns the surface the player is standing on based on surface and speed direction, as well as updates DesiredSpeed
