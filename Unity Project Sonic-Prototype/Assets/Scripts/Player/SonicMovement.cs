@@ -169,13 +169,17 @@ public class SonicMovement : MonoBehaviour
         */
         if (Time.time - jumpStartTime < jumpIgnoreDuration)
         {
+            Debug.DrawRay(transform.position, Vector3.down * 5f, Color.red);
             if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit surfaceBelow, surfaceHitRay, whatIsGround))
             {
-                grounded = surfaceBelow.normal != jumpNormal;
+                if (surfaceBelow.normal != jumpNormal)
+                {
+                    readyToJump = true;
+                    jumpStartTime = jumpIgnoreDuration;
+                }
             }
             else
             {
-                Debug.Log("ELSE CASE");
                 readyToJump = true;
                 jumpStartTime = jumpIgnoreDuration;
             }
