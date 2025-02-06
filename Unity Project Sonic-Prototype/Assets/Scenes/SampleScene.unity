@@ -15619,7 +15619,7 @@ MonoBehaviour:
   blendFactorJumpingUpHill: 0.5
   jumpIgnoreDuration: 0.15
   surfaceHitRay: 10
-  groundStickingDistance: 2
+  groundStickingDistance: 2.5
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
