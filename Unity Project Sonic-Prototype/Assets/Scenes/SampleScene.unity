@@ -15540,6 +15540,7 @@ GameObject:
   - component: {fileID: 1575560302}
   - component: {fileID: 1575560305}
   - component: {fileID: 1575560304}
+  - component: {fileID: 1575560306}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -15616,11 +15617,10 @@ MonoBehaviour:
   shortHopForce: 30
   gravity: 70
   TimeAllowedToPerformShortHop: 0.058
-  jumpCooldown: 0.5
   blendFactorJumpingUpHill: 0.5
+  blendFactorJumpingDownHill: 0.85
+  jumpCooldown: 0.15
   jumpIgnoreDuration: 0.15
-  MinAngDiffDetectGroundAfterJump: 50
-  safeDistance: 30
   surfaceHitRay: 10
   groundStickingDistance: 2.5
   whatIsGround:
@@ -15646,6 +15646,30 @@ MonoBehaviour:
   movementState: 0
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
+  triggerColliderForJumpTime: {fileID: 1575560306}
+--- !u!136 &1575560306
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575560301}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.6
+  m_Height: 1.985069
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.007465363, z: 0}
 --- !u!1 &1576205938
 GameObject:
   m_ObjectHideFlags: 0

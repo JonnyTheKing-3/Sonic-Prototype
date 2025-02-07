@@ -29,16 +29,14 @@ public class SonicMovement : MonoBehaviour
     public float shortHopForce;
     public float gravity;
     public float TimeAllowedToPerformShortHop;  //.058 (2-5 frames) is around the average time for most games
-    public float jumpCooldown; // time to reset readyToJump
     [Range(0,1)]public float blendFactorJumpingUpHill = .5f;
+    [Range(0,1)]public float blendFactorJumpingDownHill = .3f;
+    public float jumpCooldown; // time to reset readyToJump
     [Space] // below is for jump locking
     public float jumpIgnoreDuration = 0.15f;
-    public float MinAngDiffDetectGroundAfterJump;
-    public float safeDistance;
     private float jumpStartTime;
     private Vector3 jumpNormal;
-    private Vector3 LastNormalForJumpTimer;
-    
+
     [Header("GROUND")]
     public float surfaceHitRay;
     public float groundStickingDistance;
@@ -62,6 +60,7 @@ public class SonicMovement : MonoBehaviour
     public bool rayHit;
     public bool ShortHopping = false;
     public bool readyToJump;
+    public bool inIgnoreGroundJumpTime = false;
     public bool CanHomingAttack = false;
     public float distancePlayerToGround;
     public float horizontalInput;
@@ -78,6 +77,7 @@ public class SonicMovement : MonoBehaviour
     [Header("REFERENCES")]
     public Transform orientation;
     public Rigidbody rb;
+    public CapsuleCollider triggerColliderForJumpTime;  // During ignore grounding while jumping, if the ground touches this collider, turn grounding back on
 
     private void Start()
     {
@@ -89,6 +89,9 @@ public class SonicMovement : MonoBehaviour
         ShortHopping = false;
         CanHomingAttack = true;
         movementState = MovementState.Regular;
+        triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
+        triggerColliderForJumpTime.enabled = false;
+        jumpStartTime = -jumpIgnoreDuration;
     }
     
     private void Update()
@@ -143,6 +146,48 @@ public class SonicMovement : MonoBehaviour
         yield return new WaitForSeconds(jumpCooldown);
         ResetJump();
     }
+
+    private Vector3 jumpOrigin;
+    private void Jump(bool shortHop)
+    {
+        jumpOrigin = transform.position;
+        float forceToUse = shortHop ? shortHopForce : jumpForce;
+        
+        // Record the ground normal at the moment of jump
+        jumpNormal = surfaceHit.normal;
+        Debug.Log(jumpNormal);
+        jumpStartTime = Time.time;
+
+        // Remove any velocity component in the jump direction.
+        // This prevents any unwanted buildup from the ground movement.
+        Vector3 velocityWithoutJumpComponent = Vector3.ProjectOnPlane(rb.velocity, jumpNormal);
+        rb.velocity = velocityWithoutJumpComponent;
+
+        // mark as not grounded so that the ground adjustments in FixedUpdate won’t interfere with the jump.
+        grounded = false;
+        readyToJump = false;
+        triggerColliderForJumpTime.enabled = true;
+        
+        // If moving upward (e.g. running uphill), blend the jump direction toward world up to be able to make jumps bigger and cooler
+        Vector3 jumpDirection = jumpNormal;
+        if (surfaceState == SurfaceState.GoingUpHill)
+        {
+            // Adjust the blend factor (0.5f) to taste.
+            jumpDirection = Vector3.Lerp(jumpNormal, Vector3.up, blendFactorJumpingUpHill);
+        }
+        else if (surfaceState == SurfaceState.GoingDownHill)
+        {
+            // Adjust the blend factor (0.5f) to taste.
+            jumpDirection = Vector3.Lerp(jumpNormal, Vector3.up, blendFactorJumpingDownHill);
+        }
+        
+        rb.AddForce(jumpDirection * forceToUse, ForceMode.Impulse);
+    }
+
+    private void ResetJump()
+    {
+        readyToJump = true;
+    }
     
     private bool CheckForHomingAttack()
     {
@@ -159,80 +204,26 @@ public class SonicMovement : MonoBehaviour
         // If everything above passed, then we can homing attack
         return true;
     }
-    
-    private Vector3 jumpOrigin;
-    private void Jump(bool shortHop)
-    {
-        jumpOrigin = transform.position;
-        float forceToUse = shortHop ? shortHopForce : jumpForce;
-        
-        // Record the ground normal at the moment of jump
-        jumpNormal = surfaceHit.normal;
-        LastNormalForJumpTimer = surfaceHit.normal;
-        jumpStartTime = Time.time;
-
-        // Remove any velocity component in the jump direction.
-        // This prevents any unwanted buildup from the ground movement.
-        Vector3 velocityWithoutJumpComponent = Vector3.ProjectOnPlane(rb.velocity, jumpNormal);
-        rb.velocity = velocityWithoutJumpComponent;
-
-        // mark as not grounded so that the ground adjustments in FixedUpdate won’t interfere with the jump.
-        grounded = false;
-        readyToJump = false;
-
-        // If moving upward (e.g. running uphill), blend the jump direction toward world up to be able to make jumps bigger and cooler
-        Vector3 jumpDirection = jumpNormal;
-        if (surfaceState == SurfaceState.GoingUpHill)
-        {
-            // Adjust the blend factor (0.5f) to taste.
-            jumpDirection = Vector3.Lerp(jumpNormal, Vector3.up, blendFactorJumpingUpHill);
-        }
-        
-        rb.AddForce(jumpDirection * forceToUse, ForceMode.Impulse);
-    }
-
-    private void ResetJump()
-    {
-        readyToJump = true;
-    }
 
     private void FixedUpdate()
     {
         /*
          * With this check, we make sure that when the player jumps,
          * the vertical velocity in move-player doesn't interfere with the jump.
-         * We make ground false for a small fraction, that way, the vertical velcoity
+         * We keep ground at false briefly, so the vertical velocity
          * doesn't get affected by the few frames the character remains in grounded after jumping
         */
-        if (Time.time - jumpStartTime < jumpIgnoreDuration)
+        if (Time.time - jumpStartTime >= jumpIgnoreDuration)
         {
-            /*
-             * Lastly, we check if the surface below the player is any different than the one the player started in.
-             * If it is, we no longer need the window of ignoring grounded.
-             * This is also done to prevent bouncing off a surface. When the player jumps, readyToJump becomes false.
-             * So if this window closes, and we can detect ground again, readyToJump will stay false, so the the player won't stick to the ground,
-             * making the character bounce because of collision, rather than sticking to the ground.
-            */
-            float distanceSinceJump = Vector3.Distance(jumpOrigin, transform.position);
-            if (distanceSinceJump > safeDistance)
-            {
-                // Now it’s safe to re-enable ground sticking even if the surface below is angled differently.
-                jumpStartTime = Time.time - jumpIgnoreDuration;
-                readyToJump = true;
-                
-                // Update ground status as needed
-                rayHit = Physics.Raycast(transform.position, Vector3.down, out surfaceHit, surfaceHitRay, whatIsGround);
-                UpdateGroundedStatus();
-            }
-        }
-        // If we're not in the ground-jump ignore time, proceed as normally
-        else
-        {
+            // If we're not in the ground-jump ignore time, proceed as normally
             // Get ground info and status
+            inIgnoreGroundJumpTime = false;
+            triggerColliderForJumpTime.enabled = false;
             rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
             UpdateGroundedStatus();
         }
-        
+        else{ inIgnoreGroundJumpTime = true;}
+
         transform.up = grounded ? surfaceHit.normal : Vector3.up;
         
         // reset short hopping and stick the player to the ground if they are in the ground
@@ -400,5 +391,21 @@ public class SonicMovement : MonoBehaviour
         Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
 
         transform.position = targetPosition;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        triggerColliderForJumpTime.enabled = false;
+        
+        // Check if the colliding object's layer is in the whatIsGround LayerMask.
+        // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
+        if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
+        {
+            Debug.Log("Touched ground during jump time");
+            jumpStartTime = jumpIgnoreDuration;
+            readyToJump = true;
+            rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
+            UpdateGroundedStatus();
+        }
     }
 }
