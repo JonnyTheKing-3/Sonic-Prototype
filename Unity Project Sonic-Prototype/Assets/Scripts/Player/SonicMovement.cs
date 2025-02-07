@@ -13,6 +13,7 @@ public class SonicMovement : MonoBehaviour
 {
     [Header("INPUTS")]
     public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode homingAttackKey = KeyCode.C;
 
     [Header("VALUES FOR MOVEMENT")]
     public float speed;
@@ -32,8 +33,11 @@ public class SonicMovement : MonoBehaviour
     [Range(0,1)]public float blendFactorJumpingUpHill = .5f;
     [Space] // below is for jump locking
     public float jumpIgnoreDuration = 0.15f;
+    public float MinAngDiffDetectGroundAfterJump;
+    public float safeDistance;
     private float jumpStartTime;
     private Vector3 jumpNormal;
+    private Vector3 LastNormalForJumpTimer;
     
     [Header("GROUND")]
     public float surfaceHitRay;
@@ -43,14 +47,22 @@ public class SonicMovement : MonoBehaviour
     public float GroundStickingOffset = 1f;
     public RaycastHit surfaceHit;
 
-    public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
+    [Header("HOMING ATTACK")]
+    public float homingSpeed;
+    public float ImpulseAfterAttack;
+    public float homingAttackDistance;
+    private Vector3 StartPosition;
+    private Vector3 EndPosition;
     
+    public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
+    public enum MovementState { Regular, HomingAttacking, Spindashing }
+
     [Header("STATUS")]
     public bool grounded;
     public bool rayHit;
     public bool ShortHopping = false;
     public bool readyToJump;
-    public bool DecidingHowToJump = false;
+    public bool CanHomingAttack = false;
     public float distancePlayerToGround;
     public float horizontalInput;
     public float verticalInput;
@@ -58,8 +70,10 @@ public class SonicMovement : MonoBehaviour
     private Vector3 horizontalVelocity;
     public float DesiredSpeed;
     public float CurrentSpeedMagnitude;
+    public Vector3 LastSpeedDirection; // Used for homing attack
     public SurfaceState surfaceState;
     public SurfaceState lastSurfaceState;
+    public MovementState movementState;
 
     [Header("REFERENCES")]
     public Transform orientation;
@@ -73,6 +87,8 @@ public class SonicMovement : MonoBehaviour
         // initiating values
         readyToJump = true;
         ShortHopping = false;
+        CanHomingAttack = true;
+        movementState = MovementState.Regular;
     }
     
     private void Update()
@@ -88,13 +104,19 @@ public class SonicMovement : MonoBehaviour
 
         // Jump when the player is on the ground and presses the jump key
         if(Input.GetKeyDown(jumpKey) && readyToJump && grounded) { StartCoroutine(JumpRoutine()); }
+        
+        // Perform a homing attack if the player pressed the homing attack key and can homing attack
+        CanHomingAttack = CheckForHomingAttack();
+        if (CanHomingAttack && Input.GetKeyDown(homingAttackKey))
+        {
+            // Debug.Log("Pressed for a homing attack");
+            movementState = MovementState.HomingAttacking;
+        }
+        
     }
     
     private IEnumerator JumpRoutine()
     {
-        // Process to know how the player wants to jump has started
-        DecidingHowToJump = true;
-        
         // Record the start time.
         float startTime = Time.time;
         ShortHopping = false; // reset short hopping just in case
@@ -122,12 +144,31 @@ public class SonicMovement : MonoBehaviour
         ResetJump();
     }
     
+    private bool CheckForHomingAttack()
+    {
+        // We can't do a homing attack from the ground
+        // Debug.DrawRay(transform.position, (orientation.forward).normalized * homingAttackDistance, Color.red);
+        if (grounded) {return false;}
+        
+        
+        // Check if there is any object in homing attack view
+        // Physics.bo
+        
+        // Check if there is any object in homing attack distance
+
+        // If everything above passed, then we can homing attack
+        return true;
+    }
+    
+    private Vector3 jumpOrigin;
     private void Jump(bool shortHop)
     {
+        jumpOrigin = transform.position;
         float forceToUse = shortHop ? shortHopForce : jumpForce;
         
         // Record the ground normal at the moment of jump
         jumpNormal = surfaceHit.normal;
+        LastNormalForJumpTimer = surfaceHit.normal;
         jumpStartTime = Time.time;
 
         // Remove any velocity component in the jump direction.
@@ -137,12 +178,8 @@ public class SonicMovement : MonoBehaviour
 
         // mark as not grounded so that the ground adjustments in FixedUpdate won’t interfere with the jump.
         grounded = false;
-    
-        // Reset jump state and apply force along the stored jump normal
-        grounded = false;
         readyToJump = false;
-        DecidingHowToJump = false;
-        
+
         // If moving upward (e.g. running uphill), blend the jump direction toward world up to be able to make jumps bigger and cooler
         Vector3 jumpDirection = jumpNormal;
         if (surfaceState == SurfaceState.GoingUpHill)
@@ -169,24 +206,29 @@ public class SonicMovement : MonoBehaviour
         */
         if (Time.time - jumpStartTime < jumpIgnoreDuration)
         {
-            Debug.DrawRay(transform.position, Vector3.down * 5f, Color.red);
-            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit surfaceBelow, surfaceHitRay, whatIsGround))
+            /*
+             * Lastly, we check if the surface below the player is any different than the one the player started in.
+             * If it is, we no longer need the window of ignoring grounded.
+             * This is also done to prevent bouncing off a surface. When the player jumps, readyToJump becomes false.
+             * So if this window closes, and we can detect ground again, readyToJump will stay false, so the the player won't stick to the ground,
+             * making the character bounce because of collision, rather than sticking to the ground.
+            */
+            float distanceSinceJump = Vector3.Distance(jumpOrigin, transform.position);
+            if (distanceSinceJump > safeDistance)
             {
-                if (surfaceBelow.normal != jumpNormal)
-                {
-                    readyToJump = true;
-                    jumpStartTime = jumpIgnoreDuration;
-                }
-            }
-            else
-            {
+                // Now it’s safe to re-enable ground sticking even if the surface below is angled differently.
+                jumpStartTime = Time.time - jumpIgnoreDuration;
                 readyToJump = true;
-                jumpStartTime = jumpIgnoreDuration;
+                
+                // Update ground status as needed
+                rayHit = Physics.Raycast(transform.position, Vector3.down, out surfaceHit, surfaceHitRay, whatIsGround);
+                UpdateGroundedStatus();
             }
         }
+        // If we're not in the ground-jump ignore time, proceed as normally
         else
         {
-            // Otherwise, perform the raycast and update grounded status normally.
+            // Get ground info and status
             rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
             UpdateGroundedStatus();
         }
@@ -194,42 +236,24 @@ public class SonicMovement : MonoBehaviour
         transform.up = grounded ? surfaceHit.normal : Vector3.up;
         
         // reset short hopping and stick the player to the ground if they are in the ground
-        if (grounded && readyToJump)
+        if (grounded && readyToJump) { ShortHopping = false; StickPlayerToGround(); }
+
+        // Move the player based on the player state
+        switch (movementState)
         {
-            DecidingHowToJump = false; 
-            ShortHopping = false; 
-            StickPlayerToGround();
+            case MovementState.Regular:
+                MovePlayer();
+                break;
+            case MovementState.HomingAttacking:
+                HomingAttack();
+                break;
         }
-        
-        MovePlayer();
+
+        // Keep track os speed and direction
         CurrentSpeedMagnitude = rb.velocity.magnitude;
+        if (moveDirection != Vector3.zero) { LastSpeedDirection = new Vector3(moveDirection.x, 0f, moveDirection.z); }
     }
 
-    private void UpdateGroundedStatus()
-    {
-        if (rayHit)
-        {
-            // Calculate the distance to the ground, and determine if the player is grounded
-            distancePlayerToGround = Vector3.Distance(transform.position, surfaceHit.point);
-            grounded = distancePlayerToGround <= groundStickingDistance;
-        }
-        else
-        {
-            grounded = false;
-        }
-    }
-    
-    private void StickPlayerToGround()
-    {
-        // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
-        // If it's not, just make sure to scale the offset by an accurate 
-        
-        // Get the target position, which is right above the surface the player is standing on, stick the player to that position
-        Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
-
-        transform.position = targetPosition;
-    }
-    
     private void MovePlayer()
     {
         // Calculate move direction based on input and camera orientation
@@ -304,7 +328,6 @@ public class SonicMovement : MonoBehaviour
             }
             else
             {
-                // Debug.Log("LAST: " + lastSurfaceState + " --- CURRENT: " + surfaceState);
                 horizontalVelocity.Normalize();
                 horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
             }
@@ -345,5 +368,37 @@ public class SonicMovement : MonoBehaviour
         }
         
         return SurfaceState.Flat;
+    }
+
+    private void HomingAttack()
+    {
+        //Debug.Log("Was In Homing Attack");
+        movementState = MovementState.Regular;
+        //Debug.Log(movementState);
+    }
+
+    private void UpdateGroundedStatus()
+    {
+        if (rayHit)
+        {
+            // Calculate the distance to the ground, and determine if the player is grounded
+            distancePlayerToGround = Vector3.Distance(transform.position, surfaceHit.point);
+            grounded = distancePlayerToGround <= groundStickingDistance;
+        }
+        else
+        {
+            grounded = false;
+        }
+    }
+    
+    private void StickPlayerToGround()
+    {
+        // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
+        // If it's not, just make sure to scale the offset by an accurate 
+        
+        // Get the target position, which is right above the surface the player is standing on, stick the player to that position
+        Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
+
+        transform.position = targetPosition;
     }
 }

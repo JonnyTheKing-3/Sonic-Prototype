@@ -10929,7 +10929,7 @@ GameObject:
   m_Layer: 0
   m_Name: orientation
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -15604,6 +15604,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpKey: 32
+  homingAttackKey: 99
   speed: 150
   GoingDownHillSpeed: 210
   GoingUpHillSpeed: 115
@@ -15618,24 +15619,31 @@ MonoBehaviour:
   jumpCooldown: 0.5
   blendFactorJumpingUpHill: 0.5
   jumpIgnoreDuration: 0.15
+  MinAngDiffDetectGroundAfterJump: 50
+  safeDistance: 30
   surfaceHitRay: 10
   groundStickingDistance: 2.5
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
   GroundStickingOffset: 1
+  homingSpeed: 0
+  ImpulseAfterAttack: 0
+  homingAttackDistance: 10
   grounded: 0
   rayHit: 0
   ShortHopping: 0
   readyToJump: 0
-  DecidingHowToJump: 0
+  CanHomingAttack: 0
   distancePlayerToGround: 0
   horizontalInput: 0
   verticalInput: 0
   DesiredSpeed: 0
   CurrentSpeedMagnitude: 0
+  LastSpeedDirection: {x: 0, y: 0, z: 0}
   surfaceState: 0
   lastSurfaceState: 0
+  movementState: 0
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
 --- !u!1 &1576205938
