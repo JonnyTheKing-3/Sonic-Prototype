@@ -47,11 +47,16 @@ public class SonicMovement : MonoBehaviour
 
     [Header("HOMING ATTACK")]
     public float homingSpeed;
+    public float NoTargethomingSpeed;
     public float ImpulseAfterAttack;
+    public float ImpulseAfterAttackStrongMomentum;
+    public float ImpulseAfterAttackWeakMomentum;
     public float homingAttackDistance;
-    private Vector3 StartPosition;
-    private Vector3 EndPosition;
-    
+    [SerializeField] private LayerMask HomingAttackLayer;
+    [SerializeField] private float PlayerDistWeight = 1f;       // How strongly the distance from the player affects it's standing in being the target for a homing attack
+    [SerializeField] private float CameraCenterDistWeight = 1f; // How strongly the distance from the cener of the camera affects it's standing in being the target for a homing attack
+    [SerializeField] private Transform Target;  // Homing Attack target
+
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
     public enum MovementState { Regular, HomingAttacking, Spindashing }
 
@@ -78,17 +83,19 @@ public class SonicMovement : MonoBehaviour
     public Transform orientation;
     public Rigidbody rb;
     public CapsuleCollider triggerColliderForJumpTime;  // During ignore grounding while jumping, if the ground touches this collider, turn grounding back on
-
+    public Camera cam;
+    
     private void Start()
     {
         // getting references
         rb = GetComponent<Rigidbody>();
 
         // initiating values
-        readyToJump = true;
-        ShortHopping = false;
-        CanHomingAttack = true;
         movementState = MovementState.Regular;
+        cam = Camera.main;
+        CanHomingAttack = true;
+        ShortHopping = false;
+        readyToJump = true;
         triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
         triggerColliderForJumpTime.enabled = false;
         jumpStartTime = -jumpIgnoreDuration;
@@ -101,6 +108,9 @@ public class SonicMovement : MonoBehaviour
 
     private void MyInput()
     {
+        // Don't accept any input if we're in homing attacking. This makes it easy to avoid any potential interruptions
+        if (movementState == MovementState.HomingAttacking) { return;}
+        
         // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
@@ -109,13 +119,15 @@ public class SonicMovement : MonoBehaviour
         if(Input.GetKeyDown(jumpKey) && readyToJump && grounded) { StartCoroutine(JumpRoutine()); }
         
         // Perform a homing attack if the player pressed the homing attack key and can homing attack
-        CanHomingAttack = CheckForHomingAttack();
-        if (CanHomingAttack && Input.GetKeyDown(homingAttackKey))
+        if (!grounded && Input.GetKeyDown(homingAttackKey) && CanHomingAttack) // We shouldn't do a homing attack from the ground
         {
-            // Debug.Log("Pressed for a homing attack");
+            // Freeze the player to make sure homing attack starts without any forces attached
+            rb.velocity = Vector3.zero;
+            
+            Target = GetTargetForHomingAttack();
             movementState = MovementState.HomingAttacking;
         }
-        
+
     }
     
     private IEnumerator JumpRoutine()
@@ -189,45 +201,99 @@ public class SonicMovement : MonoBehaviour
         readyToJump = true;
     }
     
-    private bool CheckForHomingAttack()
+    private Transform GetTargetForHomingAttack()
     {
-        // We can't do a homing attack from the ground
-        // Debug.DrawRay(transform.position, (orientation.forward).normalized * homingAttackDistance, Color.red);
-        if (grounded) {return false;}
+        // Check if there is any object in homing range
+        Collider[] colliders = Physics.OverlapSphere(transform.position, homingAttackDistance, HomingAttackLayer);
         
-        
-        // Check if there is any object in homing attack view
-        // Physics.bo
-        
-        // Check if there is any object in homing attack distance
+        Transform bestTarget = null;
+        float bestScore = float.MaxValue;
+        Vector2 viewportCenter = new Vector2(0.5f, 0.5f);
 
-        // If everything above passed, then we can homing attack
-        return true;
+        // Of the ones that were found, check if they are within camera view,
+        // and if they are, choose the one closest to the center of the camera as well as to the player
+        foreach (Collider col in colliders)
+        {
+            // 1: Convert the object's position to viewport coordinates (coordinates relative to camera view)
+            Vector3 viewportPos = cam.WorldToViewportPoint(col.transform.position);
+
+            // 2: Check if the object is in front of the camera (z > 0) and within the viewport bounds ((0,0) is bottom left corner, (1,1) is top right corner)
+            if (viewportPos.z > 0 && viewportPos.x >= 0 && viewportPos.x <= 1 && viewportPos.y >= 0 && viewportPos.y <= 1)
+            {
+                Vector2 objectViewportPos = new Vector2(viewportPos.x, viewportPos.y);
+                
+                // 3: Calculate how far the object is from the center of the viewport and world distance
+                float distanceFromCenter = Vector2.Distance(viewportCenter, objectViewportPos);
+                float distFromPlayer = Vector3.Distance(transform.position, col.transform.position); // Use regular coords because we want distance from player not camera
+                
+                float score = (distanceFromCenter * CameraCenterDistWeight) + (distFromPlayer * PlayerDistWeight); // tweak weight as needed
+
+                // 4: Lower score means closer to the center and player
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestTarget = col.transform;
+                }
+            }
+        }
+
+        if (bestTarget != null)
+        {
+            // Debug.Log("Selected: " + bestTarget.name);
+            return bestTarget;
+        }
+
+        return null; // If no target could be chosen, return null
+    }
+    
+    // Let's me see how big the selection radius is for homing attack
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, homingAttackDistance);
     }
 
     private void FixedUpdate()
     {
-        /*
-         * With this check, we make sure that when the player jumps,
-         * the vertical velocity in move-player doesn't interfere with the jump.
-         * We keep ground at false briefly, so the vertical velocity
-         * doesn't get affected by the few frames the character remains in grounded after jumping
-        */
-        if (Time.time - jumpStartTime >= jumpIgnoreDuration)
+        // Ignore everything except transitions if we're homing attacking to avoid any interruptions
+        if (movementState != MovementState.HomingAttacking)
         {
-            // If we're not in the ground-jump ignore time, proceed as normally
-            // Get ground info and status
-            inIgnoreGroundJumpTime = false;
-            triggerColliderForJumpTime.enabled = false;
-            rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
-            UpdateGroundedStatus();
-        }
-        else{ inIgnoreGroundJumpTime = true;}
+            /*
+             * With this check, we make sure that when the player jumps,
+             * the vertical velocity in move-player doesn't interfere with the jump.
+             * We keep ground at false briefly, so the vertical velocity
+             * doesn't get affected by the few frames the character remains in grounded after jumping
+            */
+            if (Time.time - jumpStartTime >= jumpIgnoreDuration)
+            {
+                // If we're not in the ground-jump ignore time, proceed as normally
+                // Get ground info and status
+                inIgnoreGroundJumpTime = false;
+                triggerColliderForJumpTime.enabled = false;
+                rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
+                UpdateGroundedStatus();
+            }
+            else
+            {
+                inIgnoreGroundJumpTime = true;
+            }
+    
+            transform.up = grounded ? surfaceHit.normal : Vector3.up;
+    
+            // reset short hopping and stick the player to the ground if they are in the ground
+            if (grounded && readyToJump)
+            {
+                ShortHopping = false;
+                StickPlayerToGround();
+            }
 
-        transform.up = grounded ? surfaceHit.normal : Vector3.up;
-        
-        // reset short hopping and stick the player to the ground if they are in the ground
-        if (grounded && readyToJump) { ShortHopping = false; StickPlayerToGround(); }
+            // Turn on homing attack if we hit the ground after not being able to homing attack
+            if (!CanHomingAttack && grounded)
+            {
+                CanHomingAttack = true;
+            }
+
+        }
 
         // Move the player based on the player state
         switch (movementState)
@@ -363,9 +429,32 @@ public class SonicMovement : MonoBehaviour
 
     private void HomingAttack()
     {
-        //Debug.Log("Was In Homing Attack");
-        movementState = MovementState.Regular;
-        //Debug.Log(movementState);
+        // If we have a target, move towards the target and once we reach it, "bounce off". Then transition back to regular movement
+        if (Target != null)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, Target.position, homingSpeed * Time.deltaTime);
+            
+            // If we reached the target, "bounce" and transition back to regular movement state
+            if (Vector3.Distance(transform.position, Target.position) < 1f)
+            {
+                /*
+                // Replace .5f with ImpulseAfterAttackWeakMomentum or ImpulseAfterAttackWeakMomentum (depending on how much momentum you want to keep)
+                // to keep momentum for the direction the player last inputted.
+                // Replacing .5f by 0 makes it so the player shoots upwards only
+                // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
+                */
+                rb.AddForce((Vector3.up + (LastSpeedDirection * .5f)) * ImpulseAfterAttack, ForceMode.Impulse);
+                movementState = MovementState.Regular;
+            }
+        }
+        // Otherwise, homing attack towards direction player is facing then transition to regular movement
+        else
+        {
+            Debug.Log("No Target selected");
+            rb.AddForce(LastSpeedDirection.normalized * NoTargethomingSpeed, ForceMode.Impulse);
+            CanHomingAttack = false; // If the player homing attacked and didn't hit anything, don't allow another homing attack until the player retouches the ground
+            movementState = MovementState.Regular;
+        }
     }
 
     private void UpdateGroundedStatus()
@@ -393,6 +482,7 @@ public class SonicMovement : MonoBehaviour
         transform.position = targetPosition;
     }
 
+    // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
     private void OnTriggerEnter(Collider other)
     {
         triggerColliderForJumpTime.enabled = false;
