@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/SceneSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/SceneSettings.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,6 +114,9 @@
       <workItem from="1738828833595" duration="3595000" />
       <workItem from="1738868104040" duration="23735000" />
       <workItem from="1738951075148" duration="17685000" />
+      <workItem from="1739044019287" duration="1104000" />
+      <workItem from="1739045953564" duration="2940000" />
+      <workItem from="1739049526709" duration="11872000" />
     </task>
     <servers />
   </component>

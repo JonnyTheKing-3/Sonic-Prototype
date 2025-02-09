@@ -13,7 +13,8 @@ public class SonicMovement : MonoBehaviour
 {
     [Header("INPUTS")]
     public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode homingAttackKey = KeyCode.C;
+    public KeyCode homingAttackKey = KeyCode.P;
+    public KeyCode SpindashKey = KeyCode.O;
 
     [Header("VALUES FOR MOVEMENT")]
     public float speed;
@@ -23,7 +24,18 @@ public class SonicMovement : MonoBehaviour
     public float acceleration;
     public float deceleration;
     public float turnSpeed; // How fast the player can change direction while running
+    [Space]
+    public float SpindDashSpeed;
+    public float SpinDashDownHillSpeed;
+    public float SpinDashGoingUpHillSpeed;
+    public float SpinDashAcceleration;
+    public float SpinDashDeceleration;
+    public float SpinDashTurnSpeed;
+    public float ChargePower; // How fast speed charges
+    public float ChargedSpeed; // How much speed has been charged since we started charging spin dash. Gets reset to zero when we exit the spindash
+    public bool StartingSpinDash = false;
 
+    
     [Header("JUMP RELATED")]
     public float jumpForce;
     public float shortHopForce;
@@ -57,6 +69,10 @@ public class SonicMovement : MonoBehaviour
     [SerializeField] private float CameraCenterDistWeight = 1f; // How strongly the distance from the cener of the camera affects it's standing in being the target for a homing attack
     [SerializeField] private Transform Target;  // Homing Attack target
 
+    [Header("SPINDASH")] 
+    public bool sd_StartedFromZeroVel = false;
+    public bool sd_StartedFromAir = false;
+    
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
     public enum MovementState { Regular, HomingAttacking, Spindashing }
 
@@ -76,8 +92,8 @@ public class SonicMovement : MonoBehaviour
     public float CurrentSpeedMagnitude;
     public Vector3 LastSpeedDirection; // Used for homing attack
     public SurfaceState surfaceState;
-    public SurfaceState lastSurfaceState;
     public MovementState movementState;
+    private SurfaceState lastSurfaceState;
 
     [Header("REFERENCES")]
     public Transform orientation;
@@ -99,6 +115,24 @@ public class SonicMovement : MonoBehaviour
         triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
         triggerColliderForJumpTime.enabled = false;
         jumpStartTime = -jumpIgnoreDuration;
+        StartingSpinDash = false;
+    }
+    
+    // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
+    private void OnTriggerEnter(Collider other)
+    {
+        triggerColliderForJumpTime.enabled = false;
+        
+        // Check if the colliding object's layer is in the whatIsGround LayerMask.
+        // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
+        if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
+        {
+            Debug.Log("Touched ground during jump time");
+            jumpStartTime = jumpIgnoreDuration;
+            readyToJump = true;
+            rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
+            UpdateGroundedStatus();
+        }
     }
     
     private void Update()
@@ -110,6 +144,7 @@ public class SonicMovement : MonoBehaviour
     {
         // Don't accept any input if we're in homing attacking. This makes it easy to avoid any potential interruptions
         if (movementState == MovementState.HomingAttacking) { return;}
+        if (movementState == MovementState.Spindashing && StartingSpinDash) { ChargeSpinDash(); return; }
         
         // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -117,6 +152,20 @@ public class SonicMovement : MonoBehaviour
 
         // Jump when the player is on the ground and presses the jump key
         if(Input.GetKeyDown(jumpKey) && readyToJump && grounded) { StartCoroutine(JumpRoutine()); }
+
+        // Transition to spin-dash if key was pressed and we were in regular movement
+        if (movementState == MovementState.Regular && Input.GetKeyDown(SpindashKey))
+        {
+            if (Mathf.Abs(rb.velocity.x) < .1f && Mathf.Abs(rb.velocity.z) < .1f && grounded)
+            {
+                Debug.Log("Spindash Start");
+                // Check if the player started from zero velocity and/or in the air
+                StartingSpinDash = true;
+                ChargedSpeed = 0f;
+                movementState = MovementState.Spindashing;
+                ChargeSpinDash();
+            }
+        }
         
         // Perform a homing attack if the player pressed the homing attack key and can homing attack
         if (!grounded && Input.GetKeyDown(homingAttackKey) && CanHomingAttack) // We shouldn't do a homing attack from the ground
@@ -201,6 +250,18 @@ public class SonicMovement : MonoBehaviour
         readyToJump = true;
     }
     
+    private void ChargeSpinDash()
+    {
+        if (Input.GetKeyUp(SpindashKey))
+        {
+            StartingSpinDash = false;
+        }
+        else
+        {
+            ChargedSpeed = Mathf.Lerp(ChargedSpeed, SpindDashSpeed, ChargePower * Time.deltaTime);
+        }
+    }
+
     private Transform GetTargetForHomingAttack()
     {
         // Check if there is any object in homing range
@@ -273,10 +334,7 @@ public class SonicMovement : MonoBehaviour
                 rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
                 UpdateGroundedStatus();
             }
-            else
-            {
-                inIgnoreGroundJumpTime = true;
-            }
+            else { inIgnoreGroundJumpTime = true; }
     
             transform.up = grounded ? surfaceHit.normal : Vector3.up;
     
@@ -288,10 +346,7 @@ public class SonicMovement : MonoBehaviour
             }
 
             // Turn on homing attack if we hit the ground after not being able to homing attack
-            if (!CanHomingAttack && grounded)
-            {
-                CanHomingAttack = true;
-            }
+            if (!CanHomingAttack && grounded) { CanHomingAttack = true; }
 
         }
 
@@ -304,11 +359,40 @@ public class SonicMovement : MonoBehaviour
             case MovementState.HomingAttacking:
                 HomingAttack();
                 break;
+            case MovementState.Spindashing:
+                // If we're in the startup, charge up. Otherwise, continue with regular spindash movemennt
+                if (!StartingSpinDash) {SpindashMovement();}
+                break; // StartingSpinDash logic (Charging the spindash) is handled in MyInput and ChargeSpinDash
         }
 
         // Keep track os speed and direction
         CurrentSpeedMagnitude = rb.velocity.magnitude;
         if (moveDirection != Vector3.zero) { LastSpeedDirection = new Vector3(moveDirection.x, 0f, moveDirection.z); }
+    }
+    
+    private void UpdateGroundedStatus()
+    {
+        if (rayHit)
+        {
+            // Calculate the distance to the ground, and determine if the player is grounded
+            distancePlayerToGround = Vector3.Distance(transform.position, surfaceHit.point);
+            grounded = distancePlayerToGround <= groundStickingDistance;
+        }
+        else
+        {
+            grounded = false;
+        }
+    }
+    
+    private void StickPlayerToGround()
+    {
+        // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
+        // If it's not, just make sure to scale the offset by an accurate 
+        
+        // Get the target position, which is right above the surface the player is standing on, stick the player to that position
+        Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
+
+        transform.position = targetPosition;
     }
 
     private void MovePlayer()
@@ -450,52 +534,28 @@ public class SonicMovement : MonoBehaviour
         // Otherwise, homing attack towards direction player is facing then transition to regular movement
         else
         {
-            Debug.Log("No Target selected");
+            // Debug.Log("No Target selected");
             rb.AddForce(LastSpeedDirection.normalized * NoTargethomingSpeed, ForceMode.Impulse);
             CanHomingAttack = false; // If the player homing attacked and didn't hit anything, don't allow another homing attack until the player retouches the ground
             movementState = MovementState.Regular;
         }
     }
 
-    private void UpdateGroundedStatus()
+    private void SpindashMovement()
     {
-        if (rayHit)
+        if (sd_StartedFromZeroVel && grounded)
         {
-            // Calculate the distance to the ground, and determine if the player is grounded
-            distancePlayerToGround = Vector3.Distance(transform.position, surfaceHit.point);
-            grounded = distancePlayerToGround <= groundStickingDistance;
+        }
+        
+        else if (sd_StartedFromAir)
+        {
+            
         }
         else
         {
-            grounded = false;
+            
         }
-    }
-    
-    private void StickPlayerToGround()
-    {
-        // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
-        // If it's not, just make sure to scale the offset by an accurate 
-        
-        // Get the target position, which is right above the surface the player is standing on, stick the player to that position
-        Vector3 targetPosition = surfaceHit.point + (surfaceHit.normal * GroundStickingOffset);
-
-        transform.position = targetPosition;
-    }
-
-    // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
-    private void OnTriggerEnter(Collider other)
-    {
-        triggerColliderForJumpTime.enabled = false;
-        
-        // Check if the colliding object's layer is in the whatIsGround LayerMask.
-        // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
-        if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
-        {
-            Debug.Log("Touched ground during jump time");
-            jumpStartTime = jumpIgnoreDuration;
-            readyToJump = true;
-            rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
-            UpdateGroundedStatus();
-        }
+        Debug.Log(ChargedSpeed);
+        movementState = MovementState.Regular;
     }
 }

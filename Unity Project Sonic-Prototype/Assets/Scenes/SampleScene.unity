@@ -5685,6 +5685,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeScale: 1
+  IncreaseTimer: 109
+  DecreaseTimer: 110
 --- !u!4 &663323177
 Transform:
   m_ObjectHideFlags: 0
@@ -15815,7 +15817,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpKey: 32
-  homingAttackKey: 99
+  homingAttackKey: 112
+  SpindashKey: 111
   speed: 150
   GoingDownHillSpeed: 210
   GoingUpHillSpeed: 115
@@ -15823,6 +15826,15 @@ MonoBehaviour:
   acceleration: 40
   deceleration: 170
   turnSpeed: 5
+  SpindDashSpeed: 170
+  SpinDashDownHillSpeed: 230
+  SpinDashGoingUpHillSpeed: 80
+  SpinDashAcceleration: 0
+  SpinDashDeceleration: 0
+  SpinDashTurnSpeed: 0
+  ChargePower: 1.5
+  ChargedSpeed: 0
+  StartingSpinDash: 0
   jumpForce: 45
   shortHopForce: 30
   gravity: 70
@@ -15840,6 +15852,8 @@ MonoBehaviour:
   homingSpeed: 145
   NoTargethomingSpeed: 140
   ImpulseAfterAttack: 42
+  ImpulseAfterAttackStrongMomentum: 0
+  ImpulseAfterAttackWeakMomentum: 0
   homingAttackDistance: 20.32
   HomingAttackLayer:
     serializedVersion: 2
@@ -15847,6 +15861,8 @@ MonoBehaviour:
   PlayerDistWeight: 1
   CameraCenterDistWeight: 1
   Target: {fileID: 0}
+  sd_StartedFromZeroVel: 0
+  sd_StartedFromAir: 0
   grounded: 0
   rayHit: 0
   ShortHopping: 0
@@ -15860,7 +15876,6 @@ MonoBehaviour:
   CurrentSpeedMagnitude: 0
   LastSpeedDirection: {x: 0, y: 0, z: 0}
   surfaceState: 0
-  lastSurfaceState: 0
   movementState: 0
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
