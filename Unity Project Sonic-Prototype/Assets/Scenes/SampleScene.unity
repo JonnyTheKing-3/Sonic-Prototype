@@ -15935,10 +15935,9 @@ MonoBehaviour:
   turnSpeed: 5
   SpindDashSpeed: 210
   SpinDashDownHillSpeed: 240
-  SpinDashAcceleration: 40
   SpinDashDeceleration: 20
   SpinDashDecelerationUpSlope: 40
-  spindashDesiredAcceleration: 50
+  SpinDashDownHillAcceleration: 40
   SpinDashTurnSpeed: 5
   ChargePower: 1.5
   ChargedSpeed: 0
@@ -15972,8 +15971,6 @@ MonoBehaviour:
   PlayerDistWeight: 1
   CameraCenterDistWeight: 1
   Target: {fileID: 0}
-  sd_StartedFromZeroVel: 0
-  sd_StartedFromAir: 0
   grounded: 0
   rayHit: 0
   ShortHopping: 0
@@ -15983,6 +15980,7 @@ MonoBehaviour:
   distancePlayerToGround: 0
   horizontalInput: 0
   verticalInput: 0
+  spindashDesiredAcceleration: 50
   DesiredSpeed: 0
   CurrentSpeedMagnitude: 0
   LastSpeedDirection: {x: 0, y: 0, z: 0}

@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8a32008a-2dfa-44ab-900c-535bb1ce1ecc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,6 +117,7 @@
       <workItem from="1739045953564" duration="2940000" />
       <workItem from="1739049526709" duration="11872000" />
       <workItem from="1739124631106" duration="11243000" />
+      <workItem from="1739216823280" duration="3404000" />
     </task>
     <servers />
   </component>

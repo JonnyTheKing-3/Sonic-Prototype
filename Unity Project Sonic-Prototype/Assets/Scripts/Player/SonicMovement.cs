@@ -24,13 +24,14 @@ public class SonicMovement : MonoBehaviour
     public float acceleration;
     public float deceleration;
     public float turnSpeed; // How fast the player can change direction while running
-    [Space]
+    
+    
+    [Header("SPINDASH")] 
     public float SpindDashSpeed;
     public float SpinDashDownHillSpeed;
-    public float SpinDashAcceleration;
     public float SpinDashDeceleration;
     public float SpinDashDecelerationUpSlope;
-    public float spindashDesiredAcceleration;
+    public float SpinDashDownHillAcceleration;
     public float SpinDashTurnSpeed;
     public float ChargePower; // How fast speed charges
     public float ChargedSpeed; // How much speed has been charged since we started charging spin dash. Gets reset to zero when we exit the spindash
@@ -38,7 +39,7 @@ public class SonicMovement : MonoBehaviour
     public bool SpinDashStartTime = false;
     public float waitToResetStartTime = .3f;
     public float InitialImpulseIfMoving = 100f;
-
+    
     
     [Header("JUMP RELATED")]
     public float jumpForce;
@@ -53,6 +54,7 @@ public class SonicMovement : MonoBehaviour
     private float jumpStartTime;
     private Vector3 jumpNormal;
 
+    
     [Header("GROUND")]
     public float surfaceHitRay;
     public float groundStickingDistance;
@@ -61,6 +63,7 @@ public class SonicMovement : MonoBehaviour
     public float GroundStickingOffset = 1f;
     public RaycastHit surfaceHit;
 
+    
     [Header("HOMING ATTACK")]
     public float homingSpeed;
     public float NoTargethomingSpeed;
@@ -73,9 +76,6 @@ public class SonicMovement : MonoBehaviour
     [SerializeField] private float CameraCenterDistWeight = 1f; // How strongly the distance from the cener of the camera affects it's standing in being the target for a homing attack
     [SerializeField] private Transform Target;  // Homing Attack target
 
-    [Header("SPINDASH")] 
-    public bool sd_StartedFromZeroVel = false;
-    public bool sd_StartedFromAir = false;
     
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
     public enum MovementState { Regular, HomingAttacking, Spindashing }
@@ -92,6 +92,7 @@ public class SonicMovement : MonoBehaviour
     public float verticalInput;
     private Vector3 moveDirection;
     private Vector3 horizontalVelocity;
+    public float spindashDesiredAcceleration;
     public float DesiredSpeed;
     public float CurrentSpeedMagnitude;
     public Vector3 LastSpeedDirection; // Used for homing attack
@@ -292,6 +293,7 @@ public class SonicMovement : MonoBehaviour
             
             Vector3 dashDireciton = Vector3.ProjectOnPlane(LastSpeedDirection, surfaceHit.normal).normalized;
             // Debug.Log("DashDirection: " + dashDireciton);
+            
             rb.velocity += ChargedSpeed * dashDireciton;
             // Debug.Log("velocity: " + rb.velocity.magnitude);
             
@@ -408,22 +410,21 @@ public class SonicMovement : MonoBehaviour
             case MovementState.Regular:
                 MovePlayer();
                 break;
+            
             case MovementState.HomingAttacking:
                 HomingAttack();
                 break;
+            
             case MovementState.Spindashing:
                 // If we're in the startup, charge up. Otherwise, continue with regular spindash movemennt
                 if (!StartingSpinDash) {SpindashMovement();}
                 
                 // If the speed is too low or we leave the ground, go back to normal
-                if (rb.velocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime)
+                if (rb.velocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime || !grounded && !StartingSpinDash)
                 {
-                    Debug.Log("STOPPED SPINDASH FOR LOW SPEED");
-                    movementState = MovementState.Regular;
-                }
-                if (!grounded && !StartingSpinDash)
-                {
-                    Debug.Log("STOPPED SPINDASH BECAUSE WE'RE NOT GROUNDED");
+                    if (!grounded) { Debug.Log("STOPPED SPINDASH BECAUSE WE'RE NOT GROUNDED"); }
+                    else {Debug.Log("STOPPED SPINDASH FOR LOW SPEED");}
+                    
                     movementState = MovementState.Regular;
                 }
 
@@ -593,7 +594,7 @@ public class SonicMovement : MonoBehaviour
                             spindashDesiredAcceleration = SpinDashDecelerationUpSlope; return SurfaceState.GoingUpHill; }
                         
                         if (rb.velocity.y < -.01f) { DesiredSpeed = SpinDashDownHillSpeed; 
-                            spindashDesiredAcceleration = SpinDashAcceleration; return SurfaceState.GoingDownHill; }
+                            spindashDesiredAcceleration = SpinDashDownHillAcceleration; return SurfaceState.GoingDownHill; }
                         break;
                 }
         
@@ -633,6 +634,7 @@ public class SonicMovement : MonoBehaviour
         }
     }
 
+    // A modified version of MovePlayer. To anyone wanting to understand this function better, take a look a moveplayer :)
     private void SpindashMovement()
     {
         // Calculate move direction based on input and camera orientation
@@ -659,52 +661,24 @@ public class SonicMovement : MonoBehaviour
             spindashDesiredAcceleration * Time.deltaTime);
         float currentSpeed = horizontalVelocity.magnitude; // Store current velocity
         
-        // If we want to move, make sure the magnitude of the speed doesn't abruptly change. When entering different surfaces, the transition hindered the magnitude
-        // This check makes sure the speed is kept at where it's supposed to be
-        if (surfaceState == lastSurfaceState)
+        if (surfaceState == lastSurfaceState && (surfaceState == SurfaceState.Flat || surfaceState == SurfaceState.GoingUpHill))
         {
-            switch (surfaceState)
+            if (currentSpeed > DesiredSpeed)
             {
-                case SurfaceState.Flat:
-                    // If our current speed is greater than our surface desired speed, simply move towards it normally. Otherwise, always keep the max speed
-                    if (currentSpeed > DesiredSpeed)
-                    {
-                        horizontalVelocity.Normalize();
-                        horizontalVelocity *= currentSpeed;
-                    }
-                    break;
-            
-                case SurfaceState.GoingUpHill:
-                    if (currentSpeed > DesiredSpeed)
-                    {
-                        horizontalVelocity.Normalize();
-                        horizontalVelocity *= currentSpeed;
-                    }
-                    break;
-            
-                case SurfaceState.GoingDownHill:
-                    horizontalVelocity.Normalize();
-                    horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
-                    break;
-            }   
+                horizontalVelocity.Normalize();
+                horizontalVelocity *= currentSpeed;
+            }
         }
         else
         {
             horizontalVelocity.Normalize();
             horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
         }
-
-        // Preserve vertical velocity
-        float verticalVelocity = rb.velocity.y;
-
-        // If grounded, reset vertical velocity. Otherwise, apply gravity to it
-        if (grounded && readyToJump)  { verticalVelocity = 0f; }
-        // else { verticalVelocity += -gravity * Time.fixedDeltaTime;} Will use later
-
+        
         // Update last surface
         lastSurfaceState = surfaceState;
         
         // Combine horizontal and vertical velocity
-        rb.velocity = horizontalVelocity + transform.up * verticalVelocity;
+        rb.velocity = horizontalVelocity;
     }
 }
