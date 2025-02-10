@@ -37,6 +37,7 @@ public class SonicMovement : MonoBehaviour
     public bool StartingSpinDash = false;
     public bool SpinDashStartTime = false;
     public float waitToResetStartTime = .3f;
+    public float InitialImpulseIfMoving = 100f;
 
     
     [Header("JUMP RELATED")]
@@ -180,6 +181,15 @@ public class SonicMovement : MonoBehaviour
                 ChargedSpeed = 0f;
                 movementState = MovementState.Spindashing;
                 ChargeSpinDash();
+            }
+            else if (grounded && Mathf.Abs(rb.velocity.x) > .1f && Mathf.Abs(rb.velocity.z) > .1f)
+            {
+                StartingSpinDash = false;
+                SpinDashStartTime = false;
+                rb.AddForce(rb.velocity.normalized * InitialImpulseIfMoving, ForceMode.Impulse);
+                ChargedSpeed = rb.velocity.magnitude > DesiredSpeed ? DesiredSpeed: rb.velocity.magnitude;
+                movementState = MovementState.Spindashing;
+                return;
             }
         }
         
@@ -406,7 +416,7 @@ public class SonicMovement : MonoBehaviour
                 if (!StartingSpinDash) {SpindashMovement();}
                 
                 // If the speed is too low or we leave the ground, go back to normal
-                if (rb.velocity.magnitude < 2f && !StartingSpinDash && !SpinDashStartTime)
+                if (rb.velocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime)
                 {
                     Debug.Log("STOPPED SPINDASH FOR LOW SPEED");
                     movementState = MovementState.Regular;

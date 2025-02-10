@@ -4889,7 +4889,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e780625efbe784499da2d9d824f3b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraMoveSpeed: 220
+  CameraMoveSpeed: 239
   CameraFollowObj: {fileID: 1376455406}
   ClampAngle: 80
   InputSensitivity: 150
@@ -15937,7 +15937,7 @@ MonoBehaviour:
   SpinDashDownHillSpeed: 240
   SpinDashAcceleration: 40
   SpinDashDeceleration: 20
-  SpinDashDecelerationUpSlope: 30
+  SpinDashDecelerationUpSlope: 40
   spindashDesiredAcceleration: 50
   SpinDashTurnSpeed: 5
   ChargePower: 1.5
@@ -15945,6 +15945,7 @@ MonoBehaviour:
   StartingSpinDash: 0
   SpinDashStartTime: 0
   waitToResetStartTime: 0.35
+  InitialImpulseIfMoving: 12.5
   jumpForce: 45
   shortHopForce: 30
   gravity: 70
