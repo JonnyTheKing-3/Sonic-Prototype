@@ -237,7 +237,7 @@ public class SonicMovement : MonoBehaviour
 
         // Boost while we hold the boost key and the boost meter isn't empty
         if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f) { movementState = MovementState.Boosting; }
-        else if (Input.GetKeyUp(BoostKey) || BoostMeter <= 0f) { movementState = MovementState.Regular; }
+        else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting)) { movementState = MovementState.Regular; }
     }
     
     private IEnumerator JumpRoutine()
