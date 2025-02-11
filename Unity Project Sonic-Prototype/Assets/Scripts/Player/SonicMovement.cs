@@ -15,6 +15,8 @@ public class SonicMovement : MonoBehaviour
     public KeyCode jumpKey = KeyCode.Space;
     public KeyCode homingAttackKey = KeyCode.P;
     public KeyCode SpindashKey = KeyCode.O;
+    public KeyCode BoostKey = KeyCode.I;
+    
 
     [Header("VALUES FOR MOVEMENT")]
     public float speed;
@@ -39,6 +41,14 @@ public class SonicMovement : MonoBehaviour
     public bool SpinDashStartTime = false;
     public float waitToResetStartTime = .3f;
     public float InitialImpulseIfMoving = 100f;
+
+
+    [Header("BOOST")] 
+    public float BoostSpeed;
+    public float BoostTurnSpeed;
+    public float BoostConsumption;
+    [Tooltip("O = empty, .5 = half full, 1 = full, and so on")] 
+    [Range(0,1)] public float BoostMeter;
     
     
     [Header("JUMP RELATED")]
@@ -78,8 +88,9 @@ public class SonicMovement : MonoBehaviour
 
     
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
-    public enum MovementState { Regular, HomingAttacking, Spindashing }
+    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting }
 
+    
     [Header("STATUS")]
     public bool grounded;
     public bool rayHit;
@@ -100,6 +111,7 @@ public class SonicMovement : MonoBehaviour
     public MovementState movementState;
     private SurfaceState lastSurfaceState;
 
+    
     [Header("REFERENCES")]
     public Transform orientation;
     public Rigidbody rb;
@@ -108,6 +120,7 @@ public class SonicMovement : MonoBehaviour
     public GameObject GFX;
     public GameObject SpinBallCharge;
     public GameObject SpinBallForm;
+    public GameObject BoostForm;
     
     private void Start()
     {
@@ -146,9 +159,20 @@ public class SonicMovement : MonoBehaviour
     private void Update()
     {
         MyInput();
-        if (movementState == MovementState.Regular) { GFX.SetActive(true); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); }
-        else if (StartingSpinDash) { GFX.SetActive(false); SpinBallCharge.SetActive(true); SpinBallForm.SetActive(false);}
-        else if (movementState == MovementState.Spindashing && !StartingSpinDash) { GFX.SetActive(false); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(true);}
+        
+        // Show the right gfx. I'll switch this type of thing for a model with animations later
+        if (movementState == MovementState.Regular) 
+        { GFX.SetActive(true); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); BoostForm.SetActive(false); }
+        
+        else if (StartingSpinDash) 
+        { GFX.SetActive(false); SpinBallCharge.SetActive(true); SpinBallForm.SetActive(false); BoostForm.SetActive(false); }
+       
+        else if (movementState == MovementState.Spindashing && !StartingSpinDash)
+        { GFX.SetActive(false); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(true); BoostForm.SetActive(false);}
+        
+        else if (movementState == MovementState.Boosting)
+        { GFX.SetActive(false); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); BoostForm.SetActive(true); }
+        
     }
 
     private void MyInput()
@@ -211,6 +235,9 @@ public class SonicMovement : MonoBehaviour
             movementState = MovementState.HomingAttacking;
         }
 
+        // Boost while we hold the boost key and the boost meter isn't empty
+        if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f) { movementState = MovementState.Boosting; }
+        else if (Input.GetKeyUp(BoostKey) || BoostMeter <= 0f) { movementState = MovementState.Regular; }
     }
     
     private IEnumerator JumpRoutine()
@@ -370,7 +397,7 @@ public class SonicMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Ignore everything except transitions if we're homing attacking to avoid any interruptions
+        // Ignore everything except state functions if we're homing attacking to avoid any interruptions
         if (movementState != MovementState.HomingAttacking)
         {
             /*
@@ -381,10 +408,11 @@ public class SonicMovement : MonoBehaviour
             */
             if (Time.time - jumpStartTime >= jumpIgnoreDuration)
             {
-                // If we're not in the ground-jump ignore time, proceed as normally
                 // Get ground info and status
                 inIgnoreGroundJumpTime = false;
                 triggerColliderForJumpTime.enabled = false;
+                
+                // Get grounding info
                 rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
                 UpdateGroundedStatus();
             }
@@ -429,6 +457,10 @@ public class SonicMovement : MonoBehaviour
                 }
 
                 break; // StartingSpinDash logic (Charging the spindash) is handled in MyInput and ChargeSpinDash
+            
+            case MovementState.Boosting:
+                BoostMovement();
+                break;
         }
 
         // Keep track os speed and direction
@@ -680,5 +712,50 @@ public class SonicMovement : MonoBehaviour
         
         // Combine horizontal and vertical velocity
         rb.velocity = horizontalVelocity;
+    }
+
+    private void BoostMovement()
+    {
+        // Calculate move direction based on input and camera orientation
+        moveDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
+        Vector3 proofDir = moveDirection != Vector3.zero ? moveDirection : LastSpeedDirection;
+
+        // Get surface normal based on grounding status
+        Vector3 Surface = grounded ? surfaceHit.normal : Vector3.up;
+    
+        // Apply movement on the slope by projecting onto the surface. In other words, get the move direction considering the surface the player is on
+        Vector3 SurfaceAppliedDirection = Vector3.ProjectOnPlane(proofDir, Surface);
+        
+        // Calculate target velocity
+        Vector3 targetVelocity = SurfaceAppliedDirection.normalized * BoostSpeed;
+
+        // Smoothly rotate towards target velocity and apply acceleration or deceleration
+        float rad = BoostTurnSpeed * Mathf.PI * Time.deltaTime;
+        
+        // Move our current velocity towards our desired velocity
+        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad, 1f * Time.deltaTime);
+        
+        // Keep the velocity always at boost-speed while boosting
+        horizontalVelocity.Normalize();
+        horizontalVelocity *= BoostSpeed;
+        
+        // Preserve vertical velocity
+        float verticalVelocity = rb.velocity.y;
+
+        // If grounded, reset vertical velocity. Otherwise, apply gravity to it
+        if (grounded && readyToJump)  { verticalVelocity = 0f; }
+        else { verticalVelocity += -gravity * Time.fixedDeltaTime;}
+
+        // Update last surface
+        lastSurfaceState = surfaceState;
+        
+        // Combine horizontal and vertical velocity
+        rb.velocity = horizontalVelocity + transform.up * verticalVelocity;
+        
+        // Decrease boost meter
+        BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
+        
+        // Go back to normal if the meter is empty
+        if (BoostMeter <= 0f) { movementState = MovementState.Regular; }
     }
 }
