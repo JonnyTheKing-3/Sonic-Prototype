@@ -9,13 +9,18 @@ public class AnimationsManager : MonoBehaviour
     [Header("MODEL SETTINGS")]
     public Vector3 offset = Vector3.zero;
     public float RotationSmoothingFactor = 10f;
+
+    [Header("ANIMATION SPEED")] 
+    public float SpeedDivider = 60f;
     
-    [Header("REFERENCES")]
+    [Header("REFERENCES")] 
+    public Animator animator;
     
     public SonicMovement player;
     void Start()
     {
         player = GameObject.FindWithTag("Player").GetComponent<SonicMovement>();
+        animator = GetComponent<Animator>();
     }
     
     void SetupModelPositionAndRotation()
@@ -42,5 +47,32 @@ public class AnimationsManager : MonoBehaviour
     void Update()
     {
         SetupModelPositionAndRotation();
+        
+        switch (player.movementState)
+        {
+            case SonicMovement.MovementState.Regular:
+                // blend tree is from 0-1, so what we want to pass to the animator is the precentage of how close we are to reaching the speed value
+                float speedVal = player.CurrentSpeedMagnitude / 100f;
+                animator.SetFloat("CurrentSpeed", speedVal);
+        
+                // this part makes it look cooler because it makes the animation move at speeds relative to players actual speeds
+                if (player.CurrentSpeedMagnitude > SpeedDivider) { animator.speed = player.CurrentSpeedMagnitude / SpeedDivider; } 
+                
+                animator.SetBool("grounded", player.grounded && player.readyToJump);
+                break;
+            
+            case SonicMovement.MovementState.HomingAttacking:
+                break;
+            
+            case SonicMovement.MovementState.Spindashing:
+                break;
+        }
+        
+        
+    }
+
+    public void TriggerJumpAnimation()
+    {
+        animator.SetTrigger("Jump");
     }
 }
