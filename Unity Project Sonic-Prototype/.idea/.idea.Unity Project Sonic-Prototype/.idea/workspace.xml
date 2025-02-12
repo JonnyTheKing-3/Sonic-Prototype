@@ -6,38 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="8a32008a-2dfa-44ab-900c-535bb1ce1ecc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Animation/AnimationsManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Animation/AnimationsManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_body.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_body.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_cloth.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_cloth.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_eye.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_eye.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_shoes.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Materials/chr_sonic_shoes.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Sanic.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/Sanic.fbx.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/animations.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/animations/sonic anim controller.controller" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/animations/sonic anim controller.controller.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/body_d.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/body_d.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/body_n.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/body_n.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/body_s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/body_s.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_body.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_body.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_cloth.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_cloth.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_eye.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_eye.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_shoes.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/chr_sonic_shoes.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/eye_d.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/eye_d.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/eye_n.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/eye_n.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/eye_s.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/sonic-forces-sonic-rig/sonic/eye_s.png.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +119,7 @@
       <workItem from="1739216823280" duration="13143000" />
       <workItem from="1739254652408" duration="2954000" />
       <workItem from="1739320036776" duration="11342000" />
-      <workItem from="1739385418925" duration="6448000" />
+      <workItem from="1739385418925" duration="7140000" />
     </task>
     <servers />
   </component>
