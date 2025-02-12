@@ -8,7 +8,10 @@ public class AnimationsManager : MonoBehaviour
 {
     [Header("MODEL SETTINGS")]
     public Vector3 offset = Vector3.zero;
+    
+    [Header("ANIMATION SPEEDS")]
     public float RotationSmoothingFactor = 10f;
+    public float BoostAnimSpeed = 2f;
 
     [Header("ANIMATION SPEED")] 
     public float SpeedDivider = 60f;
@@ -51,20 +54,41 @@ public class AnimationsManager : MonoBehaviour
         switch (player.movementState)
         {
             case SonicMovement.MovementState.Regular:
-                // blend tree is from 0-1, so what we want to pass to the animator is the precentage of how close we are to reaching the speed value
+                animator.SetBool("Boosting", false);
+                animator.SetBool("SpinDashing", false);
+                
+                // blend tree is from 0-1, so what we want to pass to the animator is the percentage of how close we are to reaching the speed value
                 float speedVal = player.CurrentSpeedMagnitude / 100f;
                 animator.SetFloat("CurrentSpeed", speedVal);
         
                 // this part makes it look cooler because it makes the animation move at speeds relative to players actual speeds
                 if (player.CurrentSpeedMagnitude > SpeedDivider) { animator.speed = player.CurrentSpeedMagnitude / SpeedDivider; } 
                 
+                animator.speed = player.grounded && player.readyToJump ? animator.speed : 1f;
+                
                 animator.SetBool("grounded", player.grounded && player.readyToJump);
+                break;
+
+            case SonicMovement.MovementState.Spindashing:
+                animator.SetBool("Boosting", false);
+                animator.SetBool("SpinDashing", true);
+                
+                animator.speed = 1f;
+                break;
+            
+            case SonicMovement.MovementState.Boosting:
+                animator.SetBool("Boosting", true);
+                animator.SetBool("SpinDashing", false);
+                
+                animator.SetBool("grounded", player.grounded && player.readyToJump);
+                animator.speed = player.grounded && player.readyToJump ? BoostAnimSpeed : 1f; // Boost animation is a bit slow out of box, but air-boost is a decent speed
                 break;
             
             case SonicMovement.MovementState.HomingAttacking:
-                break;
-            
-            case SonicMovement.MovementState.Spindashing:
+                animator.SetBool("Boosting", false);
+                animator.SetBool("SpinDashing", false);
+                
+                animator.speed = 1f;
                 break;
         }
         
@@ -74,5 +98,9 @@ public class AnimationsManager : MonoBehaviour
     public void TriggerJumpAnimation()
     {
         animator.SetTrigger("Jump");
+    }
+    public void TriggerHomingAttackTrickAnimation()
+    {
+        animator.SetTrigger("HomingAttackTrick");
     }
 }

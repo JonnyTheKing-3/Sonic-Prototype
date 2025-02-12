@@ -659,6 +659,7 @@ public class SonicMovement : MonoBehaviour
                 // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
                 */
                 rb.AddForce((Vector3.up + (LastSpeedDirection * .5f)) * ImpulseAfterAttack, ForceMode.Impulse);
+                animManager.TriggerHomingAttackTrickAnimation();
                 movementState = MovementState.Regular;
             }
         }
