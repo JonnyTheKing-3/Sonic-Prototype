@@ -101,7 +101,7 @@ public class SonicMovement : MonoBehaviour
     public float distancePlayerToGround;
     public float horizontalInput;
     public float verticalInput;
-    private Vector3 moveDirection;
+    public Vector3 moveDirection;
     private Vector3 horizontalVelocity;
     public float spindashDesiredAcceleration;
     public float DesiredSpeed;
