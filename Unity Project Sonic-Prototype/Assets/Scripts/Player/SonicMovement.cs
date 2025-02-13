@@ -1,13 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
-using Unity.VisualScripting.ReorderableList;
-using UnityEngine.PlayerLoop;
-using UnityEngine.UIElements;
 
 public class SonicMovement : MonoBehaviour
 {
