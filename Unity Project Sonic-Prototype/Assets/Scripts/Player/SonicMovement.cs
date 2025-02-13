@@ -122,7 +122,12 @@ public class SonicMovement : MonoBehaviour
     public GameObject SpinBallForm;
     public GameObject BoostForm;
     public AnimationsManager animManager;
-    
+    [SerializeField] private TMP_Text speedText;
+
+    [Header("EXTRA")] 
+    [SerializeField] private bool ShowSpeed = true;
+    [SerializeField] private KeyCode ShowSpeedKey;
+
     private void Start()
     {
         // getting references
@@ -174,6 +179,11 @@ public class SonicMovement : MonoBehaviour
         else if (movementState == MovementState.Boosting)
         { GFX.SetActive(false); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); BoostForm.SetActive(true); }
         
+        // For show case purposes
+        if (Input.GetKeyDown(ShowSpeedKey)) { ShowSpeed = !ShowSpeed;}
+        if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude; }
+        else { speedText.text = ""; }
+
     }
 
     private void MyInput()

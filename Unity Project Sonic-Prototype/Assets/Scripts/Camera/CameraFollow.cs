@@ -38,9 +38,17 @@ public class CameraFollow : MonoBehaviour
 
     void Update()
     {
-        // Replace 0 later with rightstick controls for a gamepad
         float inputX = 0f;
         float inputZ = 0f;
+        
+        if (Input.GetKey(KeyCode.LeftArrow))
+            inputX = -1f;
+        if (Input.GetKey(KeyCode.RightArrow))
+            inputX = 1f;
+        if (Input.GetKey(KeyCode.UpArrow))
+            inputZ = 1f;
+        if (Input.GetKey(KeyCode.DownArrow))
+            inputZ = -1f;
 
         MouseX = Input.GetAxis("Mouse X");
         MouseY = Input.GetAxis("Mouse Y");
