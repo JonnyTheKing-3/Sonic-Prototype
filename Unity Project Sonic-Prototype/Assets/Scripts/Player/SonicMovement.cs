@@ -1,13 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
-using Unity.VisualScripting.ReorderableList;
-using UnityEngine.PlayerLoop;
-using UnityEngine.UIElements;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -101,7 +94,7 @@ public class SonicMovement : MonoBehaviour
     public float distancePlayerToGround;
     public float horizontalInput;
     public float verticalInput;
-    private Vector3 moveDirection;
+    public Vector3 moveDirection;
     private Vector3 horizontalVelocity;
     public float spindashDesiredAcceleration;
     public float DesiredSpeed;
@@ -121,7 +114,13 @@ public class SonicMovement : MonoBehaviour
     public GameObject SpinBallCharge;
     public GameObject SpinBallForm;
     public GameObject BoostForm;
-    
+    public AnimationsManager animManager;
+    [SerializeField] private TMP_Text speedText;
+
+    [Header("EXTRA")] 
+    [SerializeField] private bool ShowSpeed = true;
+    [SerializeField] private KeyCode ShowSpeedKey;
+
     private void Start()
     {
         // getting references
@@ -148,7 +147,7 @@ public class SonicMovement : MonoBehaviour
         // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
         if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
         {
-            Debug.Log("Touched ground during jump time");
+            // Debug.Log("Touched ground during jump time");
             jumpStartTime = jumpIgnoreDuration;
             readyToJump = true;
             rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
@@ -166,13 +165,18 @@ public class SonicMovement : MonoBehaviour
         
         else if (StartingSpinDash) 
         { GFX.SetActive(false); SpinBallCharge.SetActive(true); SpinBallForm.SetActive(false); BoostForm.SetActive(false); }
-       
+        
         else if (movementState == MovementState.Spindashing && !StartingSpinDash)
         { GFX.SetActive(false); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(true); BoostForm.SetActive(false);}
         
         else if (movementState == MovementState.Boosting)
         { GFX.SetActive(false); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); BoostForm.SetActive(true); }
         
+        // For show case purposes
+        if (Input.GetKeyDown(ShowSpeedKey)) { ShowSpeed = !ShowSpeed;}
+        if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude; }
+        else { speedText.text = ""; }
+
     }
 
     private void MyInput()
@@ -190,7 +194,11 @@ public class SonicMovement : MonoBehaviour
         // Jump when the player is on the ground and presses the jump key
         if (Input.GetKeyDown(jumpKey) && readyToJump && grounded)
         {
-            if (movementState == MovementState.Spindashing) { Debug.Log("STOPPED SPINDASH BY JUMP"); movementState = MovementState.Regular;}
+            if (movementState == MovementState.Spindashing)
+            {
+                // Debug.Log("STOPPED SPINDASH BY JUMP");
+                movementState = MovementState.Regular;
+            }
             StartCoroutine(JumpRoutine());
         }
 
@@ -221,7 +229,7 @@ public class SonicMovement : MonoBehaviour
         // Go back to regular if we pressed spindash key while in spindash
         if (movementState == MovementState.Spindashing && Input.GetKeyDown(SpindashKey) && !StartingSpinDash)
         {
-            Debug.Log("STOPPED SPINDASH BY KEY PRESS");
+            // Debug.Log("STOPPED SPINDASH BY KEY PRESS");
             movementState = MovementState.Regular;
         }
 
@@ -277,7 +285,7 @@ public class SonicMovement : MonoBehaviour
         
         // Record the ground normal at the moment of jump
         jumpNormal = surfaceHit.normal;
-        Debug.Log(jumpNormal);
+        // Debug.Log(jumpNormal);
         jumpStartTime = Time.time;
 
         // Remove any velocity component in the jump direction.
@@ -303,6 +311,7 @@ public class SonicMovement : MonoBehaviour
             jumpDirection = Vector3.Lerp(jumpNormal, Vector3.up, blendFactorJumpingDownHill);
         }
         
+        animManager.TriggerJumpAnimation();
         rb.AddForce(jumpDirection * forceToUse, ForceMode.Impulse);
     }
 
@@ -450,8 +459,8 @@ public class SonicMovement : MonoBehaviour
                 // If the speed is too low or we leave the ground, go back to normal
                 if (rb.velocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime || !grounded && !StartingSpinDash)
                 {
-                    if (!grounded) { Debug.Log("STOPPED SPINDASH BECAUSE WE'RE NOT GROUNDED"); }
-                    else {Debug.Log("STOPPED SPINDASH FOR LOW SPEED");}
+                    // if (!grounded) { Debug.Log("STOPPED SPINDASH BECAUSE WE'RE NOT GROUNDED"); }
+                    // else {Debug.Log("STOPPED SPINDASH FOR LOW SPEED");}
                     
                     movementState = MovementState.Regular;
                 }
@@ -653,6 +662,7 @@ public class SonicMovement : MonoBehaviour
                 // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
                 */
                 rb.AddForce((Vector3.up + (LastSpeedDirection * .5f)) * ImpulseAfterAttack, ForceMode.Impulse);
+                animManager.TriggerHomingAttackTrickAnimation();
                 movementState = MovementState.Regular;
             }
         }

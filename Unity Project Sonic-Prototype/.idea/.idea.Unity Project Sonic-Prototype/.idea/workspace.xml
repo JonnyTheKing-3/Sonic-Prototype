@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8a32008a-2dfa-44ab-900c-535bb1ce1ecc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +43,14 @@
   }
 }</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
+    <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../../Sonic Project Version 1.0\Unity Project Sonic-Prototype.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\jorro\OneDrive\Documents\Sonic Project Version 1.0" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.15f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath &quot;C:\Users\jorro\OneDrive\Documents\GitHub\Sonic-Prototype\Unity Project Sonic-Prototype&quot; -debugCodeOptimization" />
@@ -120,6 +126,11 @@
       <workItem from="1739124631106" duration="11243000" />
       <workItem from="1739216823280" duration="13143000" />
       <workItem from="1739254652408" duration="2954000" />
+      <workItem from="1739320036776" duration="11342000" />
+      <workItem from="1739385418925" duration="7140000" />
+      <workItem from="1739476751279" duration="1790000" />
+      <workItem from="1739478755279" duration="664000" />
+      <workItem from="1739494591350" duration="762000" />
     </task>
     <servers />
   </component>
