@@ -9,6 +9,7 @@ public class SonicMovement : MonoBehaviour
     public KeyCode homingAttackKey = KeyCode.P;
     public KeyCode SpindashKey = KeyCode.O;
     public KeyCode BoostKey = KeyCode.I;
+    public KeyCode StompKey = KeyCode.L;
     
 
     [Header("VALUES FOR MOVEMENT")]
@@ -79,9 +80,13 @@ public class SonicMovement : MonoBehaviour
     [SerializeField] private float CameraCenterDistWeight = 1f; // How strongly the distance from the cener of the camera affects it's standing in being the target for a homing attack
     [SerializeField] private Transform Target;  // Homing Attack target
 
+    [Header("STOMP")] 
+    [SerializeField] private float StompSpeed = 20f;
+    public float AfterStompWaitTime = .6f;
+    public bool InStompWaitTime = false;
     
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
-    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting }
+    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp }
 
     
     [Header("STATUS")]
@@ -182,7 +187,7 @@ public class SonicMovement : MonoBehaviour
     private void MyInput()
     {
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
-        if (movementState == MovementState.HomingAttacking) { return;}
+        if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || InStompWaitTime) { return;}
         
         // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -200,6 +205,13 @@ public class SonicMovement : MonoBehaviour
                 movementState = MovementState.Regular;
             }
             StartCoroutine(JumpRoutine());
+        }
+
+        if (Input.GetKeyDown(StompKey) && movementState == MovementState.Regular && surfaceState == SurfaceState.Air)
+        {
+            rb.velocity = Vector3.zero;
+            movementState = MovementState.Stomp;
+            return;
         }
 
         // Transition to spin-dash if key was pressed and we were in regular movement
@@ -469,6 +481,12 @@ public class SonicMovement : MonoBehaviour
             
             case MovementState.Boosting:
                 BoostMovement();
+                break;
+            
+            case MovementState.Stomp:
+                // Do nothing. Just wait until control is passed over to regular
+                if (InStompWaitTime) { return; }
+                Stomp();
                 break;
         }
 
@@ -767,5 +785,24 @@ public class SonicMovement : MonoBehaviour
         
         // Go back to normal if the meter is empty
         if (BoostMeter <= 0f) { movementState = MovementState.Regular; }
+    }
+
+    private void Stomp()
+    {
+        rb.velocity = Vector3.down * StompSpeed;
+
+        if (grounded)
+        {
+            rb.velocity = Vector3.zero;
+            InStompWaitTime = true;
+            StartCoroutine(AfterStompWait());
+        }
+    }
+
+    IEnumerator AfterStompWait()
+    {
+        yield return new WaitForSeconds(AfterStompWaitTime);
+        InStompWaitTime = false;
+        movementState = MovementState.Regular;
     }
 }

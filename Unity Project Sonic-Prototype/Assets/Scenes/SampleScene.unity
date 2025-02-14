@@ -17292,6 +17292,7 @@ MonoBehaviour:
   homingAttackKey: 112
   SpindashKey: 111
   BoostKey: 105
+  StompKey: 108
   speed: 150
   GoingDownHillSpeed: 210
   GoingUpHillSpeed: 115
@@ -17341,6 +17342,9 @@ MonoBehaviour:
   PlayerDistWeight: 1
   CameraCenterDistWeight: 1
   Target: {fileID: 0}
+  StompSpeed: 241
+  AfterStompWaitTime: 0.6
+  InStompWaitTime: 0
   grounded: 0
   rayHit: 0
   ShortHopping: 0
@@ -17368,7 +17372,7 @@ MonoBehaviour:
   animManager: {fileID: 1488038380}
   speedText: {fileID: 915234398}
   ShowSpeed: 1
-  ShowSpeedKey: 108
+  ShowSpeedKey: 13
 --- !u!136 &1575560306
 CapsuleCollider:
   m_ObjectHideFlags: 0
