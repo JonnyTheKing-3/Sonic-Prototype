@@ -9,6 +9,8 @@ public class SonicMovement : MonoBehaviour
     public KeyCode homingAttackKey = KeyCode.P;
     public KeyCode SpindashKey = KeyCode.O;
     public KeyCode BoostKey = KeyCode.I;
+    public KeyCode StompKey = KeyCode.L;
+    public KeyCode SlideKey = KeyCode.K;
     
 
     [Header("VALUES FOR MOVEMENT")]
@@ -79,9 +81,21 @@ public class SonicMovement : MonoBehaviour
     [SerializeField] private float CameraCenterDistWeight = 1f; // How strongly the distance from the cener of the camera affects it's standing in being the target for a homing attack
     [SerializeField] private Transform Target;  // Homing Attack target
 
-    
+    [Header("STOMP")] 
+    [SerializeField] private float StompSpeed = 20f;
+    public float AfterStompWaitTime = .6f;
+    public bool InStompWaitTime = false;
+
+    [Header("SLIDING")]
+    [SerializeField] private float TopSlideSpeed;
+    [SerializeField] private float SlideDeceleration;
+    [SerializeField] private float SlideUpHillDeceleration;
+    [SerializeField] private float desiredSlideDeceleration;
+    [SerializeField] private float SlideTurnSpeed;
+
+
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
-    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting }
+    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding }
 
     
     [Header("STATUS")]
@@ -182,7 +196,7 @@ public class SonicMovement : MonoBehaviour
     private void MyInput()
     {
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
-        if (movementState == MovementState.HomingAttacking) { return;}
+        if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || InStompWaitTime) { return;}
         
         // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -190,16 +204,22 @@ public class SonicMovement : MonoBehaviour
         
         if (movementState == MovementState.Spindashing && StartingSpinDash) { ChargeSpinDash(); return; }
         
-
         // Jump when the player is on the ground and presses the jump key
         if (Input.GetKeyDown(jumpKey) && readyToJump && grounded)
         {
-            if (movementState == MovementState.Spindashing)
+            if (movementState == MovementState.Spindashing || movementState == MovementState.Sliding)
             {
                 // Debug.Log("STOPPED SPINDASH BY JUMP");
                 movementState = MovementState.Regular;
             }
             StartCoroutine(JumpRoutine());
+        }
+
+        if (Input.GetKeyDown(StompKey) && movementState == MovementState.Regular && surfaceState == SurfaceState.Air)
+        {
+            rb.velocity = Vector3.zero;
+            movementState = MovementState.Stomp;
+            return;
         }
 
         // Transition to spin-dash if key was pressed and we were in regular movement
@@ -246,6 +266,20 @@ public class SonicMovement : MonoBehaviour
         // Boost while we hold the boost key and the boost meter isn't empty
         if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f) { movementState = MovementState.Boosting; }
         else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting)) { movementState = MovementState.Regular; }
+        
+        // Sliding
+        if (movementState != MovementState.Boosting && grounded && readyToJump && Input.GetKeyDown(SlideKey))
+        {
+            // Debug.Log("Start Slide");
+            // Make sure players speed caps as soon as they slide. Kinda like a negative side effect to prevent spamming
+            if (rb.velocity.magnitude > TopSlideSpeed) { rb.velocity = TopSlideSpeed * LastSpeedDirection; }
+            movementState = MovementState.Sliding;
+        }
+        else if (movementState == MovementState.Sliding && Input.GetKeyUp(SlideKey))
+        {
+            // Debug.Log("Stop Slide");
+            movementState = MovementState.Regular;
+        }
     }
     
     private IEnumerator JumpRoutine()
@@ -470,6 +504,22 @@ public class SonicMovement : MonoBehaviour
             case MovementState.Boosting:
                 BoostMovement();
                 break;
+            
+            case MovementState.Stomp:
+                // Do nothing. Just wait until control is passed over to regular
+                if (InStompWaitTime) { return; }
+                Stomp();
+                break;
+            
+            case MovementState.Sliding:
+                // If we go below a certain speed, go back to regular
+                if (rb.velocity.magnitude < 5f || !grounded) { movementState = MovementState.Regular;}
+                Slide();
+                break;
+            
+            case MovementState.RailGrinding:
+                RailGrinding();
+                break;
         }
 
         // Keep track os speed and direction
@@ -640,6 +690,25 @@ public class SonicMovement : MonoBehaviour
                 }
         
                 return SurfaceState.Flat;
+            
+            case MovementState.Sliding: 
+                switch (angle)
+                {
+                    case 0:
+                        DesiredSpeed = 1;
+                        desiredSlideDeceleration = SlideDeceleration;
+                        return SurfaceState.Flat;
+            
+                    case > 0:
+                        if (rb.velocity.y > .01f) { DesiredSpeed = 1;
+                            desiredSlideDeceleration = SlideUpHillDeceleration; return SurfaceState.GoingUpHill; }
+                        
+                        if (rb.velocity.y < -.01f) { DesiredSpeed = 1; 
+                            desiredSlideDeceleration = SlideDeceleration; return SurfaceState.GoingDownHill; }
+                        break;
+                }
+        
+                return SurfaceState.Flat;
         }
 
         return SurfaceState.Flat;
@@ -767,5 +836,74 @@ public class SonicMovement : MonoBehaviour
         
         // Go back to normal if the meter is empty
         if (BoostMeter <= 0f) { movementState = MovementState.Regular; }
+    }
+
+    private void Stomp()
+    {
+        rb.velocity = Vector3.down * StompSpeed;
+
+        if (grounded)
+        {
+            rb.velocity = Vector3.zero;
+            InStompWaitTime = true;
+            StartCoroutine(AfterStompWait());
+        }
+    }
+
+    IEnumerator AfterStompWait()
+    {
+        horizontalVelocity = Vector3.zero;
+        yield return new WaitForSeconds(AfterStompWaitTime);
+        InStompWaitTime = false;
+        movementState = MovementState.Regular;
+    }
+
+    public void Slide()
+    {
+        // Calculate move direction based on input and camera orientation
+        // and if the player doesn't input anything, keep going in the direction last used
+        moveDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
+        if (moveDirection == Vector3.zero) { moveDirection = LastSpeedDirection; }
+
+        // Apply movement on the slope by projecting onto the surface. In other words, get the move direction considering the surface the player is on
+        Vector3 SurfaceAppliedDirection = Vector3.ProjectOnPlane(moveDirection, surfaceHit.normal);
+
+        // Get the current surface, which also updates the desired speed
+        surfaceState = SurfacePlayerIsStandingOn();
+        
+        Vector3 targetVelocity = SurfaceAppliedDirection.normalized * DesiredSpeed;
+
+        // Smoothly rotate towards target velocity and apply acceleration or deceleration
+        float rad = SlideTurnSpeed * Mathf.PI * Time.deltaTime;
+
+        float prevSpeed = horizontalVelocity.magnitude;
+        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, surfaceHit.normal), targetVelocity, rad, 
+            desiredSlideDeceleration * Time.deltaTime);
+        float currentSpeed = horizontalVelocity.magnitude;
+        
+        if (surfaceState == lastSurfaceState && (surfaceState == SurfaceState.Flat || surfaceState == SurfaceState.GoingUpHill))
+        {
+            if (currentSpeed > DesiredSpeed)
+            {
+                horizontalVelocity.Normalize();
+                horizontalVelocity *= currentSpeed;
+            }
+        }
+        else
+        {
+            horizontalVelocity.Normalize();
+            horizontalVelocity *= Mathf.Max(prevSpeed, currentSpeed);
+        }
+        
+        // Update last surface
+        lastSurfaceState = surfaceState;
+        
+        // Combine horizontal and vertical velocity
+        rb.velocity = horizontalVelocity;
+    }
+
+    public void RailGrinding()
+    {
+        movementState = MovementState.Regular;
     }
 }
