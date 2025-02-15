@@ -95,7 +95,7 @@ public class SonicMovement : MonoBehaviour
 
 
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
-    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding }
+    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding }
 
     
     [Header("STATUS")]
@@ -516,6 +516,10 @@ public class SonicMovement : MonoBehaviour
                 if (rb.velocity.magnitude < 5f || !grounded) { movementState = MovementState.Regular;}
                 Slide();
                 break;
+            
+            case MovementState.RailGrinding:
+                RailGrinding();
+                break;
         }
 
         // Keep track os speed and direction
@@ -896,5 +900,10 @@ public class SonicMovement : MonoBehaviour
         
         // Combine horizontal and vertical velocity
         rb.velocity = horizontalVelocity;
+    }
+
+    public void RailGrinding()
+    {
+        movementState = MovementState.Regular;
     }
 }
