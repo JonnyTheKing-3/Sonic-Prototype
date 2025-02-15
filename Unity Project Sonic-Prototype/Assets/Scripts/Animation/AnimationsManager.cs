@@ -57,6 +57,7 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("StompWait", false);
+                animator.SetBool("Sliding", false);
                 
                 // blend tree is from 0-1, so what we want to pass to the animator is the percentage of how close we are to reaching the speed value
                 float speedVal = player.CurrentSpeedMagnitude / 100f;
@@ -101,6 +102,14 @@ public class AnimationsManager : MonoBehaviour
                     animator.SetBool("StompWait", true);
                 }
                 break;
+            
+            case SonicMovement.MovementState.Sliding:
+                animator.SetBool("Sliding", true);
+                animator.SetBool("SpinDashing", false);
+                animator.SetBool("grounded", player.grounded && player.readyToJump);
+                animator.speed = 1f;
+                break;
+                
         }
         
         

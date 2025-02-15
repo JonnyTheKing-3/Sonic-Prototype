@@ -17293,6 +17293,7 @@ MonoBehaviour:
   SpindashKey: 111
   BoostKey: 105
   StompKey: 108
+  SlideKey: 107
   speed: 150
   GoingDownHillSpeed: 210
   GoingUpHillSpeed: 115
@@ -17343,8 +17344,13 @@ MonoBehaviour:
   CameraCenterDistWeight: 1
   Target: {fileID: 0}
   StompSpeed: 241
-  AfterStompWaitTime: 0.6
+  AfterStompWaitTime: 0.3
   InStompWaitTime: 0
+  TopSlideSpeed: 120
+  SlideDeceleration: 70
+  SlideUpHillDeceleration: 105
+  desiredSlideDeceleration: 0
+  SlideTurnSpeed: 5
   grounded: 0
   rayHit: 0
   ShortHopping: 0
