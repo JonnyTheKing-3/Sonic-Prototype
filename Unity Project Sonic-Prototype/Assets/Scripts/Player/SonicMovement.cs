@@ -217,7 +217,7 @@ public class SonicMovement : MonoBehaviour
 
         if (Input.GetKeyDown(StompKey) && movementState == MovementState.Regular && surfaceState == SurfaceState.Air)
         {
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             movementState = MovementState.Stomp;
             return;
         }
@@ -226,7 +226,7 @@ public class SonicMovement : MonoBehaviour
         if (movementState == MovementState.Regular && Input.GetKeyDown(SpindashKey))
         {
             SpinDashStartTime = true;
-            if (Mathf.Abs(rb.velocity.x) < .1f && Mathf.Abs(rb.velocity.z) < .1f && grounded)
+            if (Mathf.Abs(rb.linearVelocity.x) < .1f && Mathf.Abs(rb.linearVelocity.z) < .1f && grounded)
             {
                 // Debug.Log("Spindash Start");
                 // Check if the player started from zero velocity and/or in the air
@@ -235,12 +235,12 @@ public class SonicMovement : MonoBehaviour
                 movementState = MovementState.Spindashing;
                 ChargeSpinDash();
             }
-            else if (grounded && Mathf.Abs(rb.velocity.x) > .1f && Mathf.Abs(rb.velocity.z) > .1f)
+            else if (grounded && Mathf.Abs(rb.linearVelocity.x) > .1f && Mathf.Abs(rb.linearVelocity.z) > .1f)
             {
                 StartingSpinDash = false;
                 SpinDashStartTime = false;
-                rb.AddForce(rb.velocity.normalized * InitialImpulseIfMoving, ForceMode.Impulse);
-                ChargedSpeed = rb.velocity.magnitude > DesiredSpeed ? DesiredSpeed: rb.velocity.magnitude;
+                rb.AddForce(rb.linearVelocity.normalized * InitialImpulseIfMoving, ForceMode.Impulse);
+                ChargedSpeed = rb.linearVelocity.magnitude > DesiredSpeed ? DesiredSpeed: rb.linearVelocity.magnitude;
                 movementState = MovementState.Spindashing;
                 return;
             }
@@ -257,7 +257,7 @@ public class SonicMovement : MonoBehaviour
         if (!grounded && Input.GetKeyDown(homingAttackKey) && CanHomingAttack) // We shouldn't do a homing attack from the ground
         {
             // Freeze the player to make sure homing attack starts without any forces attached
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             
             Target = GetTargetForHomingAttack();
             movementState = MovementState.HomingAttacking;
@@ -272,7 +272,7 @@ public class SonicMovement : MonoBehaviour
         {
             // Debug.Log("Start Slide");
             // Make sure players speed caps as soon as they slide. Kinda like a negative side effect to prevent spamming
-            if (rb.velocity.magnitude > TopSlideSpeed) { rb.velocity = TopSlideSpeed * LastSpeedDirection; }
+            if (rb.linearVelocity.magnitude > TopSlideSpeed) { rb.linearVelocity = TopSlideSpeed * LastSpeedDirection; }
             movementState = MovementState.Sliding;
         }
         else if (movementState == MovementState.Sliding && Input.GetKeyUp(SlideKey))
@@ -324,8 +324,8 @@ public class SonicMovement : MonoBehaviour
 
         // Remove any velocity component in the jump direction.
         // This prevents any unwanted buildup from the ground movement.
-        Vector3 velocityWithoutJumpComponent = Vector3.ProjectOnPlane(rb.velocity, jumpNormal);
-        rb.velocity = velocityWithoutJumpComponent;
+        Vector3 velocityWithoutJumpComponent = Vector3.ProjectOnPlane(rb.linearVelocity, jumpNormal);
+        rb.linearVelocity = velocityWithoutJumpComponent;
 
         // mark as not grounded so that the ground adjustments in FixedUpdate won’t interfere with the jump.
         grounded = false;
@@ -364,7 +364,7 @@ public class SonicMovement : MonoBehaviour
             Vector3 dashDireciton = Vector3.ProjectOnPlane(LastSpeedDirection, surfaceHit.normal).normalized;
             // Debug.Log("DashDirection: " + dashDireciton);
             
-            rb.velocity += ChargedSpeed * dashDireciton;
+            rb.linearVelocity += ChargedSpeed * dashDireciton;
             // Debug.Log("velocity: " + rb.velocity.magnitude);
             
             StartingSpinDash = false;
@@ -491,7 +491,7 @@ public class SonicMovement : MonoBehaviour
                 if (!StartingSpinDash) {SpindashMovement();}
                 
                 // If the speed is too low or we leave the ground, go back to normal
-                if (rb.velocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime || !grounded && !StartingSpinDash)
+                if (rb.linearVelocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime || !grounded && !StartingSpinDash)
                 {
                     // if (!grounded) { Debug.Log("STOPPED SPINDASH BECAUSE WE'RE NOT GROUNDED"); }
                     // else {Debug.Log("STOPPED SPINDASH FOR LOW SPEED");}
@@ -513,7 +513,7 @@ public class SonicMovement : MonoBehaviour
             
             case MovementState.Sliding:
                 // If we go below a certain speed, go back to regular
-                if (rb.velocity.magnitude < 5f || !grounded) { movementState = MovementState.Regular;}
+                if (rb.linearVelocity.magnitude < 5f || !grounded) { movementState = MovementState.Regular;}
                 Slide();
                 break;
             
@@ -523,7 +523,7 @@ public class SonicMovement : MonoBehaviour
         }
 
         // Keep track os speed and direction
-        CurrentSpeedMagnitude = rb.velocity.magnitude;
+        CurrentSpeedMagnitude = rb.linearVelocity.magnitude;
         if (moveDirection != Vector3.zero) { LastSpeedDirection = new Vector3(moveDirection.x, 0f, moveDirection.z); }
     }
     
@@ -578,7 +578,7 @@ public class SonicMovement : MonoBehaviour
 
         float prevSpeed = horizontalVelocity.magnitude; // Store previous velocity
         // Move our current velocity towards our desired velocity
-        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad, 
+        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.linearVelocity, Surface), targetVelocity, rad, 
             appropriateAcceleration * Time.deltaTime);
         float currentSpeed = horizontalVelocity.magnitude; // Store current velocity
         
@@ -632,7 +632,7 @@ public class SonicMovement : MonoBehaviour
         }
         
         // Preserve vertical velocity
-        float verticalVelocity = rb.velocity.y;
+        float verticalVelocity = rb.linearVelocity.y;
 
         // If grounded, reset vertical velocity. Otherwise, apply gravity to it
         if (grounded && readyToJump)  { verticalVelocity = 0f; }
@@ -642,7 +642,7 @@ public class SonicMovement : MonoBehaviour
         lastSurfaceState = surfaceState;
         
         // Combine horizontal and vertical velocity
-        rb.velocity = horizontalVelocity + transform.up * verticalVelocity;
+        rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
     }
 
     // Returns the surface the player is standing on based on surface and speed direction, as well as updates DesiredSpeed
@@ -664,8 +664,8 @@ public class SonicMovement : MonoBehaviour
             
                     case > 0:
                         // Check the direction the player is running in to see how they are running in the slope
-                        if (rb.velocity.y > .01f) { DesiredSpeed = GoingUpHillSpeed; return SurfaceState.GoingUpHill; }
-                        if (rb.velocity.y < -.01f) { DesiredSpeed = GoingDownHillSpeed; return SurfaceState.GoingDownHill; }
+                        if (rb.linearVelocity.y > .01f) { DesiredSpeed = GoingUpHillSpeed; return SurfaceState.GoingUpHill; }
+                        if (rb.linearVelocity.y < -.01f) { DesiredSpeed = GoingDownHillSpeed; return SurfaceState.GoingDownHill; }
                         break;
                 }
         
@@ -681,10 +681,10 @@ public class SonicMovement : MonoBehaviour
             
                     case > 0:
                         // Check the direction the player is running in to see how they are running in the slope
-                        if (rb.velocity.y > .01f) { DesiredSpeed = 1;
+                        if (rb.linearVelocity.y > .01f) { DesiredSpeed = 1;
                             spindashDesiredAcceleration = SpinDashDecelerationUpSlope; return SurfaceState.GoingUpHill; }
                         
-                        if (rb.velocity.y < -.01f) { DesiredSpeed = SpinDashDownHillSpeed; 
+                        if (rb.linearVelocity.y < -.01f) { DesiredSpeed = SpinDashDownHillSpeed; 
                             spindashDesiredAcceleration = SpinDashDownHillAcceleration; return SurfaceState.GoingDownHill; }
                         break;
                 }
@@ -700,10 +700,10 @@ public class SonicMovement : MonoBehaviour
                         return SurfaceState.Flat;
             
                     case > 0:
-                        if (rb.velocity.y > .01f) { DesiredSpeed = 1;
+                        if (rb.linearVelocity.y > .01f) { DesiredSpeed = 1;
                             desiredSlideDeceleration = SlideUpHillDeceleration; return SurfaceState.GoingUpHill; }
                         
-                        if (rb.velocity.y < -.01f) { DesiredSpeed = 1; 
+                        if (rb.linearVelocity.y < -.01f) { DesiredSpeed = 1; 
                             desiredSlideDeceleration = SlideDeceleration; return SurfaceState.GoingDownHill; }
                         break;
                 }
@@ -768,7 +768,7 @@ public class SonicMovement : MonoBehaviour
 
         float prevSpeed = horizontalVelocity.magnitude; // Store previous velocity
         // Move our current velocity towards our desired velocity
-        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, surfaceHit.normal), targetVelocity, rad, 
+        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.linearVelocity, surfaceHit.normal), targetVelocity, rad, 
             spindashDesiredAcceleration * Time.deltaTime);
         float currentSpeed = horizontalVelocity.magnitude; // Store current velocity
         
@@ -790,7 +790,7 @@ public class SonicMovement : MonoBehaviour
         lastSurfaceState = surfaceState;
         
         // Combine horizontal and vertical velocity
-        rb.velocity = horizontalVelocity;
+        rb.linearVelocity = horizontalVelocity;
     }
 
     private void BoostMovement()
@@ -812,14 +812,14 @@ public class SonicMovement : MonoBehaviour
         float rad = BoostTurnSpeed * Mathf.PI * Time.deltaTime;
         
         // Move our current velocity towards our desired velocity
-        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, Surface), targetVelocity, rad, 1f * Time.deltaTime);
+        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.linearVelocity, Surface), targetVelocity, rad, 1f * Time.deltaTime);
         
         // Keep the velocity always at boost-speed while boosting
         horizontalVelocity.Normalize();
         horizontalVelocity *= BoostSpeed;
         
         // Preserve vertical velocity
-        float verticalVelocity = rb.velocity.y;
+        float verticalVelocity = rb.linearVelocity.y;
 
         // If grounded, reset vertical velocity. Otherwise, apply gravity to it
         if (grounded && readyToJump)  { verticalVelocity = 0f; }
@@ -829,7 +829,7 @@ public class SonicMovement : MonoBehaviour
         lastSurfaceState = surfaceState;
         
         // Combine horizontal and vertical velocity
-        rb.velocity = horizontalVelocity + transform.up * verticalVelocity;
+        rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
         
         // Decrease boost meter
         BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
@@ -840,11 +840,11 @@ public class SonicMovement : MonoBehaviour
 
     private void Stomp()
     {
-        rb.velocity = Vector3.down * StompSpeed;
+        rb.linearVelocity = Vector3.down * StompSpeed;
 
         if (grounded)
         {
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             InStompWaitTime = true;
             StartCoroutine(AfterStompWait());
         }
@@ -877,7 +877,7 @@ public class SonicMovement : MonoBehaviour
         float rad = SlideTurnSpeed * Mathf.PI * Time.deltaTime;
 
         float prevSpeed = horizontalVelocity.magnitude;
-        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.velocity, surfaceHit.normal), targetVelocity, rad, 
+        horizontalVelocity = Vector3.RotateTowards(Vector3.ProjectOnPlane(rb.linearVelocity, surfaceHit.normal), targetVelocity, rad, 
             desiredSlideDeceleration * Time.deltaTime);
         float currentSpeed = horizontalVelocity.magnitude;
         
@@ -899,7 +899,7 @@ public class SonicMovement : MonoBehaviour
         lastSurfaceState = surfaceState;
         
         // Combine horizontal and vertical velocity
-        rb.velocity = horizontalVelocity;
+        rb.linearVelocity = horizontalVelocity;
     }
 
     public void RailGrinding()
