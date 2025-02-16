@@ -16079,6 +16079,12 @@ MonoBehaviour:
   SlideUpHillDeceleration: 105
   desiredSlideDeceleration: 0
   SlideTurnSpeed: 5
+  railRayStickingDist: 2.5
+  railRayMaxDist: 10
+  whatIsRail:
+    serializedVersion: 2
+    m_Bits: 128
+  HitRail: 0
   grounded: 0
   rayHit: 0
   ShortHopping: 0
@@ -20918,9 +20924,9 @@ GameObject:
   - component: {fileID: 2027398910}
   - component: {fileID: 2027398909}
   - component: {fileID: 2027398908}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rail
-  m_TagString: Rail
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -20940,11 +20946,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 1
+  m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 937135650}
 --- !u!33 &2027398909
