@@ -8,8 +8,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +57,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.15f1\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.0.38f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath &quot;C:\Users\jorro\OneDrive\Documents\GitHub\Sonic-Prototype\Unity Project Sonic-Prototype&quot; -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="C:\Users\jorro\OneDrive\Documents\GitHub\Sonic-Prototype\Unity Project Sonic-Prototype" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -64,7 +65,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.15f1\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.0.38f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath &quot;C:\Users\jorro\OneDrive\Documents\GitHub\Sonic-Prototype\Unity Project Sonic-Prototype&quot; -testResults Logs/results.xml -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="C:\Users\jorro\OneDrive\Documents\GitHub\Sonic-Prototype\Unity Project Sonic-Prototype" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -136,6 +137,8 @@
       <workItem from="1739478755279" duration="664000" />
       <workItem from="1739494591350" duration="762000" />
       <workItem from="1739570804148" duration="10753000" />
+      <workItem from="1739686516009" duration="1620000" />
+      <workItem from="1739688317786" duration="2938000" />
     </task>
     <servers />
   </component>
