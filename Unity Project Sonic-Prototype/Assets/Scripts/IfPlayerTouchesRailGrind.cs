@@ -13,7 +13,7 @@ public class IfPlayerTouchesRailGrind : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("trigger");
+        Debug.Log("RAIL TRIGGER");
         if (other.CompareTag("Player"))
         {
             // Allow time for player to leave rail if they jump

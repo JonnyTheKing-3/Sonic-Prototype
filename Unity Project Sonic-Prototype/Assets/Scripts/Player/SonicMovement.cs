@@ -870,7 +870,8 @@ public class SonicMovement : MonoBehaviour
     private void Stomp()
     {
         rb.linearVelocity = Vector3.down * StompSpeed;
-
+        
+        // Rail takes priority
         DetectRail();
         
         if (grounded)
@@ -882,15 +883,18 @@ public class SonicMovement : MonoBehaviour
     }
     private void DetectRail()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit stompRay, surfaceHitRay, whatIsRail))
+        /*
+         * The player travels very fast when stomping, so the collision between rail and player might be missed
+         * because of the frame by frame window, even if the player's collision detection is continuous/continuous dynamic
+         * So instead, we do our own simulation. Instead of waiting for the next frame, we predict the spot the player is going to be on the next frame
+         * And if on our way to that spot we hit a rail, get on the rail. It works better because we don't have to wait for the next frame
+        */
+        Vector3 nextSpot = transform.position + rb.linearVelocity * Time.fixedDeltaTime;
+        if (Physics.Linecast(transform.position, nextSpot, out RaycastHit stompRay, whatIsRail))
         {
-            float dist = Vector3.Distance(stompRay.point, transform.position);
-            if (dist < groundStickingDistance)
-            {
-                rb.linearVelocity = Vector3.zero;
-                CurrentCart = stompRay.transform.parent.GetComponentInChildren<CinemachineSplineCart>();
-                movementState = MovementState.RailGrinding;
-            }
+            rb.linearVelocity = Vector3.zero;
+            CurrentCart = stompRay.transform.parent.GetComponentInChildren<CinemachineSplineCart>();
+            movementState = MovementState.RailGrinding;
         }
     }
 
