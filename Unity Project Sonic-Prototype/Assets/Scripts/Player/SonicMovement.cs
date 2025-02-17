@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -81,18 +83,24 @@ public class SonicMovement : MonoBehaviour
     [SerializeField] private float CameraCenterDistWeight = 1f; // How strongly the distance from the cener of the camera affects it's standing in being the target for a homing attack
     [SerializeField] private Transform Target;  // Homing Attack target
 
+    
     [Header("STOMP")] 
     [SerializeField] private float StompSpeed = 20f;
     public float AfterStompWaitTime = .6f;
     public bool InStompWaitTime = false;
 
+    
     [Header("SLIDING")]
     [SerializeField] private float TopSlideSpeed;
     [SerializeField] private float SlideDeceleration;
     [SerializeField] private float SlideUpHillDeceleration;
     [SerializeField] private float desiredSlideDeceleration;
     [SerializeField] private float SlideTurnSpeed;
-
+    
+    [Header("RAIL GRINDINNG")]
+    public CinemachineSplineCart CurrentCart;
+    public float RailOffsetPos;
+    public LayerMask whatIsRail;
 
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
     public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding }
@@ -205,9 +213,11 @@ public class SonicMovement : MonoBehaviour
         if (movementState == MovementState.Spindashing && StartingSpinDash) { ChargeSpinDash(); return; }
         
         // Jump when the player is on the ground and presses the jump key
-        if (Input.GetKeyDown(jumpKey) && readyToJump && grounded)
+        if (Input.GetKeyDown(jumpKey) && (readyToJump && grounded || movementState == MovementState.RailGrinding))
         {
-            if (movementState == MovementState.Spindashing || movementState == MovementState.Sliding)
+            CurrentCart = null;
+            InStompWaitTime = false;
+            if (movementState == MovementState.Spindashing || movementState == MovementState.Sliding || movementState == MovementState.RailGrinding)
             {
                 // Debug.Log("STOPPED SPINDASH BY JUMP");
                 movementState = MovementState.Regular;
@@ -456,8 +466,11 @@ public class SonicMovement : MonoBehaviour
                 triggerColliderForJumpTime.enabled = false;
                 
                 // Get grounding info
-                rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
-                UpdateGroundedStatus();
+                if (movementState != MovementState.RailGrinding)
+                {
+                    rayHit = Physics.Raycast(transform.position, -transform.up, out surfaceHit, surfaceHitRay, whatIsGround);
+                    UpdateGroundedStatus();
+                }
             }
             else { inIgnoreGroundJumpTime = true; }
     
@@ -526,7 +539,7 @@ public class SonicMovement : MonoBehaviour
         CurrentSpeedMagnitude = rb.linearVelocity.magnitude;
         if (moveDirection != Vector3.zero) { LastSpeedDirection = new Vector3(moveDirection.x, 0f, moveDirection.z); }
     }
-    
+
     private void UpdateGroundedStatus()
     {
         if (rayHit)
@@ -655,6 +668,22 @@ public class SonicMovement : MonoBehaviour
 
         switch (movementState)
         {
+            case MovementState.RailGrinding:
+                switch (angle)
+                {
+                    case 0:
+                        DesiredSpeed = 0f;
+                        return SurfaceState.Flat;
+            
+                    case > 0:
+                        // Check the direction the player is running in to see how they are running in the slope
+                        if (rb.linearVelocity.y > .01f) { DesiredSpeed = 0f; return SurfaceState.GoingUpHill; }
+                        if (rb.linearVelocity.y < -.01f) { DesiredSpeed = GoingDownHillSpeed; return SurfaceState.GoingDownHill; }
+                        break;
+                }
+        
+                return SurfaceState.Flat;
+            
             case MovementState.Regular:
                 switch (angle)
                 {
@@ -841,12 +870,31 @@ public class SonicMovement : MonoBehaviour
     private void Stomp()
     {
         rb.linearVelocity = Vector3.down * StompSpeed;
-
+        
+        // Rail takes priority
+        DetectRail();
+        
         if (grounded)
         {
             rb.linearVelocity = Vector3.zero;
             InStompWaitTime = true;
             StartCoroutine(AfterStompWait());
+        }
+    }
+    private void DetectRail()
+    {
+        /*
+         * The player travels very fast when stomping, so the collision between rail and player might be missed
+         * because of the frame by frame window, even if the player's collision detection is continuous/continuous dynamic
+         * So instead, we do our own simulation. Instead of waiting for the next frame, we predict the spot the player is going to be on the next frame
+         * And if on our way to that spot we hit a rail, get on the rail. It works better because we don't have to wait for the next frame
+        */
+        Vector3 nextSpot = transform.position + rb.linearVelocity * Time.fixedDeltaTime;
+        if (Physics.Linecast(transform.position, nextSpot, out RaycastHit stompRay, whatIsRail))
+        {
+            rb.linearVelocity = Vector3.zero;
+            CurrentCart = stompRay.transform.parent.GetComponentInChildren<CinemachineSplineCart>();
+            movementState = MovementState.RailGrinding;
         }
     }
 
@@ -904,6 +952,11 @@ public class SonicMovement : MonoBehaviour
 
     public void RailGrinding()
     {
-        movementState = MovementState.Regular;
+        // Get the current surface, which also updates the desired speed
+        surfaceState = SurfacePlayerIsStandingOn();
+
+        transform.position = CurrentCart.transform.position + (transform.up * RailOffsetPos);
+        
+        // Rail grinding movement will be done in a script inside the rails because it's easier to access the dolly cart and spline that way. I may integrate it here later though
     }
 }
