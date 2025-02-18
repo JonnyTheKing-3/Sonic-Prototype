@@ -881,6 +881,7 @@ public class SonicMovement : MonoBehaviour
             StartCoroutine(AfterStompWait());
         }
     }
+    
     private void DetectRail()
     {
         /*
@@ -892,9 +893,9 @@ public class SonicMovement : MonoBehaviour
         Vector3 nextSpot = transform.position + rb.linearVelocity * Time.fixedDeltaTime;
         if (Physics.Linecast(transform.position, nextSpot, out RaycastHit stompRay, whatIsRail))
         {
-            rb.linearVelocity = Vector3.zero;
-            CurrentCart = stompRay.transform.parent.GetComponentInChildren<CinemachineSplineCart>();
-            movementState = MovementState.RailGrinding;
+            // rb.linearVelocity = Vector3.zero;
+            
+            stompRay.transform.gameObject.GetComponent<IfPlayerTouchesRailGrind>().SetupBeforeRailGrinding(this);
         }
     }
 

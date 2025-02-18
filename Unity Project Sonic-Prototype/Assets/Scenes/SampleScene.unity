@@ -16538,8 +16538,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SplineSettings:
     Spline: {fileID: 872301239}
-    Position: 25.7
-    Units: 0
+    Position: 0.40472442
+    Units: 1
   UpdateMethod: 1
   AutomaticDolly:
     Enabled: 0
@@ -22444,7 +22444,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1cc2f2b78bd17b4cad53c4761400025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cart: {fileID: 0}
+  cart: {fileID: 1546518720}
+  railPath: {fileID: 0}
+  railMovement: {fileID: 0}
 --- !u!65 &2027398916
 BoxCollider:
   m_ObjectHideFlags: 0
