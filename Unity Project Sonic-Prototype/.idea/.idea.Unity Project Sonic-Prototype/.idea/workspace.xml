@@ -6,8 +6,20 @@
   <component name="ChangeListManager">
     <list default="true" id="8a32008a-2dfa-44ab-900c-535bb1ce1ecc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Unity Project Sonic-Prototype/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/BlueTrail.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/BlueTrail.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/VFX/URP Asset.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/VFX/URP Asset.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/IfPlayerTouchesRailGrind.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/IfPlayerTouchesRailGrind.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SonicMovement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RailMovement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RailMovement.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ResetScene.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ResetScene.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/SceneSettings.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/SceneSettings.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/SliderBoostMeterMover.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/SliderBoostMeterMover.cs.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,6 +151,7 @@
       <workItem from="1739731959959" duration="18939000" />
       <workItem from="1739775922135" duration="1420000" />
       <workItem from="1739822648587" duration="13419000" />
+      <workItem from="1739904644503" duration="7821000" />
     </task>
     <servers />
   </component>

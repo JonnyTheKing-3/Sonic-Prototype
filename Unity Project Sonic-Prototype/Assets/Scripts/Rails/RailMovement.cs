@@ -3,11 +3,13 @@ using Unity.Cinemachine;
 
 public class RailMovement : MonoBehaviour
 {
-    public SonicMovement player;
     public bool playerIsOnRail;
+    public float startSpeed;    // Speed in which player entered the rail
+    
+    [Header("REFERENCES")]
+    public SonicMovement player;
     public CinemachineSplineCart cart;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         player = GameObject.FindWithTag("Player").GetComponent<SonicMovement>();
@@ -15,8 +17,7 @@ public class RailMovement : MonoBehaviour
         playerIsOnRail = false;
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+   void FixedUpdate()
     {
         if (playerIsOnRail)
         {

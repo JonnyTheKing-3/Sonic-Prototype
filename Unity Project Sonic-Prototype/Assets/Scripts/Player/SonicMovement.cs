@@ -96,8 +96,9 @@ public class SonicMovement : MonoBehaviour
     [SerializeField] private float SlideUpHillDeceleration;
     [SerializeField] private float desiredSlideDeceleration;
     [SerializeField] private float SlideTurnSpeed;
-    
-    [Header("RAIL GRINDINNG")]
+
+    [Header("RAIL GRINDINNG")] 
+    public float RailStartSpeed = 0f;
     public CinemachineSplineCart CurrentCart;
     public float RailOffsetPos;
     public LayerMask whatIsRail;
@@ -123,8 +124,9 @@ public class SonicMovement : MonoBehaviour
     public float CurrentSpeedMagnitude;
     public Vector3 LastSpeedDirection; // Used for homing attack
     public SurfaceState surfaceState;
-    public MovementState movementState;
     private SurfaceState lastSurfaceState;
+    public MovementState movementState;
+    public MovementState LastMovementState;
 
     
     [Header("REFERENCES")]
@@ -139,6 +141,7 @@ public class SonicMovement : MonoBehaviour
     public AnimationsManager animManager;
     [SerializeField] private TMP_Text speedText;
 
+    
     [Header("EXTRA")] 
     [SerializeField] private bool ShowSpeed = true;
     [SerializeField] private KeyCode ShowSpeedKey;
@@ -531,13 +534,17 @@ public class SonicMovement : MonoBehaviour
                 break;
             
             case MovementState.RailGrinding:
+                // If we just got on the rail, first determine which direction we should traverse the rail in
+                // if (movementState != LastMovementState) { RailDirectionToGoIn(); break; }
+                
                 RailGrinding();
                 break;
         }
 
-        // Keep track os speed and direction
+        // Keep track of speed, direction and last movement state
         CurrentSpeedMagnitude = rb.linearVelocity.magnitude;
         if (moveDirection != Vector3.zero) { LastSpeedDirection = new Vector3(moveDirection.x, 0f, moveDirection.z); }
+        LastMovementState = movementState;
     }
 
     private void UpdateGroundedStatus()
@@ -892,11 +899,7 @@ public class SonicMovement : MonoBehaviour
         */
         Vector3 nextSpot = transform.position + rb.linearVelocity * Time.fixedDeltaTime;
         if (Physics.Linecast(transform.position, nextSpot, out RaycastHit stompRay, whatIsRail))
-        {
-            // rb.linearVelocity = Vector3.zero;
-            
-            stompRay.transform.gameObject.GetComponent<IfPlayerTouchesRailGrind>().SetupBeforeRailGrinding(this);
-        }
+        { stompRay.transform.gameObject.GetComponent<IfPlayerTouchesRailGrind>().SetupBeforeRailGrinding(this); }
     }
 
     IEnumerator AfterStompWait()
@@ -949,6 +952,12 @@ public class SonicMovement : MonoBehaviour
         
         // Combine horizontal and vertical velocity
         rb.linearVelocity = horizontalVelocity;
+    }
+
+    // Determines what direction the player should go as well as the velocity the player should start with
+    public void RailDirectionToGoIn()
+    {
+        // CurrentCart.SplinePosition = Vector3.MoveTowards(CurrentCart.SplinePosition, , RailStartSpeed/100 * Time.deltaTime);
     }
 
     public void RailGrinding()

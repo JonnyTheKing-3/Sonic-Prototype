@@ -16634,7 +16634,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1546518719}
   - component: {fileID: 1546518720}
-  - component: {fileID: 1546518721}
   m_Layer: 0
   m_Name: Dolly Cart
   m_TagString: Untagged
@@ -16671,8 +16670,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SplineSettings:
     Spline: {fileID: 872301239}
-    Position: 0.40472442
-    Units: 1
+    Position: 25.7
+    Units: 0
   UpdateMethod: 1
   AutomaticDolly:
     Enabled: 0
@@ -16687,21 +16686,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
---- !u!114 &1546518721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1546518718}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ac7a705042d16c4890f09144a786fd7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  playerIsOnRail: 0
-  cart: {fileID: 0}
 --- !u!1 &1570754351
 GameObject:
   m_ObjectHideFlags: 0
@@ -17061,6 +17045,7 @@ MonoBehaviour:
   SlideUpHillDeceleration: 105
   desiredSlideDeceleration: 0
   SlideTurnSpeed: 5
+  RailStartSpeed: 0
   CurrentCart: {fileID: 0}
   RailOffsetPos: 1
   whatIsRail:
@@ -17082,6 +17067,7 @@ MonoBehaviour:
   LastSpeedDirection: {x: 0, y: 0, z: 0}
   surfaceState: 0
   movementState: 0
+  LastMovementState: 0
   orientation: {fileID: 1142633062}
   rb: {fileID: 1575560304}
   triggerColliderForJumpTime: {fileID: 1575560306}
@@ -21900,12 +21886,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2027398913}
+  - component: {fileID: 2027398915}
   - component: {fileID: 2027398912}
   - component: {fileID: 2027398911}
   - component: {fileID: 2027398910}
   - component: {fileID: 2027398909}
   - component: {fileID: 2027398908}
-  - component: {fileID: 2027398915}
   - component: {fileID: 2027398916}
   m_Layer: 7
   m_Name: Rail
@@ -22578,9 +22564,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1cc2f2b78bd17b4cad53c4761400025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cartIterations: 25
+  roughIterations: 0.04
   cart: {fileID: 1546518720}
-  railPath: {fileID: 0}
-  railMovement: {fileID: 0}
+  railPath: {fileID: 872301239}
 --- !u!65 &2027398916
 BoxCollider:
   m_ObjectHideFlags: 0
