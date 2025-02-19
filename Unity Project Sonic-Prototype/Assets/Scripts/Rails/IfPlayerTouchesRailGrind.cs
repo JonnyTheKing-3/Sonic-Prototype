@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -7,26 +9,32 @@ public class IfPlayerTouchesRailGrind : MonoBehaviour
 {
     [SerializeField, Min(0)] private int cartIterations; // higher = accuracy in landing on rail, lower = performance
     [SerializeField, Range(0.000000001f,1)] private float roughIterations;
+    [SerializeField] private float ignoreWaitTime = .2f;
+    public bool ignoreRail; // ignore rail becomes true as soon as player presses jump in player script
     
     public CinemachineSplineCart cart;
     public SplineContainer railPath;
-    
-    
+
     private void Start()
     {
         GameObject parent = transform.parent.gameObject;
         
         cart = parent.GetComponentInChildren<CinemachineSplineCart>();
         railPath = parent.GetComponentInChildren<SplineContainer>();
+
+        ignoreRail = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("RAIL TRIGGER");
+        // Debug.Log("RAIL TRIGGER");
         if (other.CompareTag("Player"))
         {
             // Allow time for player to leave rail if they jump
-            if (other.GetComponent<SonicMovement>().inIgnoreGroundJumpTime) { return; }
+            if (other.GetComponent<SonicMovement>().inIgnoreGroundJumpTime || 
+                other.GetComponent<SonicMovement>().movementState == SonicMovement.MovementState.RailGrinding ||
+                ignoreRail)
+            { return; }
             
             SetupBeforeRailGrinding(other.GetComponent<SonicMovement>());
         }
@@ -36,14 +44,22 @@ public class IfPlayerTouchesRailGrind : MonoBehaviour
     {
         // Pass the in which the player entered the rail
         other.RailStartSpeed = other.CurrentSpeedMagnitude;
-
+        Vector3 vel = other.rb.linearVelocity.normalized;
+        
         // Stop player to make sure the don't bounce on the rail for trying to move. Remember, we want to move the cart which moves sonic, not sonic himself
         other.rb.linearVelocity = Vector3.zero;
             
         // move cart towards where player landed
         float newCartPos = GetClosestPointOnTrack(other.transform.position);
         cart.SplinePosition = newCartPos;
-            
+        
+        // Determines what direction the player should go
+        Vector3 positionVector = cart.Spline.EvaluateTangent(cart.SplinePosition);
+        positionVector.Normalize();
+        float angle = Vector3.Dot(vel,positionVector);
+        other.RailStartSpeed *= angle; // change direction in relation to the angle
+        other.TowardsEndPoint = angle > 0f; 
+        
         // Attach player to cart
         other.CurrentCart = cart;
         cart.PositionUnits = PathIndexUnit.Distance;
@@ -111,5 +127,15 @@ public class IfPlayerTouchesRailGrind : MonoBehaviour
 
         return closestPoint;
     }
+
+    private void OnTriggerExit(Collider other)
+    { StartCoroutine(ResetRail()); }
+
+    IEnumerator ResetRail()
+    {
+        yield return new WaitForSeconds(ignoreWaitTime);
+        ignoreRail = false;
+    }
+
 
 }

@@ -97,12 +97,21 @@ public class SonicMovement : MonoBehaviour
     [SerializeField] private float desiredSlideDeceleration;
     [SerializeField] private float SlideTurnSpeed;
 
+
     [Header("RAIL GRINDINNG")] 
     public float RailStartSpeed = 0f;
+    public float desiredRailAcceleration;
+    [Space]
+    public float railDeceleration;
+    public float railUpDeceleration;
+    public float railDownAcceleration;
+    [Space]
     public CinemachineSplineCart CurrentCart;
     public float RailOffsetPos;
     public LayerMask whatIsRail;
+    public bool TowardsEndPoint;
 
+    
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
     public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding }
 
@@ -215,10 +224,16 @@ public class SonicMovement : MonoBehaviour
         
         if (movementState == MovementState.Spindashing && StartingSpinDash) { ChargeSpinDash(); return; }
         
-        // Jump when the player is on the ground and presses the jump key
+        // Jump
         if (Input.GetKeyDown(jumpKey) && (readyToJump && grounded || movementState == MovementState.RailGrinding))
         {
-            CurrentCart = null;
+            // If we're jumping off a rail, make cart null and ignore the rail for a bit so that we have enough time to get out
+            if (CurrentCart != null)
+            {
+                CurrentCart.transform.parent.GetComponentInChildren<IfPlayerTouchesRailGrind>().ignoreRail = true;
+                CurrentCart = null;
+            }
+            
             InStompWaitTime = false;
             if (movementState == MovementState.Spindashing || movementState == MovementState.Sliding || movementState == MovementState.RailGrinding)
             {
@@ -228,6 +243,7 @@ public class SonicMovement : MonoBehaviour
             StartCoroutine(JumpRoutine());
         }
 
+        // Stomp
         if (Input.GetKeyDown(StompKey) && movementState == MovementState.Regular && surfaceState == SurfaceState.Air)
         {
             rb.linearVelocity = Vector3.zero;
@@ -235,7 +251,7 @@ public class SonicMovement : MonoBehaviour
             return;
         }
 
-        // Transition to spin-dash if key was pressed and we were in regular movement
+        // Spin-dash
         if (movementState == MovementState.Regular && Input.GetKeyDown(SpindashKey))
         {
             SpinDashStartTime = true;
@@ -259,14 +275,14 @@ public class SonicMovement : MonoBehaviour
             }
         }
         
-        // Go back to regular if we pressed spindash key while in spindash
+        // Spin-dash to Regular
         if (movementState == MovementState.Spindashing && Input.GetKeyDown(SpindashKey) && !StartingSpinDash)
         {
             // Debug.Log("STOPPED SPINDASH BY KEY PRESS");
             movementState = MovementState.Regular;
         }
 
-        // Perform a homing attack if the player pressed the homing attack key and can homing attack
+        // homing attack
         if (!grounded && Input.GetKeyDown(homingAttackKey) && CanHomingAttack) // We shouldn't do a homing attack from the ground
         {
             // Freeze the player to make sure homing attack starts without any forces attached
@@ -276,7 +292,7 @@ public class SonicMovement : MonoBehaviour
             movementState = MovementState.HomingAttacking;
         }
 
-        // Boost while we hold the boost key and the boost meter isn't empty
+        // Boost
         if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f) { movementState = MovementState.Boosting; }
         else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting)) { movementState = MovementState.Regular; }
         
@@ -332,6 +348,14 @@ public class SonicMovement : MonoBehaviour
         
         // Record the ground normal at the moment of jump
         jumpNormal = surfaceHit.normal;
+        
+        // If we jumped from a rail, jump from transform.up. Might change jumpNormal to be transform.up always for simplicty. I'll have to see if that works though
+        Vector3 nextSpot = transform.position + Vector3.down * 2f;
+        if (Physics.Linecast(transform.position, nextSpot, whatIsRail))
+        {
+            jumpNormal = transform.up;
+        }
+        
         // Debug.Log(jumpNormal);
         jumpStartTime = Time.time;
 
@@ -534,9 +558,6 @@ public class SonicMovement : MonoBehaviour
                 break;
             
             case MovementState.RailGrinding:
-                // If we just got on the rail, first determine which direction we should traverse the rail in
-                // if (movementState != LastMovementState) { RailDirectionToGoIn(); break; }
-                
                 RailGrinding();
                 break;
         }
@@ -665,32 +686,16 @@ public class SonicMovement : MonoBehaviour
         rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
     }
 
-    // Returns the surface the player is standing on based on surface and speed direction, as well as updates DesiredSpeed
+    // Returns the surface the player is standing on based on player rotation, as well as updates DesiredSpeed
     private SurfaceState SurfacePlayerIsStandingOn()
     {
-        if (!grounded) { DesiredSpeed = speed; return SurfaceState.Air; }
+        if (!grounded && movementState != MovementState.RailGrinding) { DesiredSpeed = speed; return SurfaceState.Air; }
 
         // Check the angle of the surface. 0 = flat surface, > 0 = slope
         float angle = Vector3.Angle(transform.up, Vector3.up);
 
         switch (movementState)
         {
-            case MovementState.RailGrinding:
-                switch (angle)
-                {
-                    case 0:
-                        DesiredSpeed = 0f;
-                        return SurfaceState.Flat;
-            
-                    case > 0:
-                        // Check the direction the player is running in to see how they are running in the slope
-                        if (rb.linearVelocity.y > .01f) { DesiredSpeed = 0f; return SurfaceState.GoingUpHill; }
-                        if (rb.linearVelocity.y < -.01f) { DesiredSpeed = GoingDownHillSpeed; return SurfaceState.GoingDownHill; }
-                        break;
-                }
-        
-                return SurfaceState.Flat;
-            
             case MovementState.Regular:
                 switch (angle)
                 {
@@ -954,19 +959,47 @@ public class SonicMovement : MonoBehaviour
         rb.linearVelocity = horizontalVelocity;
     }
 
-    // Determines what direction the player should go as well as the velocity the player should start with
-    public void RailDirectionToGoIn()
-    {
-        // CurrentCart.SplinePosition = Vector3.MoveTowards(CurrentCart.SplinePosition, , RailStartSpeed/100 * Time.deltaTime);
-    }
-
+    private float lastY;
     public void RailGrinding()
     {
-        // Get the current surface, which also updates the desired speed
-        surfaceState = SurfacePlayerIsStandingOn();
+        // Get the current surface, which also updates the desired speed and rail acceleration
+        RailSpeedUpdate();
+        lastY = transform.position.y;
 
-        transform.position = CurrentCart.transform.position + (transform.up * RailOffsetPos);
+        // Put desired speed in the right direction after magnitude has been chosen
+        DesiredSpeed *= TowardsEndPoint ? 1 : -1;
         
-        // Rail grinding movement will be done in a script inside the rails because it's easier to access the dolly cart and spline that way. I may integrate it here later though
+        // Move rail speed towards appropriate speed
+        RailStartSpeed = Mathf.MoveTowards(RailStartSpeed, DesiredSpeed, desiredRailAcceleration * Time.deltaTime);
+
+        // Move cart
+        CurrentCart.SplinePosition += RailStartSpeed * Time.deltaTime;
+        
+        // Move player based on cart
+        transform.position = CurrentCart.transform.position + (transform.up * RailOffsetPos);
+    }
+
+    void RailSpeedUpdate()
+    {
+        // Compare the y pos of the current and last frame to see if we're going up, down, or flat
+        switch (transform.position.y - lastY)
+        {
+            case 0f:
+                //Debug.Log("FLAT");
+                DesiredSpeed = 0f;
+                desiredRailAcceleration = railDeceleration;
+                break;
+            case > 0f:
+                //Debug.Log("UP-HILL");
+                DesiredSpeed = 0f; 
+                desiredRailAcceleration = railUpDeceleration; 
+                break;
+                    
+            case < 0f:
+                //Debug.Log("DOWN-HILL");
+                DesiredSpeed = GoingDownHillSpeed; 
+                desiredRailAcceleration = railDownAcceleration; 
+                break;
+        }
     }
 }
