@@ -18041,8 +18041,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1546518718}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -131.1667, y: 1.06, z: 0.40000153}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.40000916, y: 1.06, z: 0.40000153}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18062,7 +18062,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SplineSettings:
     Spline: {fileID: 872301239}
-    Position: 25.7
+    Position: 156.4
     Units: 0
   UpdateMethod: 1
   AutomaticDolly:
@@ -18442,6 +18442,7 @@ MonoBehaviour:
   railDeceleration: 10
   railUpDeceleration: 20
   railDownAcceleration: 20
+  lastRailDirection: {x: 0, y: 0, z: 0}
   CurrentCart: {fileID: 0}
   RailOffsetPos: 1
   whatIsRail:

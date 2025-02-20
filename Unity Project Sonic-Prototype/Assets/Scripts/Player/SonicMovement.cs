@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 using Unity.Cinemachine;
+using UnityEngine.Splines;
 using Unity.VisualScripting;
 
 public class SonicMovement : MonoBehaviour
@@ -105,6 +106,7 @@ public class SonicMovement : MonoBehaviour
     public float railDeceleration;
     public float railUpDeceleration;
     public float railDownAcceleration;
+    public Vector3 lastRailDirection;
     [Space]
     public CinemachineSplineCart CurrentCart;
     public float RailOffsetPos;
@@ -210,7 +212,6 @@ public class SonicMovement : MonoBehaviour
         if (Input.GetKeyDown(ShowSpeedKey)) { ShowSpeed = !ShowSpeed;}
         if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude; }
         else { speedText.text = ""; }
-
     }
 
     private void MyInput()
@@ -237,8 +238,10 @@ public class SonicMovement : MonoBehaviour
             InStompWaitTime = false;
             if (movementState == MovementState.Spindashing || movementState == MovementState.Sliding || movementState == MovementState.RailGrinding)
             {
-                // Debug.Log("STOPPED SPINDASH BY JUMP");
                 movementState = MovementState.Regular;
+                
+                // Keep momentum if we're exiting a rail
+                if (LastMovementState == MovementState.RailGrinding) { rb.linearVelocity += lastRailDirection.normalized * RailStartSpeed; }
             }
             StartCoroutine(JumpRoutine());
         }
@@ -975,8 +978,38 @@ public class SonicMovement : MonoBehaviour
         // Move cart
         CurrentCart.SplinePosition += RailStartSpeed * Time.deltaTime;
         
-        // Move player based on cart
-        transform.position = CurrentCart.transform.position + (transform.up * RailOffsetPos);
+        // Move player based on cart if there's more rail left. Otherwise, get off cart with momentum
+        float newPos = CurrentCart.SplinePosition;
+        Debug.Log("New: " + newPos + " --- Length: " + CurrentCart.Spline.CalculateLength());
+        if (newPos < CurrentCart.Spline.CalculateLength() && newPos > 0f)
+        {
+            transform.position = CurrentCart.transform.position + (transform.up * RailOffsetPos);
+            lastRailDirection = GetNormalizedTangentOfRailPointBasedOnDirection();
+        }
+        else
+        {
+            Debug.Log("No more rail!");
+            CurrentCart.transform.parent.GetComponentInChildren<IfPlayerTouchesRailGrind>().ignoreRail = true;
+            CurrentCart = null;
+            movementState = MovementState.Regular;
+            rb.linearVelocity = lastRailDirection.normalized * RailStartSpeed;
+        }
+        
+    }
+
+    Vector3 GetNormalizedTangentOfRailPointBasedOnDirection()
+    {
+        // Normalized position units are needed to get the tangent
+        CurrentCart.PositionUnits = PathIndexUnit.Normalized;
+        
+        // Get tangent and normalize it. Then, get proper direction
+        Vector3 tangent = CurrentCart.Spline.EvaluateTangent(CurrentCart.SplinePosition);
+        tangent.Normalize();
+        // tangent *= TowardsEndPoint ? 1 : -1;
+        
+        // Go back to regular units when rail moving
+        CurrentCart.PositionUnits = PathIndexUnit.Distance;
+        return tangent;
     }
 
     void RailSpeedUpdate()
