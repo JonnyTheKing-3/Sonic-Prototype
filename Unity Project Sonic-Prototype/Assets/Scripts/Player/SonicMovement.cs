@@ -296,8 +296,14 @@ public class SonicMovement : MonoBehaviour
         }
 
         // Boost
-        if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f) { movementState = MovementState.Boosting; }
-        else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting)) { movementState = MovementState.Regular; }
+        if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f && movementState != MovementState.RailGrinding) { movementState = MovementState.Boosting; }
+        else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting))
+        {
+            // If we're on rail, don't go to normal
+            if (movementState == MovementState.RailGrinding) { return;}
+            
+            movementState = MovementState.Regular;
+        } // exit bossting
         
         // Sliding
         if (movementState != MovementState.Boosting && grounded && readyToJump && Input.GetKeyDown(SlideKey))
@@ -971,7 +977,7 @@ public class SonicMovement : MonoBehaviour
 
         // Put desired speed in the right direction after magnitude has been chosen
         DesiredSpeed *= TowardsEndPoint ? 1 : -1;
-        
+
         // Move rail speed towards appropriate speed
         RailStartSpeed = Mathf.MoveTowards(RailStartSpeed, DesiredSpeed, desiredRailAcceleration * Time.deltaTime);
 
@@ -980,7 +986,6 @@ public class SonicMovement : MonoBehaviour
         
         // Move player based on cart if there's more rail left. Otherwise, get off cart with momentum
         float newPos = CurrentCart.SplinePosition;
-        Debug.Log("New: " + newPos + " --- Length: " + CurrentCart.Spline.CalculateLength());
         if (newPos < CurrentCart.Spline.CalculateLength() && newPos > 0f)
         {
             transform.position = CurrentCart.transform.position + (transform.up * RailOffsetPos);
@@ -988,7 +993,6 @@ public class SonicMovement : MonoBehaviour
         }
         else
         {
-            Debug.Log("No more rail!");
             CurrentCart.transform.parent.GetComponentInChildren<IfPlayerTouchesRailGrind>().ignoreRail = true;
             CurrentCart = null;
             movementState = MovementState.Regular;
@@ -1033,6 +1037,15 @@ public class SonicMovement : MonoBehaviour
                 DesiredSpeed = GoingDownHillSpeed; 
                 desiredRailAcceleration = railDownAcceleration; 
                 break;
+        }
+        
+        // If we're on a rail, simulate boost
+        if (Input.GetKey(BoostKey) && BoostMeter > 0f)
+        {
+            DesiredSpeed = BoostSpeed;
+            RailStartSpeed = BoostSpeed;
+            RailStartSpeed *= TowardsEndPoint ? 1 : -1;
+            BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
         }
     }
 }
