@@ -11,6 +11,12 @@ public class SplineMeshCollider : MonoBehaviour
 
     public bool ignoreRail;
 
+    [Header("SETTINGS FOR NEWRAIL")]
+    public int cart_Iterations = 25; // Adjust default values if needed
+    public float rough_Iterations = 0.04f;
+    public float ignore_WaitTime = 0.5f;
+
+
     private void Start()
     {
         GenerateCollidersAlongSpline();
@@ -64,9 +70,9 @@ public class SplineMeshCollider : MonoBehaviour
 
             // Debug.Log($"Placed collider at {midPoint} with height {capsule.height}");
             NewRailMoveDetection railScript = capsuleObj.AddComponent<NewRailMoveDetection>();
-            railScript.cartIterations = 25; // Adjust default values if needed
-            railScript.roughIterations = 0.04f;
-            railScript.ignoreWaitTime = 0.2f;
+            railScript.cartIterations = cart_Iterations; // Adjust default values if needed
+            railScript.roughIterations = rough_Iterations;
+            railScript.ignoreWaitTime = ignore_WaitTime;
         }
     }
 
