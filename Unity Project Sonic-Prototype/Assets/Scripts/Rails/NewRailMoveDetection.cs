@@ -3,14 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Splines;
 
-public class IfPlayerTouchesRailGrind : MonoBehaviour
+public class NewRailMoveDetection : MonoBehaviour
 {
-    [SerializeField, Min(0)] private int cartIterations; // higher = accuracy in landing on rail, lower = performance
-    [SerializeField, Range(0.000000001f,1)] private float roughIterations;
-    [SerializeField] private float ignoreWaitTime = .2f;
-    public bool ignoreRail; // ignore rail becomes true as soon as player presses jump in player script
+    [SerializeField, Min(0)] public int cartIterations; // higher = accuracy in landing on rail, lower = performance
+    [SerializeField, Range(0.000000001f,1)] public float roughIterations;
+    [SerializeField] public float ignoreWaitTime = .2f;
     
     public CinemachineSplineCart cart;
     public SplineContainer railPath;
@@ -19,21 +19,18 @@ public class IfPlayerTouchesRailGrind : MonoBehaviour
     {
         GameObject parent = transform.parent.gameObject;
         
-        cart = parent.GetComponentInChildren<CinemachineSplineCart>();
-        railPath = parent.GetComponentInChildren<SplineContainer>();
-
-        ignoreRail = false;
+        cart = parent.transform.parent.GetComponentInChildren<CinemachineSplineCart>();
+        railPath = parent.GetComponent<SplineContainer>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("RAIL TRIGGER");
         if (other.CompareTag("Player"))
         {
             // Allow time for player to leave rail if they jump
             if (other.GetComponent<SonicMovement>().inIgnoreGroundJumpTime || 
                 other.GetComponent<SonicMovement>().movementState == SonicMovement.MovementState.RailGrinding ||
-                ignoreRail)
+                transform.parent.GetComponent<SplineMeshCollider>().ignoreRail)
             { return; }
             
             SetupBeforeRailGrinding(other.GetComponent<SonicMovement>());
@@ -129,12 +126,13 @@ public class IfPlayerTouchesRailGrind : MonoBehaviour
     }
 
     private void OnTriggerExit(Collider other)
-    { StartCoroutine(ResetRail()); }
+    {
+        StartCoroutine(ResetRail()); }
 
     IEnumerator ResetRail()
     {
         yield return new WaitForSeconds(ignoreWaitTime);
-        ignoreRail = false;
+        transform.parent.GetComponent<SplineMeshCollider>().ignoreRail = false;
     }
 
 

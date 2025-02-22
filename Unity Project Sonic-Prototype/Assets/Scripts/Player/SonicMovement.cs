@@ -112,6 +112,7 @@ public class SonicMovement : MonoBehaviour
     public float RailOffsetPos;
     public LayerMask whatIsRail;
     public bool TowardsEndPoint;
+    public float rotateSmoothFactor;
 
     
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
@@ -231,7 +232,7 @@ public class SonicMovement : MonoBehaviour
             // If we're jumping off a rail, make cart null and ignore the rail for a bit so that we have enough time to get out
             if (CurrentCart != null)
             {
-                CurrentCart.transform.parent.GetComponentInChildren<IfPlayerTouchesRailGrind>().ignoreRail = true;
+                CurrentCart.transform.parent.GetChild(0).GetComponentInChildren<SplineMeshCollider>().ignoreRail = true;
                 CurrentCart = null;
             }
             
@@ -362,6 +363,7 @@ public class SonicMovement : MonoBehaviour
         Vector3 nextSpot = transform.position + Vector3.down * 2f;
         if (Physics.Linecast(transform.position, nextSpot, whatIsRail))
         {
+            Debug.Log("Rail detected during jump");
             jumpNormal = transform.up;
         }
         
@@ -972,6 +974,7 @@ public class SonicMovement : MonoBehaviour
     public void RailGrinding()
     {
         // Get the current surface, which also updates the desired speed and rail acceleration
+        UpdateRotationForRailMovement();
         RailSpeedUpdate();
         lastY = transform.position.y;
 
@@ -993,7 +996,7 @@ public class SonicMovement : MonoBehaviour
         }
         else
         {
-            CurrentCart.transform.parent.GetComponentInChildren<IfPlayerTouchesRailGrind>().ignoreRail = true;
+            CurrentCart.transform.parent.GetChild(0).GetComponentInChildren<SplineMeshCollider>().ignoreRail = true;
             CurrentCart = null;
             movementState = MovementState.Regular;
             rb.linearVelocity = lastRailDirection.normalized * RailStartSpeed;
@@ -1001,15 +1004,41 @@ public class SonicMovement : MonoBehaviour
         
     }
 
+    void UpdateRotationForRailMovement()
+{
+    Vector3 tangent = GetNormalizedTangentOfRailPointBasedOnDirection();
+    tangent *= TowardsEndPoint ? 1 : -1; // Correct direction
+
+    // Use the spline's up vector instead of Vector3.up
+    CurrentCart.PositionUnits = PathIndexUnit.Normalized;
+    Vector3 splineUp = CurrentCart.Spline.EvaluateUpVector(CurrentCart.SplinePosition);
+    CurrentCart.PositionUnits = PathIndexUnit.Distance;
+    Debug.DrawRay(transform.position, splineUp *3f, Color.red);
+
+    // Compute binormal and normal vectors
+    Vector3 binormal = Vector3.Cross(tangent, splineUp).normalized;
+    // Debug.DrawRay(transform.position, normal *3f, Color.blue);
+    Vector3 normal = Vector3.Cross(tangent, binormal).normalized;
+
+
+    // Apply the rotation using LookRotation
+    transform.rotation = Quaternion.LookRotation(tangent, normal);
+}
+
+
+// Add this as a class-level variable
+private Vector3 previousUp = Vector3.zero;
+
+
+
     Vector3 GetNormalizedTangentOfRailPointBasedOnDirection()
     {
         // Normalized position units are needed to get the tangent
         CurrentCart.PositionUnits = PathIndexUnit.Normalized;
         
-        // Get tangent and normalize it. Then, get proper direction
+        // Get tangent and normalize it
         Vector3 tangent = CurrentCart.Spline.EvaluateTangent(CurrentCart.SplinePosition);
         tangent.Normalize();
-        // tangent *= TowardsEndPoint ? 1 : -1;
         
         // Go back to regular units when rail moving
         CurrentCart.PositionUnits = PathIndexUnit.Distance;
