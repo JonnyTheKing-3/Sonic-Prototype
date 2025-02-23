@@ -45,9 +45,9 @@ public class AnimationsManager : MonoBehaviour
             {
                 // Construct a rotation matrix manually
                 Matrix4x4 rotationMatrix = new Matrix4x4();
-                rotationMatrix.SetColumn(0, player._right);  // X-axis (right)
+                rotationMatrix.SetColumn(0, -player._T);      // Z-axis (forward)
                 rotationMatrix.SetColumn(1, player._N);      // Y-axis (up)
-                rotationMatrix.SetColumn(2, player._T);      // Z-axis (forward)
+                rotationMatrix.SetColumn(2, player._right);  // X-axis (right)
                 rotationMatrix.SetColumn(3, new Vector4(0, 0, 0, 1)); // Homogeneous coordinate
             
                 // Extract quaternion from rotation matrix
