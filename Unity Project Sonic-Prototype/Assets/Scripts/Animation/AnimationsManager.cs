@@ -40,6 +40,24 @@ public class AnimationsManager : MonoBehaviour
         // If we have a valid forward direction, compute the target rotation.
         if (forward != Vector3.zero)
         {
+
+            if (player.movementState == SonicMovement.MovementState.RailGrinding)
+            {
+                // Construct a rotation matrix manually
+                Matrix4x4 rotationMatrix = new Matrix4x4();
+                rotationMatrix.SetColumn(0, -player._T);      // Z-axis (forward)
+                rotationMatrix.SetColumn(1, player._N);      // Y-axis (up)
+                rotationMatrix.SetColumn(2, player._right);  // X-axis (right)
+                rotationMatrix.SetColumn(3, new Vector4(0, 0, 0, 1)); // Homogeneous coordinate
+            
+                // Extract quaternion from rotation matrix
+                Quaternion _targetRotation = Quaternion.LookRotation(rotationMatrix.GetColumn(2), rotationMatrix.GetColumn(1));
+            
+                // Apply to character
+                transform.rotation = _targetRotation;
+                return;
+            }
+
             Quaternion targetRotation = Quaternion.LookRotation(forward, player.transform.up);
         
             // Smoothly interpolate from the current rotation to the target rotation.

@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Cinemachine;
 using UnityEngine.Splines;
 using Unity.VisualScripting;
+using UnityEngine.Rendering;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -112,6 +113,7 @@ public class SonicMovement : MonoBehaviour
     public float RailOffsetPos;
     public LayerMask whatIsRail;
     public bool TowardsEndPoint;
+    public float rotateSmoothFactor;
 
     
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
@@ -211,7 +213,7 @@ public class SonicMovement : MonoBehaviour
         // For show case purposes
         if (Input.GetKeyDown(ShowSpeedKey)) { ShowSpeed = !ShowSpeed;}
         if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude; }
-        else { speedText.text = ""; }
+        else { speedText.text = ""; }        
     }
 
     private void MyInput()
@@ -231,7 +233,7 @@ public class SonicMovement : MonoBehaviour
             // If we're jumping off a rail, make cart null and ignore the rail for a bit so that we have enough time to get out
             if (CurrentCart != null)
             {
-                CurrentCart.transform.parent.GetComponentInChildren<IfPlayerTouchesRailGrind>().ignoreRail = true;
+                CurrentCart.transform.parent.GetChild(0).GetComponentInChildren<SplineMeshCollider>().ignoreRail = true;
                 CurrentCart = null;
             }
             
@@ -241,7 +243,7 @@ public class SonicMovement : MonoBehaviour
                 movementState = MovementState.Regular;
                 
                 // Keep momentum if we're exiting a rail
-                if (LastMovementState == MovementState.RailGrinding) { rb.linearVelocity += lastRailDirection.normalized * RailStartSpeed; }
+                if (LastMovementState == MovementState.RailGrinding) { rb.linearVelocity = lastRailDirection.normalized * RailStartSpeed; }
             }
             StartCoroutine(JumpRoutine());
         }
@@ -362,6 +364,7 @@ public class SonicMovement : MonoBehaviour
         Vector3 nextSpot = transform.position + Vector3.down * 2f;
         if (Physics.Linecast(transform.position, nextSpot, whatIsRail))
         {
+            Debug.Log("Rail detected during jump");
             jumpNormal = transform.up;
         }
         
@@ -565,7 +568,7 @@ public class SonicMovement : MonoBehaviour
                 if (rb.linearVelocity.magnitude < 5f || !grounded) { movementState = MovementState.Regular;}
                 Slide();
                 break;
-            
+        
             case MovementState.RailGrinding:
                 RailGrinding();
                 break;
@@ -913,7 +916,7 @@ public class SonicMovement : MonoBehaviour
         */
         Vector3 nextSpot = transform.position + rb.linearVelocity * Time.fixedDeltaTime;
         if (Physics.Linecast(transform.position, nextSpot, out RaycastHit stompRay, whatIsRail))
-        { stompRay.transform.gameObject.GetComponent<IfPlayerTouchesRailGrind>().SetupBeforeRailGrinding(this); }
+        { stompRay.transform.gameObject.GetComponent<NewRailMoveDetection>().SetupBeforeRailGrinding(this); }
     }
 
     IEnumerator AfterStompWait()
@@ -972,6 +975,7 @@ public class SonicMovement : MonoBehaviour
     public void RailGrinding()
     {
         // Get the current surface, which also updates the desired speed and rail acceleration
+        UpdateRotationForRailMovement();
         RailSpeedUpdate();
         lastY = transform.position.y;
 
@@ -986,19 +990,68 @@ public class SonicMovement : MonoBehaviour
         
         // Move player based on cart if there's more rail left. Otherwise, get off cart with momentum
         float newPos = CurrentCart.SplinePosition;
-        if (newPos < CurrentCart.Spline.CalculateLength() && newPos > 0f)
+        if (newPos < CurrentCart.Spline.CalculateLength() && newPos > 1f)
         {
-            transform.position = CurrentCart.transform.position + (transform.up * RailOffsetPos);
+            Vector3 targetPosition = CurrentCart.transform.position + (transform.up * RailOffsetPos);
+            Vector3 direction = (targetPosition - transform.position).normalized;
+            float distance = Vector3.Distance(transform.position, targetPosition);
+
+            // Apply movement force to Rigidbody for a smoother transition
+            rb.linearVelocity = direction * (distance / Time.deltaTime);
             lastRailDirection = GetNormalizedTangentOfRailPointBasedOnDirection();
         }
         else
         {
-            CurrentCart.transform.parent.GetComponentInChildren<IfPlayerTouchesRailGrind>().ignoreRail = true;
+            CurrentCart.transform.parent.GetChild(0).GetComponentInChildren<SplineMeshCollider>().ignoreRail = true;
             CurrentCart = null;
             movementState = MovementState.Regular;
-            rb.linearVelocity = lastRailDirection.normalized * RailStartSpeed;
+            rb.linearVelocity = lastRailDirection * RailStartSpeed;
         }
         
+    }
+
+    public Vector3 _N;
+    public Vector3 _T;
+    public Vector3 _right;
+
+
+    void UpdateRotationForRailMovement()
+    {
+        // 1) Evaluate tangents
+        float delta = 0.001f;
+
+        CurrentCart.PositionUnits = PathIndexUnit.Normalized;
+        Vector3 T1 = CurrentCart.Spline.EvaluateTangent(CurrentCart.SplinePosition);
+        Vector3 T2 = CurrentCart.Spline.EvaluateTangent(CurrentCart.SplinePosition + delta);
+        T1.Normalize();
+        T2.Normalize();
+        CurrentCart.PositionUnits = PathIndexUnit.Distance;
+
+        // 2) Approx derivative
+        Vector3 dT = (T2 - T1) / delta;
+        // 3) If nearly zero curvature, pick a fallback up
+        Vector3 N = (dT.sqrMagnitude < .01) ? Vector3.up : dT.normalized;
+
+        // 4) Now get the actual tangent (already normalized) for the current position
+        Vector3 T = T1.normalized;
+        //    (flip T if needed)
+        T *= TowardsEndPoint ? 1 : -1;
+
+        // 5) Compute binormal and re-orthonormalize
+        Vector3 B = Vector3.Cross(T, N).normalized;
+        
+        N = Vector3.Cross(B, T).normalized;
+        Vector3 right = Vector3.Cross(N, T).normalized;
+
+        // 6) Finally, rotate
+        // T is forward, N is up, right is right
+        transform.rotation = Quaternion.LookRotation(T, N);
+
+        _N = N;
+        _T = T;
+        _right = right;
+        
+        // Debug.DrawRay(transform.position, right * 3f, Color.red);
     }
 
     Vector3 GetNormalizedTangentOfRailPointBasedOnDirection()
@@ -1006,10 +1059,9 @@ public class SonicMovement : MonoBehaviour
         // Normalized position units are needed to get the tangent
         CurrentCart.PositionUnits = PathIndexUnit.Normalized;
         
-        // Get tangent and normalize it. Then, get proper direction
+        // Get tangent and normalize it
         Vector3 tangent = CurrentCart.Spline.EvaluateTangent(CurrentCart.SplinePosition);
         tangent.Normalize();
-        // tangent *= TowardsEndPoint ? 1 : -1;
         
         // Go back to regular units when rail moving
         CurrentCart.PositionUnits = PathIndexUnit.Distance;
