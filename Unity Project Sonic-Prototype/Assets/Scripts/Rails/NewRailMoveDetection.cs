@@ -53,16 +53,70 @@ public class NewRailMoveDetection : MonoBehaviour
         // Determines what direction the player should go
         Vector3 positionVector = cart.Spline.EvaluateTangent(cart.SplinePosition);
         positionVector.Normalize();
+
         float angle = Vector3.Dot(vel,positionVector);
         other.RailStartSpeed *= angle; // change direction in relation to the angle
         other.TowardsEndPoint = angle > 0f; 
         
+        // Initialize sonic's right
+        Vector3 normal = GetNormal(other);
+        Vector3 right = Vector3.Cross(normal, positionVector).normalized;
+        // StartCoroutine(DrawAxesForSeconds(other.transform.position, right, normal, positionVector));
+        other.transform.parent.GetChild(2).transform.rotation = Quaternion.LookRotation(right, normal);
+
         // Attach player to cart
         other.CurrentCart = cart;
         cart.PositionUnits = PathIndexUnit.Distance;
         other.movementState = SonicMovement.MovementState.RailGrinding;
+        
+    }
+
+    IEnumerator DrawAxesForSeconds(Vector3 pos, Vector3 right, Vector3 up, Vector3 forward)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < 3f)
+        {
+
+            // Draw right (Red), up (Green), and forward (Blue)
+            Debug.DrawRay(pos, right, Color.red);
+            Debug.DrawRay(pos, up, Color.green);
+            Debug.DrawRay(pos, forward, Color.blue);
+
+            elapsedTime += Time.deltaTime;
+            yield return null; // Run every frame
+        }
     }
     
+    Vector3 GetNormal(SonicMovement other)
+    {
+        // 1) Evaluate tangents
+        float delta = 0.001f;
+
+        cart.PositionUnits = PathIndexUnit.Normalized;
+        Vector3 T1 = cart.Spline.EvaluateTangent(cart.SplinePosition);
+        Vector3 T2 = cart.Spline.EvaluateTangent(cart.SplinePosition + delta);
+        T1.Normalize();
+        T2.Normalize();
+        cart.PositionUnits = PathIndexUnit.Distance;
+
+        // 2) Approx derivative
+        Vector3 dT = (T2 - T1) / delta;
+        // 3) If nearly zero curvature, pick a fallback up
+        Vector3 N = (dT.sqrMagnitude < .01) ? Vector3.up : dT.normalized;
+
+        // 4) Now get the actual tangent (already normalized) for the current position
+        Vector3 T = T1.normalized;
+        //    (flip T if needed)
+        T *= other.TowardsEndPoint ? 1 : -1;
+
+        // 5) Compute binormal and re-orthonormalize
+        Vector3 B = Vector3.Cross(T, N).normalized;
+        N = Vector3.Cross(B, T).normalized;
+
+        return N;
+    }
+
     private float GetClosestPointOnTrack(Vector3 position)
     {
         cart.PositionUnits = PathIndexUnit.Normalized; 

@@ -1010,6 +1010,11 @@ public class SonicMovement : MonoBehaviour
         
     }
 
+    public Vector3 _N;
+    public Vector3 _T;
+    public Vector3 _right;
+
+
     void UpdateRotationForRailMovement()
     {
         // 1) Evaluate tangents
@@ -1034,12 +1039,19 @@ public class SonicMovement : MonoBehaviour
 
         // 5) Compute binormal and re-orthonormalize
         Vector3 B = Vector3.Cross(T, N).normalized;
+        
         N = Vector3.Cross(B, T).normalized;
+        Vector3 right = Vector3.Cross(N, T).normalized;
 
-        // Debug.DrawRay(transform.position, T * 3f, Color.red);
-        // Debug.DrawRay(transform.position, N * 3f, Color.blue);
         // 6) Finally, rotate
+        // T is forward, N is up, right is right
         transform.rotation = Quaternion.LookRotation(T, N);
+
+        _N = N;
+        _T = T;
+        _right = right;
+        
+        // Debug.DrawRay(transform.position, right * 3f, Color.red);
     }
 
     Vector3 GetNormalizedTangentOfRailPointBasedOnDirection()

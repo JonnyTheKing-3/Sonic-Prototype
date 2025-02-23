@@ -6944,6 +6944,9 @@ MonoBehaviour:
   splineSegments: 50
   capsuleLengthFactor: 1.2
   ignoreRail: 0
+  cart_Iterations: 25
+  rough_Iterations: 0.04
+  ignore_WaitTime: 0.5
 --- !u!1 &762013888
 GameObject:
   m_ObjectHideFlags: 0
@@ -19463,6 +19466,10 @@ PrefabInstance:
     - target: {fileID: 2815644259657485960, guid: 02a358153e2b38d4ba708d792336794d, type: 3}
       propertyPath: m_Name
       value: PlayerHolder
+      objectReference: {fileID: 0}
+    - target: {fileID: 6866593701482475585, guid: 02a358153e2b38d4ba708d792336794d, type: 3}
+      propertyPath: rotate
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8020362734502920061, guid: 02a358153e2b38d4ba708d792336794d, type: 3}
       propertyPath: speedText
