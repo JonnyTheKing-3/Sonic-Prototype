@@ -30,6 +30,7 @@ public class NewRailMoveDetection : MonoBehaviour
             // Allow time for player to leave rail if they jump
             if (other.GetComponent<SonicMovement>().inIgnoreGroundJumpTime || 
                 other.GetComponent<SonicMovement>().movementState == SonicMovement.MovementState.RailGrinding ||
+                other.GetComponent<SonicMovement>().wasOnRail ||
                 transform.parent.GetComponent<SplineMeshCollider>().ignoreRail)
             { return; }
             

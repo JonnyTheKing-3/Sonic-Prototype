@@ -179,12 +179,13 @@ public class SonicMovement : MonoBehaviour
     // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
     private void OnTriggerEnter(Collider other)
     {
-        triggerColliderForJumpTime.enabled = false;
         
+        triggerColliderForJumpTime.enabled = false;
         // Check if the colliding object's layer is in the whatIsGround LayerMask.
         // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
         if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
         {
+            Debug.Log("Touched: " + other.name);
             // Debug.Log("Touched ground during jump time");
             jumpStartTime = jumpIgnoreDuration;
             readyToJump = true;
@@ -216,6 +217,7 @@ public class SonicMovement : MonoBehaviour
         else { speedText.text = ""; }        
     }
 
+public bool wasOnRail;
     private void MyInput()
     {
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
@@ -243,7 +245,11 @@ public class SonicMovement : MonoBehaviour
                 movementState = MovementState.Regular;
                 
                 // Keep momentum if we're exiting a rail
-                if (LastMovementState == MovementState.RailGrinding) { rb.linearVelocity = lastRailDirection.normalized * RailStartSpeed; }
+                if (LastMovementState == MovementState.RailGrinding) 
+                {
+                    rb.linearVelocity = lastRailDirection.normalized * RailStartSpeed; 
+                    wasOnRail = true;
+                }
             }
             StartCoroutine(JumpRoutine());
         }
@@ -361,20 +367,19 @@ public class SonicMovement : MonoBehaviour
         jumpNormal = surfaceHit.normal;
         
         // If we jumped from a rail, jump from transform.up. Might change jumpNormal to be transform.up always for simplicty. I'll have to see if that works though
-        Vector3 nextSpot = transform.position + Vector3.down * 2f;
-        if (Physics.Linecast(transform.position, nextSpot, whatIsRail))
-        {
-            Debug.Log("Rail detected during jump");
-            jumpNormal = transform.up;
-        }
+        if (wasOnRail) { jumpNormal = _N.normalized;}
         
         // Debug.Log(jumpNormal);
         jumpStartTime = Time.time;
 
         // Remove any velocity component in the jump direction.
         // This prevents any unwanted buildup from the ground movement.
-        Vector3 velocityWithoutJumpComponent = Vector3.ProjectOnPlane(rb.linearVelocity, jumpNormal);
-        rb.linearVelocity = velocityWithoutJumpComponent;
+        if (!wasOnRail)
+        {
+            Vector3 velocityWithoutJumpComponent = Vector3.ProjectOnPlane(rb.linearVelocity, jumpNormal);
+            rb.linearVelocity = velocityWithoutJumpComponent;
+        }
+
 
         // mark as not grounded so that the ground adjustments in FixedUpdate won’t interfere with the jump.
         grounded = false;
@@ -395,12 +400,16 @@ public class SonicMovement : MonoBehaviour
         }
         
         animManager.TriggerJumpAnimation();
-        rb.AddForce(jumpDirection * forceToUse, ForceMode.Impulse);
+
+        if (wasOnRail) { rb.AddForce(jumpNormal * forceToUse, ForceMode.Impulse); }
+        else { rb.AddForce(jumpDirection * forceToUse, ForceMode.Impulse); }
+
     }
 
     private void ResetJump()
     {
         readyToJump = true;
+        wasOnRail = false;
     }
     
     private void ChargeSpinDash()
@@ -487,11 +496,13 @@ public class SonicMovement : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, homingAttackDistance);
     }
 
+    public Vector3 LastJumpDir; // for debugging
     private void FixedUpdate()
     {
         // Ignore everything except state functions if we're homing attacking to avoid any interruptions
         if (movementState != MovementState.HomingAttacking)
         {
+            ////////////////////////////////////////////////////////// START
             /*
              * With this check, we make sure that when the player jumps,
              * the vertical velocity in move-player doesn't interfere with the jump.
@@ -521,6 +532,7 @@ public class SonicMovement : MonoBehaviour
                 ShortHopping = false;
                 StickPlayerToGround();
             }
+            /////////////////////////////////////////////////////////// END
 
             // Turn on homing attack if we hit the ground after not being able to homing attack
             if (!CanHomingAttack && grounded) { CanHomingAttack = true; }

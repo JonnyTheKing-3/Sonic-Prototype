@@ -51,6 +51,7 @@ public class AnimationsManager : MonoBehaviour
                 rotationMatrix.SetColumn(3, new Vector4(0, 0, 0, 1)); // Homogeneous coordinate
             
                 // Extract quaternion from rotation matrix
+                if (player._N == Vector3.zero || player._T == Vector3.zero ||player._right == Vector3.zero) {return;}
                 Quaternion _targetRotation = Quaternion.LookRotation(rotationMatrix.GetColumn(2), rotationMatrix.GetColumn(1));
             
                 // Apply to character
