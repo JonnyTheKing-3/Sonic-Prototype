@@ -75,7 +75,8 @@ public class SonicMovement : MonoBehaviour
 
     
     [Header("HOMING ATTACK")]
-    public float homingSpeed;
+    
+    [Tooltip("Homing speed is really fast. This slows it down... Or speeds it up if the value is below zero")] public float hommingSpeedLimiter;
     public float NoTargethomingSpeed;
     public float ImpulseAfterAttack;
     public float ImpulseAfterAttackStrongMomentum;
@@ -305,6 +306,8 @@ public bool wasOnRail;
             
             Target = GetTargetForHomingAttack();
             movementState = MovementState.HomingAttacking;
+            Debug.Log("Started Homing");
+            animManager.animator.SetTrigger("StartedHomingAttack");
         }
 
         // Boost
@@ -790,10 +793,16 @@ public bool wasOnRail;
         // If we have a target, move towards the target and once we reach it, "bounce off". Then transition back to regular movement
         if (Target != null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, Target.position, homingSpeed * Time.deltaTime);
+            // transform.position = Vector3.MoveTowards(transform.position, Target.position, homingSpeed * Time.deltaTime);
+            Vector3 targetPosition = Target.transform.position;
+            Vector3 direction = (targetPosition - transform.position).normalized;
+            float distance = Vector3.Distance(transform.position, targetPosition);
+
+            // Apply movement force to Rigidbody for a smoother transition
+            rb.linearVelocity = direction * (distance / Time.deltaTime) / hommingSpeedLimiter;
             
             // If we reached the target, "bounce" and transition back to regular movement state
-            if (Vector3.Distance(transform.position, Target.position) < 1f)
+            if (distance < 1f)
             {
                 /*
                 // Replace .5f with ImpulseAfterAttackWeakMomentum or ImpulseAfterAttackWeakMomentum (depending on how much momentum you want to keep)
@@ -801,8 +810,10 @@ public bool wasOnRail;
                 // Replacing .5f by 0 makes it so the player shoots upwards only
                 // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
                 */
+                rb.linearVelocity = Vector3.zero;
                 rb.AddForce((Vector3.up + (LastSpeedDirection * .5f)) * ImpulseAfterAttack, ForceMode.Impulse);
                 animManager.TriggerHomingAttackTrickAnimation();
+                Debug.Log("Do trick");
                 movementState = MovementState.Regular;
             }
         }

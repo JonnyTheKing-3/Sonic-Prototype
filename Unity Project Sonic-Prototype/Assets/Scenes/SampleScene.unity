@@ -19720,6 +19720,10 @@ PrefabInstance:
       propertyPath: speedText
       value: 
       objectReference: {fileID: 915234398}
+    - target: {fileID: 8020362734502920061, guid: 02a358153e2b38d4ba708d792336794d, type: 3}
+      propertyPath: hommingSpeedLimiter
+      value: 1.6
+      objectReference: {fileID: 0}
     - target: {fileID: 8847339236931821658, guid: 02a358153e2b38d4ba708d792336794d, type: 3}
       propertyPath: m_Height
       value: 1.4931966
