@@ -62,6 +62,7 @@ public class SonicMovement : MonoBehaviour
     public float jumpIgnoreDuration = 0.15f;
     private float jumpStartTime;
     private Vector3 jumpNormal;
+    public bool TouchingWallBeforeJump = false;
 
     
     [Header("GROUND")]
@@ -179,13 +180,16 @@ public class SonicMovement : MonoBehaviour
     // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
     private void OnTriggerEnter(Collider other)
     {
-        
+        // Make sure that if we're touching a wall before the jump, the player doesn't activate sticking to the ground. Turned on in playerboxtrigger script
+        if (TouchingWallBeforeJump) { return; }
+
+        // Debug.Log("Touched something");
         triggerColliderForJumpTime.enabled = false;
         // Check if the colliding object's layer is in the whatIsGround LayerMask.
         // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
         if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
         {
-            Debug.Log("Touched: " + other.name);
+           //  Debug.Log("Touched: " + other.name);
             // Debug.Log("Touched ground during jump time");
             jumpStartTime = jumpIgnoreDuration;
             readyToJump = true;
@@ -502,7 +506,6 @@ public bool wasOnRail;
         // Ignore everything except state functions if we're homing attacking to avoid any interruptions
         if (movementState != MovementState.HomingAttacking)
         {
-            ////////////////////////////////////////////////////////// START
             /*
              * With this check, we make sure that when the player jumps,
              * the vertical velocity in move-player doesn't interfere with the jump.
@@ -530,9 +533,11 @@ public bool wasOnRail;
             if (grounded && readyToJump)
             {
                 ShortHopping = false;
+
+                // Make sure that the player has a bit of time after they leave jumping off of touching the wall to not automatically stick to the ground if they are moving forwward
+                if (PlayerBoxTrigger.inDelay && rb.linearVelocity.y > 0f) { return;}
                 StickPlayerToGround();
             }
-            /////////////////////////////////////////////////////////// END
 
             // Turn on homing attack if we hit the ground after not being able to homing attack
             if (!CanHomingAttack && grounded) { CanHomingAttack = true; }
@@ -608,6 +613,7 @@ public bool wasOnRail;
     
     private void StickPlayerToGround()
     {
+
         // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
         // If it's not, just make sure to scale the offset by an accurate 
         

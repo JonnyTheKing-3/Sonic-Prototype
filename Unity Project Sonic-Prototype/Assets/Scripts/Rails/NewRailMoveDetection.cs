@@ -25,16 +25,16 @@ public class NewRailMoveDetection : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player Trigger Collider"))
         {
             // Allow time for player to leave rail if they jump
-            if (other.GetComponent<SonicMovement>().inIgnoreGroundJumpTime || 
-                other.GetComponent<SonicMovement>().movementState == SonicMovement.MovementState.RailGrinding ||
-                other.GetComponent<SonicMovement>().wasOnRail ||
+            if (other.transform.root.GetComponentInChildren<SonicMovement>().inIgnoreGroundJumpTime || 
+                other.transform.root.GetComponentInChildren<SonicMovement>().movementState == SonicMovement.MovementState.RailGrinding ||
+                other.transform.root.GetComponentInChildren<SonicMovement>().wasOnRail ||
                 transform.parent.GetComponent<SplineMeshCollider>().ignoreRail)
             { return; }
             
-            SetupBeforeRailGrinding(other.GetComponent<SonicMovement>());
+            SetupBeforeRailGrinding(other.transform.root.GetComponentInChildren<SonicMovement>());
         }
     }
 
