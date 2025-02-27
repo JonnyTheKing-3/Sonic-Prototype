@@ -632,33 +632,37 @@ public bool wasOnRail;
 
     private bool DetectedSomethingInVelocityDirection(Vector3 horizontalVel)
     {
+        // I'm using this variable in case I ever want to debug
         bool passValue = false;
 
         // Calculate the next spot
         float mag = rb.linearVelocity.magnitude < .1f ? .1f : rb.linearVelocity.magnitude; // first get an appropriate magnitude
 
+        // If we're boosting, the first frames magnitude will be really low in comparison to all the rest. So we make sure the first frame's check has enough magnitude
         if (LastMovementState != MovementState.Boosting && movementState == MovementState.Boosting) 
         {
            mag = BoostSpeed;
         }
 
         Vector3 Velocity = horizontalVel.normalized * mag;
-        Vector3 startPos = transform.position + Vector3.up * .5f;
+        Vector3 startPos = transform.position + Vector3.up * .5f; // I want the ray to be slightly above the midpoint of the player so that it doesn't collide with small objects
         Vector3 nextSpot = startPos + Velocity * Time.fixedDeltaTime; 
         
+        // If the next spot hit's somthing, and it was angled perpendicular or towards the player, then we detected something. Otherwise, we didn't
         if (Physics.Linecast(startPos, nextSpot, out RaycastHit hit, whatIsGround))
         {
+            // Dot = 0: Perpendicular, Dot = -1: Towards the player, Dot = 1; Away from player
             float dot = Vector3.Dot(transform.up.normalized, hit.normal.normalized);
-            if (dot <= 0)
+            if (dot <= 0)   
             {
                 passValue = true;
-                animManager.animator.speed = .75f;                
+                animManager.animator.speed = .75f;    // reset animation speed so that it doesn't stay in the magnitude it previously was            
             }
         }
 
         // Draw ray
-        if (passValue) {Debug.DrawLine(startPos, nextSpot, Color.green);}
-        else { Debug.DrawLine(startPos, nextSpot, Color.red);}
+        // if (passValue) {Debug.DrawLine(startPos, nextSpot, Color.green);}
+        // else { Debug.DrawLine(startPos, nextSpot, Color.red);}
 
         // if that next spot collides with something, 
         return passValue;
@@ -763,6 +767,8 @@ public bool wasOnRail;
         {
             // Combine horizontal and vertical velocity
             rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
+            // Debug.DrawRay(transform.position, rb.linearVelocity.normalized *3f, Color.red);
+            // Debug.DrawRay(transform.position, horizontalVelocity.normalized *3f, Color.green);
         }
 
     }
