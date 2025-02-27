@@ -5,6 +5,8 @@ using Unity.Cinemachine;
 using UnityEngine.Splines;
 using Unity.VisualScripting;
 using UnityEngine.Rendering;
+using System.Security.Cryptography;
+using System;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -129,6 +131,7 @@ public class SonicMovement : MonoBehaviour
     public bool readyToJump;
     public bool inIgnoreGroundJumpTime = false;
     public bool CanHomingAttack = false;
+    public bool SomethingInFront = false;
     public float distancePlayerToGround;
     public float horizontalInput;
     public float verticalInput;
@@ -551,6 +554,7 @@ public bool wasOnRail;
         switch (movementState)
         {
             case MovementState.Regular:
+                // If the player crashes with something, make velocity zero
                 MovePlayer();
                 break;
             
@@ -561,7 +565,7 @@ public bool wasOnRail;
             case MovementState.Spindashing:
                 // If we're in the startup, charge up. Otherwise, continue with regular spindash movemennt
                 if (!StartingSpinDash) {SpindashMovement();}
-                
+
                 // If the speed is too low or we leave the ground, go back to normal
                 if (rb.linearVelocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime || !grounded && !StartingSpinDash)
                 {
@@ -626,6 +630,40 @@ public bool wasOnRail;
         transform.position = targetPosition;
     }
 
+    private bool DetectedSomethingInVelocityDirection(Vector3 horizontalVel)
+    {
+        bool passValue = false;
+
+        // Calculate the next spot
+        float mag = rb.linearVelocity.magnitude < .1f ? .1f : rb.linearVelocity.magnitude; // first get an appropriate magnitude
+
+        if (LastMovementState != MovementState.Boosting && movementState == MovementState.Boosting) 
+        {
+           mag = BoostSpeed;
+        }
+
+        Vector3 Velocity = horizontalVel.normalized * mag;
+        Vector3 startPos = transform.position + Vector3.up * .5f;
+        Vector3 nextSpot = startPos + Velocity * Time.fixedDeltaTime; 
+        
+        if (Physics.Linecast(startPos, nextSpot, out RaycastHit hit, whatIsGround))
+        {
+            float dot = Vector3.Dot(transform.up.normalized, hit.normal.normalized);
+            if (dot <= 0)
+            {
+                passValue = true;
+                animManager.animator.speed = .75f;                
+            }
+        }
+
+        // Draw ray
+        if (passValue) {Debug.DrawLine(startPos, nextSpot, Color.green);}
+        else { Debug.DrawLine(startPos, nextSpot, Color.red);}
+
+        // if that next spot collides with something, 
+        return passValue;
+    }
+    
     private void MovePlayer()
     {
         // Calculate move direction based on input and camera orientation
@@ -715,8 +753,18 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
+        // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity) && grounded && readyToJump)
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+        }
+        else
+        {
+            // Combine horizontal and vertical velocity
+            rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
+        }
+
     }
 
     // Returns the surface the player is standing on based on player rotation, as well as updates DesiredSpeed
@@ -871,8 +919,17 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity;
+        // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity))
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+        }
+        else
+        {
+            // Combine horizontal
+            rb.linearVelocity = horizontalVelocity;
+        }
     }
 
     private void BoostMovement()
@@ -910,11 +967,22 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
-        
         // Decrease boost meter
         BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
+
+        // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity))
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+            movementState = MovementState.Regular;
+        }
+        else
+        {
+            // Combine horizontal and vertical velocity
+            rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
+        }
+        
         
         // Go back to normal if the meter is empty
         if (BoostMeter <= 0f) { movementState = MovementState.Regular; }

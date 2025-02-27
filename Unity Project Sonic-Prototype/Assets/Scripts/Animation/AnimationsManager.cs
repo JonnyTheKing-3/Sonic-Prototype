@@ -87,6 +87,7 @@ public class AnimationsManager : MonoBehaviour
                 if (player.CurrentSpeedMagnitude > SpeedDivider) { animator.speed = player.CurrentSpeedMagnitude / SpeedDivider; } 
                 
                 animator.speed = player.grounded && player.readyToJump ? animator.speed : .75f;
+                //Debug.Log(animator.speed);
                 
                 animator.SetBool("grounded", player.grounded && player.readyToJump);
                 animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);

@@ -19,7 +19,7 @@ public class PlayerBoxTrigger : MonoBehaviour
         // Make sure that wall doesn't stop player from jumping
         if ((whatIsGround & (1 << other.gameObject.layer)) != 0 && player.grounded && player.readyToJump)
         {
-            Debug.Log("Touched");
+            // Debug.Log("Touched");
             player.TouchingWallBeforeJump = true;
         }
     }
@@ -33,7 +33,7 @@ public class PlayerBoxTrigger : MonoBehaviour
             if (!(player.grounded && player.readyToJump))
             {
                 inDelay = true;
-                Debug.Log("Exit");
+                // Debug.Log("Exit");
                 StartCoroutine(resetWallTouching());
             }
         }
