@@ -1064,8 +1064,17 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity;
+         // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity))
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+        }
+        else
+        {
+            // Combine horizontal
+            rb.linearVelocity = horizontalVelocity;
+        }
     }
 
     private float lastY;
