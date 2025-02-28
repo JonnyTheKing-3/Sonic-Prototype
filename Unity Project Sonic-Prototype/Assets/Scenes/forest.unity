@@ -292,6 +292,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: radius
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: splineSegments
+      value: 60
+      objectReference: {fileID: 0}
     - target: {fileID: 1286878475192216908, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -13.8
@@ -303,6 +311,14 @@ PrefabInstance:
     - target: {fileID: 1286878475192216908, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.z
       value: 10.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: tubeRadius
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: pathSegments
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 2396085851637757855, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1811,6 +1827,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: radius
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: splineSegments
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: tubeRadius
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: pathSegments
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: 2396085851637757855, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 239.7
@@ -3214,6 +3246,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: radius
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: splineSegments
+      value: 104
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: tubeRadius
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: pathSegments
+      value: 104
+      objectReference: {fileID: 0}
     - target: {fileID: 2396085851637757855, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 307.1
