@@ -309,7 +309,7 @@ public bool wasOnRail;
             
             Target = GetTargetForHomingAttack();
             movementState = MovementState.HomingAttacking;
-            Debug.Log("Started Homing");
+            // Debug.Log("Started Homing");
             animManager.animator.SetTrigger("StartedHomingAttack");
         }
 
@@ -467,6 +467,7 @@ public bool wasOnRail;
         // and if they are, choose the one closest to the center of the camera as well as to the player
         foreach (Collider col in colliders)
         {
+            // Debug.Log(col.name);
             // 1: Convert the object's position to viewport coordinates (coordinates relative to camera view)
             Vector3 viewportPos = cam.WorldToViewportPoint(col.transform.position);
 
@@ -854,9 +855,10 @@ public bool wasOnRail;
 
             // Apply movement force to Rigidbody for a smoother transition
             rb.linearVelocity = direction * (distance / Time.deltaTime) / hommingSpeedLimiter;
-            
+            Debug.Log(distance);
+
             // If we reached the target, "bounce" and transition back to regular movement state
-            if (distance < 1f)
+            if (distance < 2f)
             {
                 /*
                 // Replace .5f with ImpulseAfterAttackWeakMomentum or ImpulseAfterAttackWeakMomentum (depending on how much momentum you want to keep)
@@ -864,6 +866,10 @@ public bool wasOnRail;
                 // Replacing .5f by 0 makes it so the player shoots upwards only
                 // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
                 */
+                if (Target.TryGetComponent<DestroyAfterHoming>(out DestroyAfterHoming hit))
+                {
+                    hit.DestroyTarget();
+                }
                 rb.linearVelocity = Vector3.zero;
                 rb.AddForce((Vector3.up + (LastSpeedDirection * ImpulseAfterAttackWeakMomentum)) * ImpulseAfterAttack, ForceMode.Impulse);
                 animManager.TriggerHomingAttackTrickAnimation();
