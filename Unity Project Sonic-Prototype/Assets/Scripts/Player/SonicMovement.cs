@@ -865,7 +865,7 @@ public bool wasOnRail;
                 // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
                 */
                 rb.linearVelocity = Vector3.zero;
-                rb.AddForce((Vector3.up + (LastSpeedDirection * .5f)) * ImpulseAfterAttack, ForceMode.Impulse);
+                rb.AddForce((Vector3.up + (LastSpeedDirection * ImpulseAfterAttackWeakMomentum)) * ImpulseAfterAttack, ForceMode.Impulse);
                 animManager.TriggerHomingAttackTrickAnimation();
                 Debug.Log("Do trick");
                 movementState = MovementState.Regular;
