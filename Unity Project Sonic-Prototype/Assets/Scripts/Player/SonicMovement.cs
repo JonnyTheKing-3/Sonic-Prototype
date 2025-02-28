@@ -5,6 +5,8 @@ using Unity.Cinemachine;
 using UnityEngine.Splines;
 using Unity.VisualScripting;
 using UnityEngine.Rendering;
+using System.Security.Cryptography;
+using System;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -62,6 +64,7 @@ public class SonicMovement : MonoBehaviour
     public float jumpIgnoreDuration = 0.15f;
     private float jumpStartTime;
     private Vector3 jumpNormal;
+    public bool TouchingWallBeforeJump = false;
 
     
     [Header("GROUND")]
@@ -74,7 +77,8 @@ public class SonicMovement : MonoBehaviour
 
     
     [Header("HOMING ATTACK")]
-    public float homingSpeed;
+    
+    [Tooltip("Homing speed is really fast. This slows it down... Or speeds it up if the value is below zero")] public float hommingSpeedLimiter;
     public float NoTargethomingSpeed;
     public float ImpulseAfterAttack;
     public float ImpulseAfterAttackStrongMomentum;
@@ -127,6 +131,7 @@ public class SonicMovement : MonoBehaviour
     public bool readyToJump;
     public bool inIgnoreGroundJumpTime = false;
     public bool CanHomingAttack = false;
+    public bool SomethingInFront = false;
     public float distancePlayerToGround;
     public float horizontalInput;
     public float verticalInput;
@@ -179,13 +184,16 @@ public class SonicMovement : MonoBehaviour
     // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
     private void OnTriggerEnter(Collider other)
     {
-        
+        // Make sure that if we're touching a wall before the jump, the player doesn't activate sticking to the ground. Turned on in playerboxtrigger script
+        if (TouchingWallBeforeJump) { return; }
+
+        // Debug.Log("Touched something");
         triggerColliderForJumpTime.enabled = false;
         // Check if the colliding object's layer is in the whatIsGround LayerMask.
         // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
         if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
         {
-            Debug.Log("Touched: " + other.name);
+           //  Debug.Log("Touched: " + other.name);
             // Debug.Log("Touched ground during jump time");
             jumpStartTime = jumpIgnoreDuration;
             readyToJump = true;
@@ -301,6 +309,8 @@ public bool wasOnRail;
             
             Target = GetTargetForHomingAttack();
             movementState = MovementState.HomingAttacking;
+            Debug.Log("Started Homing");
+            animManager.animator.SetTrigger("StartedHomingAttack");
         }
 
         // Boost
@@ -502,7 +512,6 @@ public bool wasOnRail;
         // Ignore everything except state functions if we're homing attacking to avoid any interruptions
         if (movementState != MovementState.HomingAttacking)
         {
-            ////////////////////////////////////////////////////////// START
             /*
              * With this check, we make sure that when the player jumps,
              * the vertical velocity in move-player doesn't interfere with the jump.
@@ -530,9 +539,11 @@ public bool wasOnRail;
             if (grounded && readyToJump)
             {
                 ShortHopping = false;
+
+                // Make sure that the player has a bit of time after they leave jumping off of touching the wall to not automatically stick to the ground if they are moving forwward
+                if (PlayerBoxTrigger.inDelay && rb.linearVelocity.y > 0f) { return;}
                 StickPlayerToGround();
             }
-            /////////////////////////////////////////////////////////// END
 
             // Turn on homing attack if we hit the ground after not being able to homing attack
             if (!CanHomingAttack && grounded) { CanHomingAttack = true; }
@@ -543,6 +554,7 @@ public bool wasOnRail;
         switch (movementState)
         {
             case MovementState.Regular:
+                // If the player crashes with something, make velocity zero
                 MovePlayer();
                 break;
             
@@ -553,7 +565,7 @@ public bool wasOnRail;
             case MovementState.Spindashing:
                 // If we're in the startup, charge up. Otherwise, continue with regular spindash movemennt
                 if (!StartingSpinDash) {SpindashMovement();}
-                
+
                 // If the speed is too low or we leave the ground, go back to normal
                 if (rb.linearVelocity.magnitude < 5f && !StartingSpinDash && !SpinDashStartTime || !grounded && !StartingSpinDash)
                 {
@@ -608,6 +620,7 @@ public bool wasOnRail;
     
     private void StickPlayerToGround()
     {
+
         // What's below works BUT REMEMBER THAT IN SLOPES, the offset can look a bit bigger in than in the ground. So when I put the model in, make sure it's good on slopes
         // If it's not, just make sure to scale the offset by an accurate 
         
@@ -617,6 +630,44 @@ public bool wasOnRail;
         transform.position = targetPosition;
     }
 
+    private bool DetectedSomethingInVelocityDirection(Vector3 horizontalVel)
+    {
+        // I'm using this variable in case I ever want to debug
+        bool passValue = false;
+
+        // Calculate the next spot
+        float mag = rb.linearVelocity.magnitude < .1f ? .1f : rb.linearVelocity.magnitude; // first get an appropriate magnitude
+
+        // If we're boosting, the first frames magnitude will be really low in comparison to all the rest. So we make sure the first frame's check has enough magnitude
+        if (LastMovementState != MovementState.Boosting && movementState == MovementState.Boosting) 
+        {
+           mag = BoostSpeed;
+        }
+
+        Vector3 Velocity = horizontalVel.normalized * mag;
+        Vector3 startPos = transform.position + Vector3.up * .5f; // I want the ray to be slightly above the midpoint of the player so that it doesn't collide with small objects
+        Vector3 nextSpot = startPos + Velocity * Time.fixedDeltaTime; 
+        
+        // If the next spot hit's somthing, and it was angled perpendicular or towards the player, then we detected something. Otherwise, we didn't
+        if (Physics.Linecast(startPos, nextSpot, out RaycastHit hit, whatIsGround))
+        {
+            // Dot = 0: Perpendicular, Dot = -1: Towards the player, Dot = 1; Away from player
+            float dot = Vector3.Dot(transform.up.normalized, hit.normal.normalized);
+            if (dot <= 0)   
+            {
+                passValue = true;
+                animManager.animator.speed = .75f;    // reset animation speed so that it doesn't stay in the magnitude it previously was            
+            }
+        }
+
+        // Draw ray
+        // if (passValue) {Debug.DrawLine(startPos, nextSpot, Color.green);}
+        // else { Debug.DrawLine(startPos, nextSpot, Color.red);}
+
+        // if that next spot collides with something, 
+        return passValue;
+    }
+    
     private void MovePlayer()
     {
         // Calculate move direction based on input and camera orientation
@@ -706,8 +757,20 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
+        // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity) && grounded && readyToJump)
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+        }
+        else
+        {
+            // Combine horizontal and vertical velocity
+            rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
+            // Debug.DrawRay(transform.position, rb.linearVelocity.normalized *3f, Color.red);
+            // Debug.DrawRay(transform.position, horizontalVelocity.normalized *3f, Color.green);
+        }
+
     }
 
     // Returns the surface the player is standing on based on player rotation, as well as updates DesiredSpeed
@@ -784,10 +847,16 @@ public bool wasOnRail;
         // If we have a target, move towards the target and once we reach it, "bounce off". Then transition back to regular movement
         if (Target != null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, Target.position, homingSpeed * Time.deltaTime);
+            // transform.position = Vector3.MoveTowards(transform.position, Target.position, homingSpeed * Time.deltaTime);
+            Vector3 targetPosition = Target.transform.position;
+            Vector3 direction = (targetPosition - transform.position).normalized;
+            float distance = Vector3.Distance(transform.position, targetPosition);
+
+            // Apply movement force to Rigidbody for a smoother transition
+            rb.linearVelocity = direction * (distance / Time.deltaTime) / hommingSpeedLimiter;
             
             // If we reached the target, "bounce" and transition back to regular movement state
-            if (Vector3.Distance(transform.position, Target.position) < 1f)
+            if (distance < 1f)
             {
                 /*
                 // Replace .5f with ImpulseAfterAttackWeakMomentum or ImpulseAfterAttackWeakMomentum (depending on how much momentum you want to keep)
@@ -795,8 +864,10 @@ public bool wasOnRail;
                 // Replacing .5f by 0 makes it so the player shoots upwards only
                 // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
                 */
-                rb.AddForce((Vector3.up + (LastSpeedDirection * .5f)) * ImpulseAfterAttack, ForceMode.Impulse);
+                rb.linearVelocity = Vector3.zero;
+                rb.AddForce((Vector3.up + (LastSpeedDirection * ImpulseAfterAttackWeakMomentum)) * ImpulseAfterAttack, ForceMode.Impulse);
                 animManager.TriggerHomingAttackTrickAnimation();
+                Debug.Log("Do trick");
                 movementState = MovementState.Regular;
             }
         }
@@ -854,8 +925,17 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity;
+        // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity))
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+        }
+        else
+        {
+            // Combine horizontal
+            rb.linearVelocity = horizontalVelocity;
+        }
     }
 
     private void BoostMovement()
@@ -893,11 +973,22 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
-        
         // Decrease boost meter
         BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
+
+        // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity))
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+            movementState = MovementState.Regular;
+        }
+        else
+        {
+            // Combine horizontal and vertical velocity
+            rb.linearVelocity = horizontalVelocity + transform.up * verticalVelocity;
+        }
+        
         
         // Go back to normal if the meter is empty
         if (BoostMeter <= 0f) { movementState = MovementState.Regular; }
@@ -979,8 +1070,17 @@ public bool wasOnRail;
         // Update last surface
         lastSurfaceState = surfaceState;
         
-        // Combine horizontal and vertical velocity
-        rb.linearVelocity = horizontalVelocity;
+         // If something is in front, clash with it
+        if (DetectedSomethingInVelocityDirection(horizontalVelocity))
+        {
+            rb.linearVelocity = Vector3.zero;
+            horizontalVelocity = Vector3.zero;
+        }
+        else
+        {
+            // Combine horizontal
+            rb.linearVelocity = horizontalVelocity;
+        }
     }
 
     private float lastY;

@@ -87,13 +87,16 @@ public class AnimationsManager : MonoBehaviour
                 if (player.CurrentSpeedMagnitude > SpeedDivider) { animator.speed = player.CurrentSpeedMagnitude / SpeedDivider; } 
                 
                 animator.speed = player.grounded && player.readyToJump ? animator.speed : .75f;
+                //Debug.Log(animator.speed);
                 
                 animator.SetBool("grounded", player.grounded && player.readyToJump);
+                animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 break;
 
             case SonicMovement.MovementState.Spindashing:
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", true);
+                animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 
                 animator.speed = .75f;
                 break;
@@ -101,6 +104,7 @@ public class AnimationsManager : MonoBehaviour
             case SonicMovement.MovementState.Boosting:
                 animator.SetBool("Boosting", true);
                 animator.SetBool("SpinDashing", false);
+                animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 
                 animator.SetBool("grounded", player.grounded && player.readyToJump);
                 animator.speed = player.grounded && player.readyToJump ? BoostAnimSpeed : 1f; // Boost animation is a bit slow out of box, but air-boost is a decent speed
@@ -109,12 +113,14 @@ public class AnimationsManager : MonoBehaviour
             case SonicMovement.MovementState.HomingAttacking:
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", false);
+                animator.SetBool("OnDelay", false);
                 
                 animator.speed = 1f;
                 break;
             
             case SonicMovement.MovementState.Stomp:
                 animator.SetBool("Stomping", true);
+                animator.SetBool("OnDelay", false);
 
                 if (player.InStompWaitTime)
                 {
@@ -127,6 +133,7 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("Sliding", true);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("grounded", player.grounded && player.readyToJump);
+                animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 animator.speed = 1f;
                 break;
             
@@ -135,6 +142,7 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("StompWait", false);
                 animator.SetBool("Sliding", false);
                 animator.SetBool("Stomping", false);
+                animator.SetBool("OnDelay", false);
                 animator.SetBool("RailGrinding", true);
                 break;
         }
