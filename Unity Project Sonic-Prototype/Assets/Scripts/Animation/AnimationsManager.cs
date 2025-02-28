@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 public class AnimationsManager : MonoBehaviour
 {
     [Header("MODEL SETTINGS")]
-    public Vector3 offset = Vector3.zero;
+    public float groundOffset = 0f;
     
     [Header("ANIMATION SPEEDS")]
     public float RotationSmoothingFactor = 10f;
@@ -29,7 +29,7 @@ public class AnimationsManager : MonoBehaviour
     void SetupModelPositionAndRotation()
     {
         // Update position with offset.
-        transform.position = player.transform.position + offset;
+        transform.position = player.transform.position + (player.transform.up * groundOffset);
     
         // Determine the raw forward direction:
         Vector3 rawForward = (player.moveDirection.sqrMagnitude > 0 ? player.moveDirection : player.LastSpeedDirection).normalized;
