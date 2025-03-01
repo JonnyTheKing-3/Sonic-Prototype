@@ -48,7 +48,7 @@ public class AnimationsManager : MonoBehaviour
                 rotationMatrix.SetColumn(0, -player._T);      // Z-axis (forward)
                 rotationMatrix.SetColumn(1, player._N);      // Y-axis (up)
                 rotationMatrix.SetColumn(2, player._right);  // X-axis (right)
-                rotationMatrix.SetColumn(3, new Vector4(0, 0, 0, 1)); // Homogeneous coordinate
+                rotationMatrix.SetColumn(3, new Vector4(0, 0, 0, 1)); // Homogeneous coordinate.
             
                 // Extract quaternion from rotation matrix
                 if (player._N == Vector3.zero || player._T == Vector3.zero ||player._right == Vector3.zero) {return;}
