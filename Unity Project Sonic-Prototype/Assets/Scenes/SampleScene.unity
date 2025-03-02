@@ -5574,8 +5574,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 915234398}
     - target: {fileID: 2041389692905894438, guid: 8102fc62ab62fda4495b1a4bb897af43, type: 3}
+      propertyPath: whatIsGround.m_Bits
+      value: 264
+      objectReference: {fileID: 0}
+    - target: {fileID: 2041389692905894438, guid: 8102fc62ab62fda4495b1a4bb897af43, type: 3}
       propertyPath: AngleWhereSpeedIsRequired
       value: 181
+      objectReference: {fileID: 0}
+    - target: {fileID: 2041389692905894438, guid: 8102fc62ab62fda4495b1a4bb897af43, type: 3}
+      propertyPath: ImpulseAfterAttackWeakMomentum
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4507212149075603838, guid: 8102fc62ab62fda4495b1a4bb897af43, type: 3}
       propertyPath: m_Name
@@ -5584,6 +5592,10 @@ PrefabInstance:
     - target: {fileID: 5699754499826340332, guid: 8102fc62ab62fda4495b1a4bb897af43, type: 3}
       propertyPath: groundOffset
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7340203703843998628, guid: 8102fc62ab62fda4495b1a4bb897af43, type: 3}
+      propertyPath: m_TagString
+      value: orientation
       objectReference: {fileID: 0}
     - target: {fileID: 8831673681226092056, guid: 8102fc62ab62fda4495b1a4bb897af43, type: 3}
       propertyPath: m_LocalPosition.x
@@ -12163,7 +12175,7 @@ MonoBehaviour:
       Rotation:
         value:
           x: -0.4523016
-          y: 0.44464007
+          y: 0.4446401
           z: 0.71078783
           w: 0.3041367
     - Position:
@@ -19238,10 +19250,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2013618190}
   - component: {fileID: 2013618191}
+  - component: {fileID: 2013618192}
   m_Layer: 3
   m_Name: Dolly Cart
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -19290,6 +19303,22 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+--- !u!114 &2013618192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013618189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ed7baeae5520de43bf4bc3faced6371, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cartIterations: 25
+  roughIterations: 0.05
+  OnlyForwardDirection: 1
+  AngleLimitForTangentSwitching: 40
 --- !u!1 &2051031960
 GameObject:
   m_ObjectHideFlags: 0
@@ -20524,5 +20553,5 @@ SceneRoots:
   - {fileID: 1070538878}
   - {fileID: 1414419947}
   - {fileID: 1209488504}
-  - {fileID: 676479274}
   - {fileID: 1374136959}
+  - {fileID: 676479274}

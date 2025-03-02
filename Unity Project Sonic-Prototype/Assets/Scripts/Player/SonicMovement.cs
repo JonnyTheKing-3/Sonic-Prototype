@@ -128,7 +128,12 @@ public class SonicMovement : MonoBehaviour
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
     public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding }
 
+
+    [Header("LOOP-DE-LOOP")]
+    public bool OnLoopDeLoop = false;
+    public LoopDeLoopCart loopInfo;
     
+
     [Header("STATUS")]
     public bool grounded;
     public bool rayHit;
@@ -628,6 +633,11 @@ public bool wasOnRail;
         {
             grounded = false;
         }
+
+        // Update loop status
+        OnLoopDeLoop = grounded && surfaceHit.collider.gameObject.layer == 8;
+        if (OnLoopDeLoop) {loopInfo = surfaceHit.collider.transform.root.GetComponentInChildren<LoopDeLoopCart>();}
+        else {loopInfo = null;}
     }
     
     private void StickPlayerToGround()
@@ -686,12 +696,12 @@ public bool wasOnRail;
 
         // Check the current angle
         float angle = Vector3.Angle(transform.up.normalized, Vector3.up);
-        Debug.Log("angle: " + angle + " --- speed: " + rb.linearVelocity.magnitude);
+        // Debug.Log("angle: " + angle + " --- speed: " + rb.linearVelocity.magnitude);
 
         // If the current angle is too high, and the speed is too low, unstick from the ground
         if (angle > AngleWhereSpeedIsRequired && rb.linearVelocity.magnitude < SpeedRequiredForHighAngles)
         {
-            Debug.Log("UN-STICK");
+            // Debug.Log("UN-STICK");
             UnSticking = true;
             StartCoroutine(resetGroundSticking());
         }

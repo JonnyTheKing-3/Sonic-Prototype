@@ -7,24 +7,23 @@ public class ThirdPersonCam : MonoBehaviour
     [Header("References")]
     public Transform orientation;
     public Transform player;
+    public SonicMovement playerMoveScript;
     public Transform playerObj;
 
     public float rotationSpeed;
 
+    void Start()
+    {
+        playerMoveScript = player.GetComponent<SonicMovement>();
+    }
+
     private void FixedUpdate()
     {
+        // We want the orientation of the player to be based on the loop if on the loop
+        if (playerMoveScript.OnLoopDeLoop) { return ;}
+
         // rotate orientation
         Vector3 viewDir = player.position - new Vector3(transform.position.x, transform.position.y, transform.position.z);
         orientation.forward = viewDir.normalized;
-
-        // rotate player object
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        
-        if (inputDir != Vector3.zero)
-        {
-            // playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
-        }
     }
 }
