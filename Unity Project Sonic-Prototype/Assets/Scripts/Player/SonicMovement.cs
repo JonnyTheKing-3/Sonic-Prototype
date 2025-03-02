@@ -73,6 +73,11 @@ public class SonicMovement : MonoBehaviour
     [Space]
     public LayerMask whatIsGround;
     public float GroundStickingOffset = 1f;
+
+    [Tooltip("If you don't want this, like in places like the forest level, make this number 181 or greater (angles only range from 0-180). Could also make a list of layers where unsticking is not allowed")] public float AngleWhereSpeedIsRequired = 69;
+    public float SpeedRequiredForHighAngles = 65f;
+    public bool UnSticking = false;
+    public float DelayAfterUnstick = .25f;
     public RaycastHit surfaceHit;
 
     
@@ -179,6 +184,7 @@ public class SonicMovement : MonoBehaviour
         triggerColliderForJumpTime.enabled = false;
         jumpStartTime = -jumpIgnoreDuration;
         StartingSpinDash = false;
+        // Debug.Log("START");
     }
     
     // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
@@ -205,7 +211,7 @@ public class SonicMovement : MonoBehaviour
     private void Update()
     {
         MyInput();
-        
+        // Debug.Log("UPDATE");
         // Show the right gfx. I'll switch this type of thing for a model with animations later
         if (movementState == MovementState.Regular) 
         { GFX.SetActive(true); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); BoostForm.SetActive(false); }
@@ -510,6 +516,7 @@ public bool wasOnRail;
     public Vector3 LastJumpDir; // for debugging
     private void FixedUpdate()
     {
+        // Debug.Log("FIXED");
         // Ignore everything except state functions if we're homing attacking to avoid any interruptions
         if (movementState != MovementState.HomingAttacking)
         {
@@ -534,6 +541,10 @@ public bool wasOnRail;
             }
             else { inIgnoreGroundJumpTime = true; }
     
+            // Checks if the player is on high angled surfaces, and if so, checks to see if they have enough speed still stick
+            SpeedCheckForHighAngledSurfaces();
+
+            grounded = UnSticking ? false : grounded;
             transform.up = grounded ? surfaceHit.normal : Vector3.up;
     
             // reset short hopping and stick the player to the ground if they are in the ground
@@ -669,6 +680,29 @@ public bool wasOnRail;
         return passValue;
     }
     
+    private void SpeedCheckForHighAngledSurfaces()
+    {
+        if (!grounded) { return; }
+
+        // Check the current angle
+        float angle = Vector3.Angle(transform.up.normalized, Vector3.up);
+        Debug.Log("angle: " + angle + " --- speed: " + rb.linearVelocity.magnitude);
+
+        // If the current angle is too high, and the speed is too low, unstick from the ground
+        if (angle > AngleWhereSpeedIsRequired && rb.linearVelocity.magnitude < SpeedRequiredForHighAngles)
+        {
+            Debug.Log("UN-STICK");
+            UnSticking = true;
+            StartCoroutine(resetGroundSticking());
+        }
+    }
+
+    IEnumerator resetGroundSticking()
+    {
+        yield return new WaitForSeconds(DelayAfterUnstick);
+        UnSticking = false;
+    }
+
     private void MovePlayer()
     {
         // Calculate move direction based on input and camera orientation
