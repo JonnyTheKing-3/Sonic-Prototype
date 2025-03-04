@@ -45,7 +45,7 @@ public class LoopDeLoopCart : MonoBehaviour
         positionVector.Normalize();
 
         float angle = Vector3.Angle(player.transform.up, Vector3.up);
-        Debug.Log(angle);
+        // Debug.Log(angle);
 
         // only change the tangent before we start looping. The tangent will make a full 360, so if we don't have this check, 
         // when the player is reaching the top of the loop de loop, the tangent will change because it's in opposite direction of where it began

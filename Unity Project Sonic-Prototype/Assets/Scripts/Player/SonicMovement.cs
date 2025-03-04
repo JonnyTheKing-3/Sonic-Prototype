@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine.Rendering;
 using System.Security.Cryptography;
 using System;
+using System.Data.Common;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -126,7 +127,7 @@ public class SonicMovement : MonoBehaviour
 
     
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
-    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding }
+    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding, OnBumperInertia }
 
 
     [Header("LOOP-DE-LOOP")]
@@ -135,6 +136,7 @@ public class SonicMovement : MonoBehaviour
     
 
     [Header("STATUS")]
+    public bool AllowInput;
     public bool grounded;
     public bool rayHit;
     public bool ShortHopping = false;
@@ -146,7 +148,7 @@ public class SonicMovement : MonoBehaviour
     public float horizontalInput;
     public float verticalInput;
     public Vector3 moveDirection;
-    private Vector3 horizontalVelocity;
+    public Vector3 horizontalVelocity;
     public float spindashDesiredAcceleration;
     public float DesiredSpeed;
     public float CurrentSpeedMagnitude;
@@ -167,6 +169,9 @@ public class SonicMovement : MonoBehaviour
     public GameObject SpinBallForm;
     public GameObject BoostForm;
     public AnimationsManager animManager;
+
+    public bumper CurrentBumper;
+
     [SerializeField] private TMP_Text speedText;
 
     
@@ -178,6 +183,7 @@ public class SonicMovement : MonoBehaviour
     {
         // getting references
         rb = GetComponent<Rigidbody>();
+        triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
 
         // initiating values
         movementState = MovementState.Regular;
@@ -185,11 +191,11 @@ public class SonicMovement : MonoBehaviour
         CanHomingAttack = true;
         ShortHopping = false;
         readyToJump = true;
-        triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
         triggerColliderForJumpTime.enabled = false;
         jumpStartTime = -jumpIgnoreDuration;
         StartingSpinDash = false;
-        // Debug.Log("START");
+        AllowInput = true;
+        CurrentBumper = null;
     }
     
     // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
@@ -204,7 +210,7 @@ public class SonicMovement : MonoBehaviour
         // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
         if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
         {
-           //  Debug.Log("Touched: " + other.name);
+            // Debug.Log("Touched: " + other.name);
             // Debug.Log("Touched ground during jump time");
             jumpStartTime = jumpIgnoreDuration;
             readyToJump = true;
@@ -215,7 +221,8 @@ public class SonicMovement : MonoBehaviour
     
     private void Update()
     {
-        MyInput();
+        if (AllowInput) {MyInput();}
+
         // Debug.Log("UPDATE");
         // Show the right gfx. I'll switch this type of thing for a model with animations later
         if (movementState == MovementState.Regular) 
@@ -427,7 +434,7 @@ public bool wasOnRail;
 
     }
 
-    private void ResetJump()
+    public void ResetJump()
     {
         readyToJump = true;
         wasOnRail = false;
@@ -567,11 +574,12 @@ public bool wasOnRail;
 
         }
 
+
         // Move the player based on the player state
         switch (movementState)
         {
             case MovementState.Regular:
-                // If the player crashes with something, make velocity zero
+                if (!AllowInput) { break;}
                 MovePlayer();
                 break;
             
@@ -612,6 +620,10 @@ public bool wasOnRail;
         
             case MovementState.RailGrinding:
                 RailGrinding();
+                break;
+        
+            case MovementState.OnBumperInertia:
+                BumperMovement();
                 break;
         }
 
@@ -1260,6 +1272,24 @@ public bool wasOnRail;
             RailStartSpeed = BoostSpeed;
             RailStartSpeed *= TowardsEndPoint ? 1 : -1;
             BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
+        }
+    }
+
+    void BumperMovement()
+    {
+        if (readyToJump)
+        {
+            // Slow player down as they fly
+            rb.linearVelocity -= CurrentBumper.transform.up.normalized * Mathf.Abs(gravity) * Time.deltaTime;
+
+            // if the player's speed goes down by a certain amount, then turn off bumper time
+            if (rb.linearVelocity.magnitude < 5f)
+            {
+                animManager.RotationSpeedUpCaller();
+                AllowInput = true;
+                CurrentBumper = null;
+                movementState = MovementState.Regular;
+            }
         }
     }
 }

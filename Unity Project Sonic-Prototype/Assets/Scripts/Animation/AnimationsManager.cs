@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,6 +9,11 @@ public class AnimationsManager : MonoBehaviour
 {
     [Header("MODEL SETTINGS")]
     public float groundOffset = 0f;
+    public float bumperZOffset = -1f; // Used for when hitting a bumper
+
+    [Header("BUMPER SETTINGS")]
+    public float rotationTime;
+    public float scalar;
     
     [Header("ANIMATION SPEEDS")]
     public float RotationSmoothingFactor = 10f;
@@ -20,6 +26,7 @@ public class AnimationsManager : MonoBehaviour
     public Animator animator;
     
     public SonicMovement player;
+
     void Start()
     {
         player = GameObject.FindWithTag("Player").GetComponent<SonicMovement>();
@@ -29,7 +36,14 @@ public class AnimationsManager : MonoBehaviour
     void SetupModelPositionAndRotation()
     {
         // Update position with offset.
-        transform.position = player.transform.position + (player.transform.up * groundOffset);
+        if (player.movementState == SonicMovement.MovementState.OnBumperInertia) 
+        {
+            transform.position = player.transform.position + (player.transform.forward * bumperZOffset);
+        }
+        else
+        {
+            transform.position = player.transform.position + (player.transform.up * groundOffset);
+        }   
     
         // Determine the raw forward direction:
         Vector3 rawForward = (player.moveDirection.sqrMagnitude > 0 ? player.moveDirection : player.LastSpeedDirection).normalized;
@@ -59,10 +73,14 @@ public class AnimationsManager : MonoBehaviour
                 return;
             }
 
-            Quaternion targetRotation = Quaternion.LookRotation(forward, player.transform.up);
-        
-            // Smoothly interpolate from the current rotation to the target rotation.
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, RotationSmoothingFactor * Time.deltaTime);
+            else if (player.AllowInput)
+            {   
+                Quaternion targetRotation = Quaternion.LookRotation(forward, player.transform.up);
+
+                // Smoothly interpolate from the current rotation to the target rotation.
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, RotationSmoothingFactor * Time.deltaTime);
+
+            }
         }
     }
     
@@ -78,6 +96,7 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("StompWait", false);
                 animator.SetBool("Sliding", false);
                 animator.SetBool("RailGrinding", false);
+                animator.SetBool("OnBumperForce", false);
                 
                 // blend tree is from 0-1, so what we want to pass to the animator is the percentage of how close we are to reaching the speed value
                 float speedVal = player.CurrentSpeedMagnitude / 100f;
@@ -96,6 +115,7 @@ public class AnimationsManager : MonoBehaviour
             case SonicMovement.MovementState.Spindashing:
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", true);
+                animator.SetBool("OnBumperForce", false);
                 animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 
                 animator.speed = .75f;
@@ -104,6 +124,7 @@ public class AnimationsManager : MonoBehaviour
             case SonicMovement.MovementState.Boosting:
                 animator.SetBool("Boosting", true);
                 animator.SetBool("SpinDashing", false);
+                animator.SetBool("OnBumperForce", false);
                 animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 
                 animator.SetBool("grounded", player.grounded && player.readyToJump);
@@ -114,6 +135,7 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("OnDelay", false);
+                animator.SetBool("OnBumperForce", false);
                 
                 animator.speed = 1f;
                 break;
@@ -121,6 +143,7 @@ public class AnimationsManager : MonoBehaviour
             case SonicMovement.MovementState.Stomp:
                 animator.SetBool("Stomping", true);
                 animator.SetBool("OnDelay", false);
+                animator.SetBool("OnBumperForce", false);
 
                 if (player.InStompWaitTime)
                 {
@@ -132,6 +155,7 @@ public class AnimationsManager : MonoBehaviour
             case SonicMovement.MovementState.Sliding:
                 animator.SetBool("Sliding", true);
                 animator.SetBool("SpinDashing", false);
+                animator.SetBool("OnBumperForce", false);
                 animator.SetBool("grounded", player.grounded && player.readyToJump);
                 animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 animator.speed = 1f;
@@ -144,6 +168,18 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("Stomping", false);
                 animator.SetBool("OnDelay", false);
                 animator.SetBool("RailGrinding", true);
+                animator.SetBool("OnBumperForce", false);
+                break;
+        
+            case SonicMovement.MovementState.OnBumperInertia:
+                animator.SetBool("grounded", false);
+                animator.SetBool("SpinDashing", false);
+                animator.SetBool("StompWait", false);
+                animator.SetBool("Sliding", false);
+                animator.SetBool("Stomping", false);
+                animator.SetBool("OnDelay", false);
+                animator.SetBool("RailGrinding", false);
+                animator.SetBool("OnBumperForce", true);
                 break;
         }
     }
@@ -156,4 +192,17 @@ public class AnimationsManager : MonoBehaviour
     {
         animator.SetTrigger("HomingAttackTrick");
     }
+
+    public void RotationSpeedUpCaller()
+    {
+        StartCoroutine(RotationSpeedUp());
+    }
+    
+    IEnumerator RotationSpeedUp()
+    {
+        RotationSmoothingFactor *= scalar;
+        yield return new WaitForSeconds(rotationTime);
+        RotationSmoothingFactor /= scalar;
+    }
+
 }
