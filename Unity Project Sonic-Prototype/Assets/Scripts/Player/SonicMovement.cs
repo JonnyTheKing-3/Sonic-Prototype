@@ -239,7 +239,7 @@ public class SonicMovement : MonoBehaviour
         
         // For show case purposes
         if (Input.GetKeyDown(ShowSpeedKey)) { ShowSpeed = !ShowSpeed;}
-        if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude; }
+        if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude.ToString("F2"); }
         else { speedText.text = ""; }        
     }
 
