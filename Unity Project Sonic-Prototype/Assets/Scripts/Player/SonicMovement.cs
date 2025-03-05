@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine.Rendering;
 using System.Security.Cryptography;
 using System;
+using System.Data.Common;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -73,6 +74,11 @@ public class SonicMovement : MonoBehaviour
     [Space]
     public LayerMask whatIsGround;
     public float GroundStickingOffset = 1f;
+
+    [Tooltip("If you don't want this, like in places like the forest level, make this number 181 or greater (angles only range from 0-180). Could also make a list of layers where unsticking is not allowed")] public float AngleWhereSpeedIsRequired = 69;
+    public float SpeedRequiredForHighAngles = 65f;
+    public bool UnSticking = false;
+    public float DelayAfterUnstick = .25f;
     public RaycastHit surfaceHit;
 
     
@@ -121,9 +127,14 @@ public class SonicMovement : MonoBehaviour
 
     
     public enum SurfaceState { Flat, GoingUpHill, GoingDownHill, Air }
-    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding }
+    public enum MovementState { Regular, HomingAttacking, Spindashing, Boosting, Stomp, Sliding, RailGrinding, OnBumperInertia }
 
+
+    [Header("LOOP-DE-LOOP")]
+    public bool OnLoopDeLoop = false;
+    public LoopDeLoopCart loopInfo;
     
+
     [Header("STATUS")]
     public bool grounded;
     public bool rayHit;
@@ -136,7 +147,7 @@ public class SonicMovement : MonoBehaviour
     public float horizontalInput;
     public float verticalInput;
     public Vector3 moveDirection;
-    private Vector3 horizontalVelocity;
+    public Vector3 horizontalVelocity;
     public float spindashDesiredAcceleration;
     public float DesiredSpeed;
     public float CurrentSpeedMagnitude;
@@ -157,6 +168,11 @@ public class SonicMovement : MonoBehaviour
     public GameObject SpinBallForm;
     public GameObject BoostForm;
     public AnimationsManager animManager;
+
+    public bumper CurrentBumper;
+
+    public dashpanel CurrentDashPanel;
+
     [SerializeField] private TMP_Text speedText;
 
     
@@ -168,6 +184,7 @@ public class SonicMovement : MonoBehaviour
     {
         // getting references
         rb = GetComponent<Rigidbody>();
+        triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
 
         // initiating values
         movementState = MovementState.Regular;
@@ -175,10 +192,10 @@ public class SonicMovement : MonoBehaviour
         CanHomingAttack = true;
         ShortHopping = false;
         readyToJump = true;
-        triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
         triggerColliderForJumpTime.enabled = false;
         jumpStartTime = -jumpIgnoreDuration;
         StartingSpinDash = false;
+        CurrentBumper = null;
     }
     
     // Mainly used for detecting surface during JumpTime where we ignore grounded. Used so player doesn't bounce off in case they reach a surface before the timer ends
@@ -193,7 +210,7 @@ public class SonicMovement : MonoBehaviour
         // (1 << other.gameObject.layer) creates a bitmask for the object's layer.
         if ((whatIsGround.value & (1 << other.gameObject.layer)) != 0)
         {
-           //  Debug.Log("Touched: " + other.name);
+            // Debug.Log("Touched: " + other.name);
             // Debug.Log("Touched ground during jump time");
             jumpStartTime = jumpIgnoreDuration;
             readyToJump = true;
@@ -205,7 +222,8 @@ public class SonicMovement : MonoBehaviour
     private void Update()
     {
         MyInput();
-        
+
+        // Debug.Log("UPDATE");
         // Show the right gfx. I'll switch this type of thing for a model with animations later
         if (movementState == MovementState.Regular) 
         { GFX.SetActive(true); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); BoostForm.SetActive(false); }
@@ -221,7 +239,7 @@ public class SonicMovement : MonoBehaviour
         
         // For show case purposes
         if (Input.GetKeyDown(ShowSpeedKey)) { ShowSpeed = !ShowSpeed;}
-        if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude; }
+        if (ShowSpeed) { speedText.text = "Speed: " + CurrentSpeedMagnitude.ToString("F2"); }
         else { speedText.text = ""; }        
     }
 
@@ -229,7 +247,8 @@ public bool wasOnRail;
     private void MyInput()
     {
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
-        if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || InStompWaitTime) { return;}
+        if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || movementState == MovementState.OnBumperInertia 
+         || OnDashPanelInertia() ||  InStompWaitTime) { return;}
         
         // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -309,7 +328,7 @@ public bool wasOnRail;
             
             Target = GetTargetForHomingAttack();
             movementState = MovementState.HomingAttacking;
-            Debug.Log("Started Homing");
+            // Debug.Log("Started Homing");
             animManager.animator.SetTrigger("StartedHomingAttack");
         }
 
@@ -416,7 +435,7 @@ public bool wasOnRail;
 
     }
 
-    private void ResetJump()
+    public void ResetJump()
     {
         readyToJump = true;
         wasOnRail = false;
@@ -467,6 +486,7 @@ public bool wasOnRail;
         // and if they are, choose the one closest to the center of the camera as well as to the player
         foreach (Collider col in colliders)
         {
+            // Debug.Log(col.name);
             // 1: Convert the object's position to viewport coordinates (coordinates relative to camera view)
             Vector3 viewportPos = cam.WorldToViewportPoint(col.transform.position);
 
@@ -509,6 +529,7 @@ public bool wasOnRail;
     public Vector3 LastJumpDir; // for debugging
     private void FixedUpdate()
     {
+        // Debug.Log("FIXED");
         // Ignore everything except state functions if we're homing attacking to avoid any interruptions
         if (movementState != MovementState.HomingAttacking)
         {
@@ -533,6 +554,10 @@ public bool wasOnRail;
             }
             else { inIgnoreGroundJumpTime = true; }
     
+            // Checks if the player is on high angled surfaces, and if so, checks to see if they have enough speed still stick
+            SpeedCheckForHighAngledSurfaces();
+
+            grounded = UnSticking ? false : grounded;
             transform.up = grounded ? surfaceHit.normal : Vector3.up;
     
             // reset short hopping and stick the player to the ground if they are in the ground
@@ -550,11 +575,11 @@ public bool wasOnRail;
 
         }
 
+
         // Move the player based on the player state
         switch (movementState)
         {
             case MovementState.Regular:
-                // If the player crashes with something, make velocity zero
                 MovePlayer();
                 break;
             
@@ -596,6 +621,10 @@ public bool wasOnRail;
             case MovementState.RailGrinding:
                 RailGrinding();
                 break;
+        
+            case MovementState.OnBumperInertia:
+                BumperMovement();
+                break;
         }
 
         // Keep track of speed, direction and last movement state
@@ -616,6 +645,11 @@ public bool wasOnRail;
         {
             grounded = false;
         }
+
+        // Update loop status
+        OnLoopDeLoop = grounded && surfaceHit.collider.gameObject.layer == 8;
+        if (OnLoopDeLoop) {loopInfo = surfaceHit.collider.transform.root.GetComponentInChildren<LoopDeLoopCart>();}
+        else {loopInfo = null;}
     }
     
     private void StickPlayerToGround()
@@ -668,6 +702,29 @@ public bool wasOnRail;
         return passValue;
     }
     
+    private void SpeedCheckForHighAngledSurfaces()
+    {
+        if (!grounded) { return; }
+
+        // Check the current angle
+        float angle = Vector3.Angle(transform.up.normalized, Vector3.up);
+        // Debug.Log("angle: " + angle + " --- speed: " + rb.linearVelocity.magnitude);
+
+        // If the current angle is too high, and the speed is too low, unstick from the ground
+        if (angle > AngleWhereSpeedIsRequired && rb.linearVelocity.magnitude < SpeedRequiredForHighAngles)
+        {
+            // Debug.Log("UN-STICK");
+            UnSticking = true;
+            StartCoroutine(resetGroundSticking());
+        }
+    }
+
+    IEnumerator resetGroundSticking()
+    {
+        yield return new WaitForSeconds(DelayAfterUnstick);
+        UnSticking = false;
+    }
+
     private void MovePlayer()
     {
         // Calculate move direction based on input and camera orientation
@@ -688,6 +745,7 @@ public bool wasOnRail;
         // Calculate target velocity
         Vector3 targetVelocity = SurfaceAppliedDirection.normalized * DesiredSpeed;
 
+
         // Smoothly rotate towards target velocity and apply acceleration or deceleration
         float rad = turnSpeed * Mathf.PI * Time.deltaTime;
         float appropriateAcceleration = moveDirection != Vector3.zero ? acceleration : deceleration;
@@ -698,9 +756,15 @@ public bool wasOnRail;
             appropriateAcceleration * Time.deltaTime);
         float currentSpeed = horizontalVelocity.magnitude; // Store current velocity
         
+
         // If we want to move, make sure the magnitude of the speed doesn't abruptly change. When entering different surfaces, the transition hindered the magnitude
         // This check makes sure the speed is kept at where it's supposed to be
-        if (moveDirection != Vector3.zero)
+        if (OnDashPanelInertia()) 
+        {
+            horizontalVelocity = CurrentDashPanel.transform.forward.normalized;
+            horizontalVelocity *= CurrentDashPanel.CustomSpeedForThisPanel ? CurrentDashPanel.speedGiven : GoingDownHillSpeed; 
+        }
+        else if (moveDirection != Vector3.zero)
         {
             if (surfaceState == lastSurfaceState)
             {
@@ -780,7 +844,6 @@ public bool wasOnRail;
 
         // Check the angle of the surface. 0 = flat surface, > 0 = slope
         float angle = Vector3.Angle(transform.up, Vector3.up);
-
         switch (movementState)
         {
             case MovementState.Regular:
@@ -854,9 +917,10 @@ public bool wasOnRail;
 
             // Apply movement force to Rigidbody for a smoother transition
             rb.linearVelocity = direction * (distance / Time.deltaTime) / hommingSpeedLimiter;
-            
+            Debug.Log(distance);
+
             // If we reached the target, "bounce" and transition back to regular movement state
-            if (distance < 1f)
+            if (distance < 2f)
             {
                 /*
                 // Replace .5f with ImpulseAfterAttackWeakMomentum or ImpulseAfterAttackWeakMomentum (depending on how much momentum you want to keep)
@@ -864,6 +928,10 @@ public bool wasOnRail;
                 // Replacing .5f by 0 makes it so the player shoots upwards only
                 // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
                 */
+                if (Target.TryGetComponent<DestroyAfterHoming>(out DestroyAfterHoming hit))
+                {
+                    hit.DestroyTarget();
+                }
                 rb.linearVelocity = Vector3.zero;
                 rb.AddForce((Vector3.up + (LastSpeedDirection * ImpulseAfterAttackWeakMomentum)) * ImpulseAfterAttack, ForceMode.Impulse);
                 animManager.TriggerHomingAttackTrickAnimation();
@@ -1211,5 +1279,42 @@ public bool wasOnRail;
             RailStartSpeed *= TowardsEndPoint ? 1 : -1;
             BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
         }
+    }
+
+    void BumperMovement()
+    {
+        if (readyToJump)
+        {
+            // Slow player down as they fly
+            rb.linearVelocity -= CurrentBumper.transform.up.normalized * Mathf.Abs(gravity) * Time.deltaTime;
+
+            Debug.Log(rb.linearVelocity.magnitude);
+
+
+            // if the player's speed goes down by a certain amount, then turn off bumper time
+            // We also add a min distance to make sure a new bumper check doesn't accidently stop bumper when it makes velocity 0
+            if (rb.linearVelocity.magnitude < CurrentBumper.speedPlayerThresholdBeforePlayerMoves && Vector3.Distance(CurrentBumper.transform.position, transform.position) > 3f)
+            {
+                Debug.Log("Leave Bumper state at " + rb.linearVelocity.magnitude + " speed and readyToJump is " + readyToJump);
+                animManager.RotationSpeedUpCaller();
+                animManager.animator.speed = .75f; // reset animation speed
+                CurrentBumper = null;
+                movementState = MovementState.Regular;
+            }
+        }
+    }
+
+    public bool OnDashPanelInertia() 
+    {
+        if (CurrentDashPanel == null) { return false; }
+
+        // if we passed the timer check, give control back to player
+        if (Time.time - CurrentDashPanel.TimePanelWasTouched > CurrentDashPanel.timerToKeepInertia) 
+        {
+            animManager.animator.speed = .75f;
+            CurrentDashPanel = null;
+            return false;
+        }
+        return true;
     }
 }

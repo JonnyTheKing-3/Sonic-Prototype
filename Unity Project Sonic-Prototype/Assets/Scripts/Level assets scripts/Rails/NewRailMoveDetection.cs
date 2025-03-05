@@ -62,7 +62,6 @@ public class NewRailMoveDetection : MonoBehaviour
         // Initialize sonic's right
         Vector3 normal = GetNormal(other);
         Vector3 right = Vector3.Cross(normal, positionVector).normalized;
-        // StartCoroutine(DrawAxesForSeconds(other.transform.position, right, normal, positionVector));
         other.transform.parent.GetChild(2).transform.rotation = Quaternion.LookRotation(right, normal);
 
         // Attach player to cart
@@ -70,23 +69,6 @@ public class NewRailMoveDetection : MonoBehaviour
         cart.PositionUnits = PathIndexUnit.Distance;
         other.movementState = SonicMovement.MovementState.RailGrinding;
         
-    }
-
-    IEnumerator DrawAxesForSeconds(Vector3 pos, Vector3 right, Vector3 up, Vector3 forward)
-    {
-        float elapsedTime = 0f;
-
-        while (elapsedTime < 3f)
-        {
-
-            // Draw right (Red), up (Green), and forward (Blue)
-            Debug.DrawRay(pos, right, Color.red);
-            Debug.DrawRay(pos, up, Color.green);
-            Debug.DrawRay(pos, forward, Color.blue);
-
-            elapsedTime += Time.deltaTime;
-            yield return null; // Run every frame
-        }
     }
     
     Vector3 GetNormal(SonicMovement other)
