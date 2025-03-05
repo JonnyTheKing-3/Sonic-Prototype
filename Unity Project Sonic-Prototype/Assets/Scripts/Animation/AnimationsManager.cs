@@ -51,8 +51,8 @@ public class AnimationsManager : MonoBehaviour
         // Project the raw forward vector onto the plane defined by player.transform.up.
         Vector3 forward = Vector3.ProjectOnPlane(rawForward, player.transform.up).normalized;
     
-        // If we have a valid forward direction, compute the target rotation.
-        if (forward != Vector3.zero)
+        // If we have a valid forward direction, and we're not interrupting a dashpanel inertia, then compute the target rotation.
+        if (forward != Vector3.zero && !player.OnDashPanelInertia())
         {
 
             if (player.movementState == SonicMovement.MovementState.RailGrinding)
@@ -73,7 +73,7 @@ public class AnimationsManager : MonoBehaviour
                 return;
             }
 
-            else if (player.AllowInput)
+            else if (player.movementState != SonicMovement.MovementState.OnBumperInertia)
             {   
                 Quaternion targetRotation = Quaternion.LookRotation(forward, player.transform.up);
 
@@ -94,6 +94,7 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("StompWait", false);
+                animator.SetBool("Stomping", false);
                 animator.SetBool("Sliding", false);
                 animator.SetBool("RailGrinding", false);
                 animator.SetBool("OnBumperForce", false);

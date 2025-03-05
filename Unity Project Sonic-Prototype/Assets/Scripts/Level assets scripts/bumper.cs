@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 public class bumper : MonoBehaviour
 {
     public float bumperForce;
+    public float speedPlayerThresholdBeforePlayerMoves;
     private SonicMovement player;
 
     void Start()
@@ -23,20 +24,19 @@ public class bumper : MonoBehaviour
             
             // Setup player so bumper time can function smoothly
             player.transform.position = transform.position;
-            player.AllowInput = false;
             // make input 0 so that moveplayer in sonicmovement doesn't interfere
             player.horizontalInput = 0;
             player.verticalInput = 0;
             player.grounded = false;
             player.readyToJump = false;
-            StartCoroutine(delayBeforeResetingReadyToJump());
+            player.movementState = SonicMovement.MovementState.OnBumperInertia;
             player.rb.linearVelocity = Vector3.zero;
             player.horizontalVelocity = Vector3.zero;
 
             // 'bounce' the player in the direction of the bumpers up rotation
             player.rb.AddForce(transform.up * bumperForce, ForceMode.Impulse);
-            player.movementState = SonicMovement.MovementState.OnBumperInertia;
 
+            StartCoroutine(delayBeforeResetingReadyToJump());
             // setup animatior
             player.animManager.transform.forward = transform.up;
         }

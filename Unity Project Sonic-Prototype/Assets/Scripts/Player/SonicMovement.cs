@@ -136,7 +136,6 @@ public class SonicMovement : MonoBehaviour
     
 
     [Header("STATUS")]
-    public bool AllowInput;
     public bool grounded;
     public bool rayHit;
     public bool ShortHopping = false;
@@ -172,6 +171,8 @@ public class SonicMovement : MonoBehaviour
 
     public bumper CurrentBumper;
 
+    public dashpanel CurrentDashPanel;
+
     [SerializeField] private TMP_Text speedText;
 
     
@@ -194,7 +195,6 @@ public class SonicMovement : MonoBehaviour
         triggerColliderForJumpTime.enabled = false;
         jumpStartTime = -jumpIgnoreDuration;
         StartingSpinDash = false;
-        AllowInput = true;
         CurrentBumper = null;
     }
     
@@ -221,7 +221,7 @@ public class SonicMovement : MonoBehaviour
     
     private void Update()
     {
-        if (AllowInput) {MyInput();}
+        MyInput();
 
         // Debug.Log("UPDATE");
         // Show the right gfx. I'll switch this type of thing for a model with animations later
@@ -247,7 +247,8 @@ public bool wasOnRail;
     private void MyInput()
     {
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
-        if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || InStompWaitTime) { return;}
+        if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || movementState == MovementState.OnBumperInertia 
+         || OnDashPanelInertia() ||  InStompWaitTime) { return;}
         
         // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -579,7 +580,6 @@ public bool wasOnRail;
         switch (movementState)
         {
             case MovementState.Regular:
-                if (!AllowInput) { break;}
                 MovePlayer();
                 break;
             
@@ -745,6 +745,7 @@ public bool wasOnRail;
         // Calculate target velocity
         Vector3 targetVelocity = SurfaceAppliedDirection.normalized * DesiredSpeed;
 
+
         // Smoothly rotate towards target velocity and apply acceleration or deceleration
         float rad = turnSpeed * Mathf.PI * Time.deltaTime;
         float appropriateAcceleration = moveDirection != Vector3.zero ? acceleration : deceleration;
@@ -755,9 +756,15 @@ public bool wasOnRail;
             appropriateAcceleration * Time.deltaTime);
         float currentSpeed = horizontalVelocity.magnitude; // Store current velocity
         
+
         // If we want to move, make sure the magnitude of the speed doesn't abruptly change. When entering different surfaces, the transition hindered the magnitude
         // This check makes sure the speed is kept at where it's supposed to be
-        if (moveDirection != Vector3.zero)
+        if (OnDashPanelInertia()) 
+        {
+            horizontalVelocity = CurrentDashPanel.transform.forward.normalized;
+            horizontalVelocity *= CurrentDashPanel.CustomSpeedForThisPanel ? CurrentDashPanel.speedGiven : GoingDownHillSpeed; 
+        }
+        else if (moveDirection != Vector3.zero)
         {
             if (surfaceState == lastSurfaceState)
             {
@@ -837,7 +844,6 @@ public bool wasOnRail;
 
         // Check the angle of the surface. 0 = flat surface, > 0 = slope
         float angle = Vector3.Angle(transform.up, Vector3.up);
-
         switch (movementState)
         {
             case MovementState.Regular:
@@ -1282,14 +1288,33 @@ public bool wasOnRail;
             // Slow player down as they fly
             rb.linearVelocity -= CurrentBumper.transform.up.normalized * Mathf.Abs(gravity) * Time.deltaTime;
 
+            Debug.Log(rb.linearVelocity.magnitude);
+
+
             // if the player's speed goes down by a certain amount, then turn off bumper time
-            if (rb.linearVelocity.magnitude < 5f)
+            // We also add a min distance to make sure a new bumper check doesn't accidently stop bumper when it makes velocity 0
+            if (rb.linearVelocity.magnitude < CurrentBumper.speedPlayerThresholdBeforePlayerMoves && Vector3.Distance(CurrentBumper.transform.position, transform.position) > 3f)
             {
+                Debug.Log("Leave Bumper state at " + rb.linearVelocity.magnitude + " speed and readyToJump is " + readyToJump);
                 animManager.RotationSpeedUpCaller();
-                AllowInput = true;
+                animManager.animator.speed = .75f; // reset animation speed
                 CurrentBumper = null;
                 movementState = MovementState.Regular;
             }
         }
+    }
+
+    public bool OnDashPanelInertia() 
+    {
+        if (CurrentDashPanel == null) { return false; }
+
+        // if we passed the timer check, give control back to player
+        if (Time.time - CurrentDashPanel.TimePanelWasTouched > CurrentDashPanel.timerToKeepInertia) 
+        {
+            animManager.animator.speed = .75f;
+            CurrentDashPanel = null;
+            return false;
+        }
+        return true;
     }
 }
