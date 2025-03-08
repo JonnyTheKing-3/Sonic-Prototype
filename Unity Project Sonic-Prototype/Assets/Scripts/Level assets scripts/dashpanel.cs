@@ -22,16 +22,15 @@ public class dashpanel : MonoBehaviour
     {
         if (other.CompareTag("Player Trigger Collider"))
         {   
-            Debug.Log("touched player");
+//             Debug.Log("touched player");
             player.CurrentDashPanel = this;
             TimePanelWasTouched = Time.time;
             
             // Setup player so bumper time can function smoothly
             player.transform.position = transform.position;
-            player.movementState = SonicMovement.MovementState.Regular;
             player.grounded = true;
             player.readyToJump = true;
-            
+            player.movementState = SonicMovement.MovementState.Regular;
 
             // make input 0 so that moveplayer in sonicmovement doesn't interfere
             player.horizontalInput = 0;

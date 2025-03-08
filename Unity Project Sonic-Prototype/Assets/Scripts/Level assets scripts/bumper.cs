@@ -20,6 +20,7 @@ public class bumper : MonoBehaviour
     {
         if (other.CompareTag("Player Trigger Collider"))
         {   
+            player.CurrentDashPanel = null;
             player.CurrentBumper = this;
             
             // Setup player so bumper time can function smoothly

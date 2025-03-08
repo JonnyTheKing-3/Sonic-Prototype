@@ -248,7 +248,13 @@ public bool wasOnRail;
     {
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
         if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || movementState == MovementState.OnBumperInertia 
-         || OnDashPanelInertia() ||  InStompWaitTime) { return;}
+        ||  InStompWaitTime) { return;}
+
+        if (OnDashPanelInertia()) 
+        {
+            verticalInput = 1f;
+            return;
+        }
         
         // Get horizontal/vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -761,7 +767,14 @@ public bool wasOnRail;
         // This check makes sure the speed is kept at where it's supposed to be
         if (OnDashPanelInertia()) 
         {
-            horizontalVelocity = CurrentDashPanel.transform.forward.normalized;
+            if (OnLoopDeLoop)
+            {
+                horizontalVelocity = moveDirection.normalized;
+            }
+            else 
+            {
+                horizontalVelocity = CurrentDashPanel.transform.forward.normalized;
+            }
             horizontalVelocity *= CurrentDashPanel.CustomSpeedForThisPanel ? CurrentDashPanel.speedGiven : GoingDownHillSpeed; 
         }
         else if (moveDirection != Vector3.zero)
