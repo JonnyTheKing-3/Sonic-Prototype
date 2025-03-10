@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Splines;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(SplineContainer))]
 public class SplineMeshCollider : MonoBehaviour
@@ -77,24 +78,24 @@ public class SplineMeshCollider : MonoBehaviour
     }
 
     // Draw colliders for debugging
-    private void OnDrawGizmos()
-    {
-        SplineContainer splineContainer = GetComponent<SplineContainer>();
-        if (splineContainer == null) return;
+    // private void OnDrawGizmos()
+    // {
+    //     SplineContainer splineContainer = GetComponent<SplineContainer>();
+    //     if (splineContainer == null) return;
 
-        Gizmos.color = Color.green;
-        float step = 1f / splineSegments;
+    //     Gizmos.color = Color.green;
+    //     float step = 1f / splineSegments;
 
-        for (int i = 0; i < splineSegments; i++)
-        {
-            float t1 = i * step;
-            float t2 = (i + 1) * step;
+    //     for (int i = 0; i < splineSegments; i++)
+    //     {
+    //         float t1 = i * step;
+    //         float t2 = (i + 1) * step;
 
-            Vector3 pos1 = splineContainer.EvaluatePosition(t1);
-            Vector3 pos2 = splineContainer.EvaluatePosition(t2);
+    //         Vector3 pos1 = splineContainer.EvaluatePosition(t1);
+    //         Vector3 pos2 = splineContainer.EvaluatePosition(t2);
 
-            Gizmos.DrawLine(pos1, pos2);
-            Gizmos.DrawWireSphere(pos1, radius);
-        }
-    }
+    //         Gizmos.DrawLine(pos1, pos2);
+    //         Gizmos.DrawWireSphere(pos1, radius);
+    //     }
+    // }
 }

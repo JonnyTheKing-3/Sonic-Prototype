@@ -930,7 +930,7 @@ public bool wasOnRail;
 
             // Apply movement force to Rigidbody for a smoother transition
             rb.linearVelocity = direction * (distance / Time.deltaTime) / hommingSpeedLimiter;
-            Debug.Log(distance);
+            // Debug.Log(distance);
 
             // If we reached the target, "bounce" and transition back to regular movement state
             if (distance < 2f)
@@ -948,7 +948,7 @@ public bool wasOnRail;
                 rb.linearVelocity = Vector3.zero;
                 rb.AddForce((Vector3.up + (LastSpeedDirection * ImpulseAfterAttackWeakMomentum)) * ImpulseAfterAttack, ForceMode.Impulse);
                 animManager.TriggerHomingAttackTrickAnimation();
-                Debug.Log("Do trick");
+                // Debug.Log("Do trick");
                 movementState = MovementState.Regular;
             }
         }
@@ -1301,14 +1301,14 @@ public bool wasOnRail;
             // Slow player down as they fly
             rb.linearVelocity -= CurrentBumper.transform.up.normalized * Mathf.Abs(gravity) * Time.deltaTime;
 
-            Debug.Log(rb.linearVelocity.magnitude);
+//             Debug.Log(rb.linearVelocity.magnitude);
 
 
             // if the player's speed goes down by a certain amount, then turn off bumper time
             // We also add a min distance to make sure a new bumper check doesn't accidently stop bumper when it makes velocity 0
             if (rb.linearVelocity.magnitude < CurrentBumper.speedPlayerThresholdBeforePlayerMoves && Vector3.Distance(CurrentBumper.transform.position, transform.position) > 3f)
             {
-                Debug.Log("Leave Bumper state at " + rb.linearVelocity.magnitude + " speed and readyToJump is " + readyToJump);
+                // Debug.Log("Leave Bumper state at " + rb.linearVelocity.magnitude + " speed and readyToJump is " + readyToJump);
                 animManager.RotationSpeedUpCaller();
                 animManager.animator.speed = .75f; // reset animation speed
                 CurrentBumper = null;

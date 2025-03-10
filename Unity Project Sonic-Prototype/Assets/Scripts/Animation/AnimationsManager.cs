@@ -85,7 +85,7 @@ public class AnimationsManager : MonoBehaviour
         }
         else if (player.OnDashPanelInertia() && player.OnLoopDeLoop)
         {
-            Debug.Log("Active");
+            // Debug.Log("Active");
             Quaternion targetRotation = Quaternion.LookRotation(forward, player.transform.up);
 
             // Smoothly interpolate from the current rotation to the target rotation.

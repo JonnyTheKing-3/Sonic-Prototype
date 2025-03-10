@@ -1,6 +1,7 @@
 using Unity.Cinemachine;
 using UnityEngine.Splines;
 using UnityEngine;
+using Unity.Collections;
 using System.Data.Common;
 using Unity.VisualScripting;
 using JetBrains.Annotations;
@@ -41,7 +42,11 @@ public class LoopDeLoopCart : MonoBehaviour
         cart.SplinePosition = newCartPos;
         
         // Get the tangent, which is going to be the forward for the movement
-        Vector3 positionVector = cart.Spline.EvaluateTangent(cart.SplinePosition);
+        Vector3 positionVector;
+        using (var nativeSpline = new NativeSpline(railPath.Splines[0], railPath.transform.localToWorldMatrix, true, Allocator.Temp))
+        {
+            positionVector = nativeSpline.EvaluateTangent(cart.SplinePosition);
+        }
         positionVector.Normalize();
 
         float angle = Vector3.Angle(player.transform.up, Vector3.up);
@@ -79,17 +84,28 @@ public class LoopDeLoopCart : MonoBehaviour
     }
 
     private float GetClosestPointOnTrack(Vector3 position)
+{
+    cart.PositionUnits = PathIndexUnit.Normalized; 
+
+    float roughStep = roughIterations;
+    float closestPoint = 0f;
+    float closestDistance = Mathf.Infinity;
+
+    // 🔹 Create a NativeSpline from the first spline in the container
+    if (railPath == null || railPath.Splines.Count == 0)
     {
-        cart.PositionUnits = PathIndexUnit.Normalized; 
+        Debug.LogError("No splines found in SplineContainer!");
+        return 0f;
+    }
 
-        float roughStep = roughIterations; // Rough initial search step size
-        float closestPoint = 0f;
-        float closestDistance = Mathf.Infinity;
-
-        // **1. Rough Search** (Quickly find an approximate closest point)
+    var nativeSpline = new NativeSpline(railPath.Splines[0], railPath.transform.localToWorldMatrix, true, Allocator.Temp);
+    
+    try
+    {
+        // **1. Rough Search**
         for (float i = 0f; i <= 1f; i += roughStep)
         {
-            Vector3 pointOnSpline = railPath.EvaluatePosition(i);
+            Vector3 pointOnSpline = nativeSpline.EvaluatePosition(i);  // ✅ Using nativeSpline
             float distance = Vector3.Distance(position, pointOnSpline);
 
             if (distance < closestDistance)
@@ -102,16 +118,15 @@ public class LoopDeLoopCart : MonoBehaviour
         // **2. Binary Search for Precision**
         float left = Mathf.Max(closestPoint - roughStep, 0f);
         float right = Mathf.Min(closestPoint + roughStep, 1f);
-    
-        int iterations = 20; // Binary search refinement iterations
+        int iterations = 20;
 
         for (int i = 0; i < iterations; i++)
         {
             float mid1 = left + (right - left) / 3f;
             float mid2 = right - (right - left) / 3f;
 
-            Vector3 pos1 = railPath.EvaluatePosition(mid1);
-            Vector3 pos2 = railPath.EvaluatePosition(mid2);
+            Vector3 pos1 = nativeSpline.EvaluatePosition(mid1);  // ✅ Using nativeSpline
+            Vector3 pos2 = nativeSpline.EvaluatePosition(mid2);
 
             float dist1 = Vector3.Distance(position, pos1);
             float dist2 = Vector3.Distance(position, pos2);
@@ -136,8 +151,14 @@ public class LoopDeLoopCart : MonoBehaviour
                 closestPoint = mid2;
             }
         }
-
-        return closestPoint;
     }
+    finally
+    {
+        nativeSpline.Dispose();  // ✅ Dispose of NativeSpline manually!
+    }
+
+    return closestPoint;
+}
+
 
 }

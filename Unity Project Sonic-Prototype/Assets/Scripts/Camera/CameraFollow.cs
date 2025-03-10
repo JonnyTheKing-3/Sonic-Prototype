@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
@@ -24,6 +25,11 @@ public class CameraFollow : MonoBehaviour
     private float rotY = 0.0f;
     private float rotX = 0.0f;
 
+    private bool overrideCamera = false;
+    private Quaternion overrideRotation;
+    private float overrideDuration = 1.0f; // Adjust time to your liking
+    private float overrideTimer = 0f;
+
     void Start()
     {
         // Initialize rotations
@@ -36,8 +42,24 @@ public class CameraFollow : MonoBehaviour
         Cursor.visible = false;
     }
 
+    public void SetTemporaryCameraDirection(Quaternion newRotation, float duration)
+    {
+        overrideCamera = true;
+        overrideRotation = newRotation;
+        overrideDuration = duration;
+        overrideTimer = 0f;
+        // Debug.Log("Camera setup complete. Starting moving camera");
+    }
+
     void Update()
     {
+        // Don't update camera if it's being overriden   
+        if (overrideCamera)
+        {
+            CameraOverriding();
+            return;
+        }
+
         float inputX = 0f;
         float inputZ = 0f;
         
@@ -63,6 +85,27 @@ public class CameraFollow : MonoBehaviour
         
         Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
         transform.rotation = localRotation;
+    }
+
+    public void CameraOverriding()
+    {
+        // Debug.Log("Override camera is on");
+        overrideTimer += Time.deltaTime;
+        if (overrideTimer >= overrideDuration)
+        {
+            overrideCamera = false; // Revert to normal control after duration
+            // Debug.Log("FINISHED");
+            // Capture the new rotation angles so that player control resumes from here
+            Vector3 newEulerAngles = transform.rotation.eulerAngles;
+            rotY = newEulerAngles.y;
+            rotX = newEulerAngles.x;
+        }
+        else
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, overrideRotation, Time.deltaTime * 5f);
+            // Debug.Log("Rotate camera");
+            return;
+        }
     }
 
     void LateUpdate()

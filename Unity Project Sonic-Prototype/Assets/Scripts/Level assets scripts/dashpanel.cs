@@ -12,6 +12,8 @@ public class dashpanel : MonoBehaviour
     public float TimePanelWasTouched;
     private SonicMovement player;
 
+    public bool switchCameraAngle = false;
+
     void Start()
     {
         player = GameObject.FindWithTag("Player").GetComponent<SonicMovement>();
@@ -40,6 +42,18 @@ public class dashpanel : MonoBehaviour
             float panelSpeed = CustomSpeedForThisPanel ? speedGiven : player.GoingDownHillSpeed;
             player.rb.linearVelocity = transform.forward * panelSpeed;
             player.animManager.transform.forward = transform.forward;
+
+            // Change camera angle if switchCameraAngle is true
+            if (switchCameraAngle)
+            {   
+                // Debug.Log("switch: " + switchCameraAngle);
+                CameraFollow cameraFollow = Camera.main.transform.parent.GetComponent<CameraFollow>();
+                if (cameraFollow != null)
+                {
+                    // Debug.Log("Set new Angle");
+                    cameraFollow.SetTemporaryCameraDirection(Quaternion.LookRotation(transform.forward), 1.5f);
+                }
+            }
         }
     }
 
