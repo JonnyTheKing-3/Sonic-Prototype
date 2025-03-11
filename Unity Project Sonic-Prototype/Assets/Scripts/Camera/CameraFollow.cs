@@ -85,7 +85,9 @@ public class CameraFollow : MonoBehaviour
         
         Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
         transform.rotation = localRotation;
+        // Debug.Log("y: " + rotY + " --- x: " + rotX);
     }
+
 
     public void CameraOverriding()
     {
@@ -96,9 +98,12 @@ public class CameraFollow : MonoBehaviour
             overrideCamera = false; // Revert to normal control after duration
             // Debug.Log("FINISHED");
             // Capture the new rotation angles so that player control resumes from here
-            Vector3 newEulerAngles = transform.rotation.eulerAngles;
-            rotY = newEulerAngles.y;
-            rotX = newEulerAngles.x;
+            Vector3 newEulerAngles = overrideRotation.eulerAngles;
+            rotX = Mathf.DeltaAngle(0, newEulerAngles.x);
+            rotY = Mathf.DeltaAngle(0, newEulerAngles.y);
+
+
+            // Debug.Log("NEW ANGLES HERE!!!!!!!!!!!! ---- y: " + rotY + " --- x: " + rotX);
         }
         else
         {
