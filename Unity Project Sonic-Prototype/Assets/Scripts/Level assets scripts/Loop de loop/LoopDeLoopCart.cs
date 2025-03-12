@@ -8,6 +8,8 @@ using JetBrains.Annotations;
 
 public class LoopDeLoopCart : MonoBehaviour
 {
+    public bool ActivateCameraLoopPath = false;
+    public CameraLoopDeLoop cameraLoopCart;
 
     [SerializeField, Min(0)] public int cartIterations; // higher = accuracy in landing on rail, lower = performance
     [SerializeField, Range(0.000000001f,1)] public float roughIterations;
@@ -18,9 +20,9 @@ public class LoopDeLoopCart : MonoBehaviour
 
     private Vector3 lastVel = Vector3.one;
 
-    private CinemachineSplineCart cart;
+    public CinemachineSplineCart cart;
     private SplineContainer railPath;
-    private SonicMovement player;
+    public SonicMovement player;
     private Camera cam;
 
     void Start()
@@ -159,6 +161,5 @@ public class LoopDeLoopCart : MonoBehaviour
 
     return closestPoint;
 }
-
 
 }

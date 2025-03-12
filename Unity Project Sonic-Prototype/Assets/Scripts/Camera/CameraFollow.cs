@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class CameraFollow : MonoBehaviour
 {
@@ -13,6 +15,7 @@ public class CameraFollow : MonoBehaviour
     public float InputSensitivity;
     public GameObject CameraObj;
     public GameObject PlayerObj;
+    public SonicMovement playerScript;
     public float CamDistanceXToPlayer;
     public float CamDistanceYToPlayer;
     public float CamDistanceZToPlayer;
@@ -30,6 +33,8 @@ public class CameraFollow : MonoBehaviour
     private float overrideDuration = 1.0f; // Adjust time to your liking
     private float overrideTimer = 0f;
 
+    public bool OnLoopPath = false;
+
     void Start()
     {
         // Initialize rotations
@@ -40,6 +45,8 @@ public class CameraFollow : MonoBehaviour
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        playerScript = PlayerObj.GetComponent<SonicMovement>();
     }
 
     public void SetTemporaryCameraDirection(Quaternion newRotation, float duration)
@@ -58,6 +65,40 @@ public class CameraFollow : MonoBehaviour
         {
             CameraOverriding();
             return;
+        }
+
+        // if the camera is suppoesd to follow the loop path, then simply stick the camera to the spline and don't do anything else
+        if (playerScript.loopInfo != null)
+        {
+            if (playerScript.loopInfo.ActivateCameraLoopPath)
+            {
+                OnLoopPath = true;
+
+                CameraLoopDeLoop camPath = PlayerObj.GetComponent<SonicMovement>().loopInfo.cameraLoopCart;
+            
+                transform.position = camPath.transform.position;
+                CameraObj.transform.position = transform.position;
+
+                CameraObj.transform.LookAt(playerScript.transform.position);
+
+                return;
+            }
+            else
+            {
+                if (OnLoopPath) 
+                {
+                    SetCameraBackToPlayer();
+                    return;
+                }    
+            }
+        }
+        else 
+        {
+            if (OnLoopPath) 
+            {
+                SetCameraBackToPlayer();
+                return;
+            }     
         }
 
         float inputX = 0f;
@@ -85,8 +126,39 @@ public class CameraFollow : MonoBehaviour
         
         Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
         transform.rotation = localRotation;
-        // Debug.Log("y: " + rotY + " --- x: " + rotX);
     }
+
+    public void SetCameraBackToPlayer()
+    {
+        OnLoopPath = false;
+        transform.position = CameraFollowObj.transform.position;
+
+        Vector3 viewDirAfterLoop = playerScript.rb.linearVelocity;
+
+        // Calculate an upward offset perpendicular to the movement direction
+        Vector3 rightDir = Vector3.Cross(viewDirAfterLoop, Vector3.up); // Right direction relative to movement
+        Vector3 upOffset = Vector3.Cross(rightDir, viewDirAfterLoop).normalized * -31f; // Up-left offset
+
+        viewDirAfterLoop += upOffset; // Apply the offset
+        
+        viewDirAfterLoop.Normalize();
+
+        // Notice the minus sign: now the parent’s forward is “backwards”
+        Quaternion targetRotation = Quaternion.LookRotation(viewDirAfterLoop, Vector3.up);
+        Vector3 targetEuler = targetRotation.eulerAngles;
+
+        rotX += Mathf.DeltaAngle(rotX, targetEuler.x);
+        rotY += Mathf.DeltaAngle(rotY, targetEuler.y);
+        transform.rotation = Quaternion.Euler(rotX, rotY, 0f);
+
+        // Child is at (0,0,-20). But since the parent is reversed, 
+        // in world space the camera is actually behind the player 
+        // and looking forward at them.
+        CameraObj.transform.localPosition = new Vector3(0, 0, -20);
+        CameraObj.transform.localRotation = Quaternion.identity;
+    }
+
+
 
 
     public void CameraOverriding()
@@ -115,6 +187,9 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
+        if (OnLoopPath) { return; }
+
+        // Debug.Log("Follow player");
         CameraUpdater();
     }
 
