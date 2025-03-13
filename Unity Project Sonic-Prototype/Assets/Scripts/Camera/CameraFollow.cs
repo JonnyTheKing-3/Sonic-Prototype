@@ -30,14 +30,16 @@ public class CameraFollow : MonoBehaviour
     private Quaternion overrideRotation;
     private float overrideDuration = 1.0f; // Adjust time to your liking
     private float overrideTimer = 0f;
+    public enum CameraState { Regular, TransitioningToLoop, Loop, TransitioningOutOfLoop, Overriding }
+
     [Space]
-    public Vector3 velocity = Vector3.zero;
-    public float smoothTime = 0.3f;
-    public float rotationSpeed = 5f; 
+    public float coroutineDuration;
+    public float coroutineOutDuration =.2f;
 
-    public enum CameraState { Regular, Loop, Overriding }
-
+    public CameraLoopDeLoop camPath = null;
     public CameraState cameraState;
+
+    public Vector3 velocityAfterLoop;
 
     void Start()
     {
@@ -52,6 +54,7 @@ public class CameraFollow : MonoBehaviour
 
         playerScript = PlayerObj.GetComponent<SonicMovement>();
         cameraState = CameraState.Regular;
+        camPath = null;
     }
 
     public void SetTemporaryCameraDirection(Quaternion newRotation, float duration)
@@ -68,11 +71,19 @@ public class CameraFollow : MonoBehaviour
         switch (cameraState) 
         {
             case CameraState.Regular:
+                if (transitionOutCoroutine != null)
+                {
+                    StopCoroutine(transitionOutCoroutine);
+                    transitionOutCoroutine = null;
+                }
+
                 if (playerScript.loopInfo != null)
                 {
                     if (playerScript.loopInfo.ActivateCameraLoopPath)
                     {
-                        cameraState = CameraState.Loop; 
+                        camPath = playerScript.loopInfo.cameraLoopCart;
+                        cameraState = CameraState.TransitioningToLoop;
+                        return;
                     }
                 }
 
@@ -108,13 +119,11 @@ public class CameraFollow : MonoBehaviour
                 
                 if (playerScript.loopInfo == null) 
                 {
-                    SetCameraBackToPlayer();
-                    cameraState = CameraState.Regular;
+                    velocityAfterLoop = playerScript.rb.linearVelocity;
+                    cameraState = CameraState.TransitioningOutOfLoop;
                     return;
                 }
-                
-                CameraLoopDeLoop camPath = PlayerObj.GetComponent<SonicMovement>().loopInfo.cameraLoopCart;
-                
+            
                 // Gradually move the transform.position towards camPath.transform.position
                 transform.position = camPath.transform.position;
                 CameraObj.transform.position = transform.position;
@@ -129,35 +138,98 @@ public class CameraFollow : MonoBehaviour
         }
     }
 
-    public void SetCameraBackToPlayer()
+    IEnumerator TransitionToLoopState(float duration)
     {
-        cameraState = CameraState.Regular;
-        transform.position = CameraFollowObj.transform.position;
+        Vector3 startPos = transform.position;
+        Quaternion startRot = transform.rotation;
+        float elapsed = 0f;
 
-        Vector3 viewDirAfterLoop = playerScript.rb.linearVelocity;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
 
-        // Calculate an upward offset perpendicular to the movement direction
-        Vector3 rightDir = Vector3.Cross(viewDirAfterLoop, Vector3.up); // Right direction relative to movement
-        Vector3 upOffset = Vector3.Cross(rightDir, viewDirAfterLoop).normalized * -31f; // Up-left offset
+            // Retrieve the current target position from the moving spline.
+            Vector3 targetPos = camPath.transform.position;
 
-        viewDirAfterLoop += upOffset; // Apply the offset
-        
-        viewDirAfterLoop.Normalize();
+            // Calculate the current target rotation (looking at the player, for instance)
+            Quaternion targetRot = Quaternion.LookRotation(playerScript.transform.position - targetPos, Vector3.up);
 
-        // Notice the minus sign: now the parent’s forward is “backwards”
-        Quaternion targetRotation = Quaternion.LookRotation(viewDirAfterLoop, Vector3.up);
-        Vector3 targetEuler = targetRotation.eulerAngles;
+            // Interpolate from start to the current target values.
+            transform.position = Vector3.Lerp(startPos, targetPos, t);
+            transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
 
-        rotX += Mathf.DeltaAngle(rotX, targetEuler.x);
-        rotY += Mathf.DeltaAngle(rotY, targetEuler.y);
-        transform.rotation = Quaternion.Euler(rotX, rotY, 0f);
+            // move and rotate camera object
+            CameraObj.transform.position = Vector3.Lerp(CameraObj.transform.position, transform.position, t);
+            Transform modifiedCamRot = CameraObj.transform;
+            modifiedCamRot.LookAt(playerScript.transform.position);
+            CameraObj.transform.rotation = Quaternion.Slerp(CameraObj.transform.rotation, modifiedCamRot.rotation, t);
 
-        // Child is at (0,0,-20). But since the parent is reversed, 
-        // in world space the camera is actually behind the player 
-        // and looking forward at them.
+            yield return null;
+        }
+
+        // Final update to match the target exactly, if needed.
+        transform.position = camPath.transform.position;
+        transform.rotation = Quaternion.LookRotation(playerScript.transform.position - camPath.transform.position, Vector3.up);
+
+        // Switch state to loop.
+        cameraState = CameraState.Loop;
+    }
+
+    public IEnumerator TransitionOutOfLoopState(float duration)
+    {
+        // Keep orientaion the same route
+        PlayerObj.transform.parent.GetChild(0).forward = velocityAfterLoop.normalized;
+
+        // Capture starting state
+        Vector3 startPos = transform.position;
+        Quaternion startRot = transform.rotation;
+        Vector3 startCamObjPos = CameraObj.transform.localPosition;
+        Quaternion startCamObjRot = CameraObj.transform.localRotation;
+
+
+        // Determine target position (player's position)
+        Vector3 targetPos = CameraFollowObj.transform.position;
+
+        // Calculate the target rotation based on the player's velocity
+        Vector3 rightDir = Vector3.Cross(velocityAfterLoop, Vector3.up);
+        Vector3 upOffset = Vector3.Cross(rightDir, velocityAfterLoop).normalized * -25f;
+        velocityAfterLoop += upOffset;
+        velocityAfterLoop.Normalize();
+        Quaternion targetRot = Quaternion.LookRotation(velocityAfterLoop, Vector3.up);
+
+        // Smoothly interpolate from current to target state over 'duration' seconds
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Smoothly interpolate position and rotation
+            transform.position = Vector3.Lerp(startPos, targetPos, t);
+            
+            Quaternion nextRot = Quaternion.Slerp(startRot, targetRot, t);
+            transform.rotation = nextRot;
+
+            // move and rotate camera object
+            CameraObj.transform.localPosition = Vector3.Lerp(startCamObjPos, new Vector3(0f, 0f, -20f), t);
+            CameraObj.transform.localRotation = Quaternion.Slerp(startCamObjRot, Quaternion.identity, t);
+
+            yield return null;
+        }
+
+        transform.position = targetPos;
+        transform.rotation = targetRot;
         CameraObj.transform.localPosition = new Vector3(0, 0, -20);
         CameraObj.transform.localRotation = Quaternion.identity;
+
+        Vector3 finalEuler = transform.rotation.eulerAngles;
+        rotX = finalEuler.x;
+        rotY = finalEuler.y;
+
+        cameraState = CameraState.Regular;
     }
+
 
     public void CameraOverriding()
     {
@@ -183,12 +255,29 @@ public class CameraFollow : MonoBehaviour
         }
     }
 
+    private Coroutine transitionOutCoroutine = null;
     void LateUpdate()
     {
-        if (cameraState == CameraState.Loop ) { return; }
+        switch (cameraState)
+        {
+            case CameraState.TransitioningToLoop:
+                StartCoroutine(TransitionToLoopState(coroutineDuration));
+                return;
 
-        // Debug.Log("Follow player");
-        CameraUpdater();
+            case CameraState.Loop:
+                return;
+
+            case CameraState.TransitioningOutOfLoop:
+                if (transitionOutCoroutine == null)
+                {
+                    transitionOutCoroutine = StartCoroutine(TransitionOutOfLoopState(coroutineOutDuration));
+                }
+                return; 
+
+            default:
+                CameraUpdater();
+                break; 
+        }
     }
 
     void CameraUpdater()

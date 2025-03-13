@@ -578,7 +578,6 @@ public bool wasOnRail;
 
             // Turn on homing attack if we hit the ground after not being able to homing attack
             if (!CanHomingAttack && grounded) { CanHomingAttack = true; }
-
         }
 
 
@@ -634,6 +633,7 @@ public bool wasOnRail;
         }
 
         // Keep track of speed, direction and last movement state
+        // Debug.DrawRay(transform.position, orientation.forward.normalized * 3.5f, Color.red);
         CurrentSpeedMagnitude = rb.linearVelocity.magnitude;
         if (moveDirection != Vector3.zero) { LastSpeedDirection = new Vector3(moveDirection.x, 0f, moveDirection.z); }
         LastMovementState = movementState;
