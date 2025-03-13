@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,7 +11,6 @@ public class CameraFollow : MonoBehaviour
 {
     public float CameraMoveSpeed;
     public GameObject CameraFollowObj;
-    private Vector3 FollowPos;
     public float ClampAngle;
     public float InputSensitivity;
     public GameObject CameraObj;
@@ -27,13 +27,17 @@ public class CameraFollow : MonoBehaviour
     public float SmoothY;
     private float rotY = 0.0f;
     private float rotX = 0.0f;
-
-    private bool overrideCamera = false;
     private Quaternion overrideRotation;
     private float overrideDuration = 1.0f; // Adjust time to your liking
     private float overrideTimer = 0f;
+    [Space]
+    public Vector3 velocity = Vector3.zero;
+    public float smoothTime = 0.3f;
+    public float rotationSpeed = 5f; 
 
-    public bool OnLoopPath = false;
+    public enum CameraState { Regular, Loop, Overriding }
+
+    public CameraState cameraState;
 
     void Start()
     {
@@ -47,11 +51,12 @@ public class CameraFollow : MonoBehaviour
         Cursor.visible = false;
 
         playerScript = PlayerObj.GetComponent<SonicMovement>();
+        cameraState = CameraState.Regular;
     }
 
     public void SetTemporaryCameraDirection(Quaternion newRotation, float duration)
     {
-        overrideCamera = true;
+        cameraState = CameraState.Overriding;
         overrideRotation = newRotation;
         overrideDuration = duration;
         overrideTimer = 0f;
@@ -60,77 +65,73 @@ public class CameraFollow : MonoBehaviour
 
     void Update()
     {
-        // Don't update camera if it's being overriden   
-        if (overrideCamera)
+        switch (cameraState) 
         {
-            CameraOverriding();
-            return;
-        }
+            case CameraState.Regular:
+                if (playerScript.loopInfo != null)
+                {
+                    if (playerScript.loopInfo.ActivateCameraLoopPath)
+                    {
+                        cameraState = CameraState.Loop; 
+                    }
+                }
 
-        // if the camera is suppoesd to follow the loop path, then simply stick the camera to the spline and don't do anything else
-        if (playerScript.loopInfo != null)
-        {
-            if (playerScript.loopInfo.ActivateCameraLoopPath)
-            {
-                OnLoopPath = true;
+                float inputX = 0f;
+                float inputZ = 0f;
 
-                CameraLoopDeLoop camPath = PlayerObj.GetComponent<SonicMovement>().loopInfo.cameraLoopCart;
+                if (Input.GetKey(KeyCode.LeftArrow))
+                    inputX = -1f;
+                if (Input.GetKey(KeyCode.RightArrow))
+                    inputX = 1f;
+                if (Input.GetKey(KeyCode.UpArrow))
+                    inputZ = 1f;
+                if (Input.GetKey(KeyCode.DownArrow))
+                    inputZ = -1f;
+
+                MouseX = Input.GetAxis("Mouse X");
+                MouseY = Input.GetAxis("Mouse Y");
+
+                FinalInputX = inputX + MouseX;
+                FinalInputZ = inputZ + MouseY;
+
+                rotY += FinalInputX * InputSensitivity * Time.deltaTime;
+                rotX += FinalInputZ * InputSensitivity * Time.deltaTime;
+
+                rotX = Mathf.Clamp(rotX, -ClampAngle, ClampAngle);
+
+                Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
+                transform.rotation = localRotation;
+                break;
             
-                transform.position = camPath.transform.position;
-                CameraObj.transform.position = transform.position;
-
-                CameraObj.transform.LookAt(playerScript.transform.position);
-
-                return;
-            }
-            else
-            {
-                if (OnLoopPath) 
+            case CameraState.Loop:
+            // if the camera is suppoesd to follow the loop path, then simply stick the camera to the spline and don't do anything else
+                
+                if (playerScript.loopInfo == null) 
                 {
                     SetCameraBackToPlayer();
+                    cameraState = CameraState.Regular;
                     return;
-                }    
-            }
+                }
+                
+                CameraLoopDeLoop camPath = PlayerObj.GetComponent<SonicMovement>().loopInfo.cameraLoopCart;
+                
+                // Gradually move the transform.position towards camPath.transform.position
+                transform.position = camPath.transform.position;
+                CameraObj.transform.position = transform.position;
+                
+                CameraObj.transform.LookAt(playerScript.transform.position);
+
+                break;
+            
+            case CameraState.Overriding:
+                CameraOverriding();
+                break;
         }
-        else 
-        {
-            if (OnLoopPath) 
-            {
-                SetCameraBackToPlayer();
-                return;
-            }     
-        }
-
-        float inputX = 0f;
-        float inputZ = 0f;
-        
-        if (Input.GetKey(KeyCode.LeftArrow))
-            inputX = -1f;
-        if (Input.GetKey(KeyCode.RightArrow))
-            inputX = 1f;
-        if (Input.GetKey(KeyCode.UpArrow))
-            inputZ = 1f;
-        if (Input.GetKey(KeyCode.DownArrow))
-            inputZ = -1f;
-
-        MouseX = Input.GetAxis("Mouse X");
-        MouseY = Input.GetAxis("Mouse Y");
-
-        FinalInputX = inputX + MouseX;
-        FinalInputZ = inputZ + MouseY;
-
-        rotY += FinalInputX * InputSensitivity * Time.deltaTime;
-        rotX += FinalInputZ * InputSensitivity * Time.deltaTime;
-
-        rotX = Mathf.Clamp(rotX, -ClampAngle, ClampAngle);
-        
-        Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
-        transform.rotation = localRotation;
     }
 
     public void SetCameraBackToPlayer()
     {
-        OnLoopPath = false;
+        cameraState = CameraState.Regular;
         transform.position = CameraFollowObj.transform.position;
 
         Vector3 viewDirAfterLoop = playerScript.rb.linearVelocity;
@@ -158,16 +159,13 @@ public class CameraFollow : MonoBehaviour
         CameraObj.transform.localRotation = Quaternion.identity;
     }
 
-
-
-
     public void CameraOverriding()
     {
         // Debug.Log("Override camera is on");
         overrideTimer += Time.deltaTime;
         if (overrideTimer >= overrideDuration)
         {
-            overrideCamera = false; // Revert to normal control after duration
+            cameraState = CameraState.Regular;
             // Debug.Log("FINISHED");
             // Capture the new rotation angles so that player control resumes from here
             Vector3 newEulerAngles = overrideRotation.eulerAngles;
@@ -187,7 +185,7 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
-        if (OnLoopPath) { return; }
+        if (cameraState == CameraState.Loop ) { return; }
 
         // Debug.Log("Follow player");
         CameraUpdater();
