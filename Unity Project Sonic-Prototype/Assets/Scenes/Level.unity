@@ -468,6 +468,14 @@ PrefabInstance:
       propertyPath: radius
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: tubeRadius
       value: 3
@@ -476,6 +484,10 @@ PrefabInstance:
       propertyPath: tubeMaterial
       value: 
       objectReference: {fileID: 2100000, guid: 72617c22719312c419743b162a45d326, type: 2}
+    - target: {fileID: 2096588264946661195, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2396085851637757855, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -681
@@ -516,9 +528,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2707304493203099352, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3721961425133744944, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_Name
       value: Procedural Rail
+      objectReference: {fileID: 0}
+    - target: {fileID: 3721961425133744944, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4485843777261391276, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -547,6 +567,10 @@ PrefabInstance:
     - target: {fileID: 4485843777261391276, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0.2461482
+      objectReference: {fileID: 0}
+    - target: {fileID: 7680990588054958791, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8625506754210794147, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_Splines.Array.data[0].m_Knots.Array.data[0].Position.x
@@ -634,6 +658,10 @@ PrefabInstance:
       propertyPath: radius
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 689610391610940924, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1286878475192216908, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 183.30971
@@ -643,6 +671,10 @@ PrefabInstance:
       value: 52.59798
       objectReference: {fileID: 0}
     - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450637919146818643, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: tubeRadius
       value: 3
       objectReference: {fileID: 0}
@@ -650,6 +682,10 @@ PrefabInstance:
       propertyPath: tubeMaterial
       value: 
       objectReference: {fileID: 2100000, guid: 72617c22719312c419743b162a45d326, type: 2}
+    - target: {fileID: 2096588264946661195, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2396085851637757855, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1419
@@ -692,11 +728,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2462278067799693855, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: AutoSmooth
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2707304493203099352, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3721961425133744944, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_Name
       value: Procedural Rail (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3721961425133744944, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4485843777261391276, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -725,6 +769,10 @@ PrefabInstance:
     - target: {fileID: 4485843777261391276, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.155778
+      objectReference: {fileID: 0}
+    - target: {fileID: 7680990588054958791, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8625506754210794147, guid: 0f3e4268f0fdb1c4cbdc1b7a056aaf6f, type: 3}
       propertyPath: m_Splines.Array.data[0].m_Knots.Array.size
@@ -907,6 +955,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -964,6 +1016,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -977,6 +1033,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 621674343682154056, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 621674343682154056, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_ScaleOffset.max.x
       value: 27.5
@@ -992,6 +1052,10 @@ PrefabInstance:
     - target: {fileID: 1665151150235290409, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1665151150235290409, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2430324742218817883, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1024,6 +1088,10 @@ PrefabInstance:
     - target: {fileID: 2487781677206282213, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2487781677206282213, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2957002720665295338, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1096,6 +1164,10 @@ PrefabInstance:
     - target: {fileID: 8003990319592710059, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8003990319592710059, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8412119998510945772, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_Splines.Array.data[0].m_Knots.Array.size
@@ -1851,6 +1923,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1908,6 +1984,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1924,6 +2004,10 @@ PrefabInstance:
     - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: m_Name
       value: Bumper (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2699427585629598540, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: cameraAngleChange
@@ -1985,6 +2069,10 @@ PrefabInstance:
     - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: m_Name
       value: Bumper (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2699427585629598540, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: cameraAngleChange
@@ -2388,6 +2476,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2404,6 +2496,10 @@ PrefabInstance:
     - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: m_Name
       value: Bumper (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2699427585629598540, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: cameraAngleChange
@@ -2513,6 +2609,10 @@ PrefabInstance:
     - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
       propertyPath: m_Name
       value: Dash panel (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2719,6 +2819,10 @@ PrefabInstance:
     - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
       propertyPath: m_Name
       value: Dash panel (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2995,6 +3099,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3168,6 +3276,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3232,6 +3344,10 @@ PrefabInstance:
     - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
       propertyPath: m_Name
       value: Dash panel (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3389,6 +3505,10 @@ PrefabInstance:
     - target: {fileID: 8003990319592710059, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8003990319592710059, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8412119998510945772, guid: d87f36be6649f93409ab2cae145ad42c, type: 3}
       propertyPath: m_Splines.Array.size
@@ -4550,6 +4670,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4722,6 +4846,10 @@ PrefabInstance:
     - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
       propertyPath: m_Name
       value: Dash panel (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4931,6 +5059,10 @@ PrefabInstance:
     - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: m_Name
       value: Bumper (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2699427585629598540, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: cameraAngleChange
@@ -5317,6 +5449,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bumper (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2699427585629598540, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: cameraAngleChange
       value: 1
@@ -5530,6 +5666,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5703,6 +5843,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dash panel (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5719,6 +5863,10 @@ PrefabInstance:
     - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: m_Name
       value: Bumper
+      objectReference: {fileID: 0}
+    - target: {fileID: 828288792204449881, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2699427585629598540, guid: 9d47b39f5e51bef45966549b8bc02eae, type: 3}
       propertyPath: cameraAngleChange
@@ -5824,6 +5972,10 @@ PrefabInstance:
     - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
       propertyPath: m_Name
       value: Dash panel (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6124,6 +6276,10 @@ PrefabInstance:
     - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
       propertyPath: m_Name
       value: Dash panel (15)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185508438266794614, guid: d9aed07158cb179498d866e24002fc55, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
