@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Splines;
+using Unity.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(SplineContainer))]
 public class SplineMeshCollider : MonoBehaviour
@@ -31,70 +33,55 @@ public class SplineMeshCollider : MonoBehaviour
             return;
         }
 
+        var nativeSpline = new NativeSpline(splineContainer.Splines[0], splineContainer.transform.localToWorldMatrix, true, Allocator.Temp);
         float step = 1f / splineSegments;
-
-        for (int i = 0; i < splineSegments; i++)
+        try 
         {
-            float t1 = i * step;
-            float t2 = (i + 1) * step;
-
-            Vector3 pos1 = splineContainer.EvaluatePosition(t1);
-            Vector3 pos2 = splineContainer.EvaluatePosition(t2);
-
-            if (pos1 == pos2)
+            for (int i = 0; i < splineSegments; i++)
             {
-                Debug.LogWarning("Skipping collider: Two consecutive points are identical.");
-                continue;
+                float t1 = i * step;
+                float t2 = (i + 1) * step;
+
+                Vector3 pos1 = splineContainer.EvaluatePosition(t1);
+                Vector3 pos2 = splineContainer.EvaluatePosition(t2);
+
+                if (pos1 == pos2)
+                {
+                    Debug.LogWarning("Skipping collider: Two consecutive points are identical.");
+                    continue;
+                }
+
+                // Create GameObject for CapsuleCollider
+                GameObject capsuleObj = new GameObject($"SplineCollider_{i}");
+                capsuleObj.transform.SetParent(transform);
+                capsuleObj.layer = 7; // layer 7 is the rail layer
+
+                CapsuleCollider capsule = capsuleObj.AddComponent<CapsuleCollider>();
+
+                // Position the collider at the midpoint
+                Vector3 midPoint = (pos1 + pos2) / 2f;
+                capsuleObj.transform.position = midPoint;
+
+                // Rotate to align with the spline direction
+                Vector3 direction = (pos2 - pos1).normalized;
+                capsuleObj.transform.rotation = Quaternion.LookRotation(direction);
+
+                // Set collider properties
+                capsule.radius = radius;
+                capsule.height = Vector3.Distance(pos1, pos2) * capsuleLengthFactor;
+                capsule.direction = 2; // Z-axis
+                capsule.isTrigger = true;
+
+                // Debug.Log($"Placed collider at {midPoint} with height {capsule.height}");
+                NewRailMoveDetection railScript = capsuleObj.AddComponent<NewRailMoveDetection>();
+                railScript.cartIterations = cart_Iterations; // Adjust default values if needed
+                railScript.roughIterations = rough_Iterations;
+                railScript.ignoreWaitTime = ignore_WaitTime;
             }
-
-            // Create GameObject for CapsuleCollider
-            GameObject capsuleObj = new GameObject($"SplineCollider_{i}");
-            capsuleObj.transform.SetParent(transform);
-            capsuleObj.layer = 7; // layer 7 is the rail layer
-
-            CapsuleCollider capsule = capsuleObj.AddComponent<CapsuleCollider>();
-
-            // Position the collider at the midpoint
-            Vector3 midPoint = (pos1 + pos2) / 2f;
-            capsuleObj.transform.position = midPoint;
-
-            // Rotate to align with the spline direction
-            Vector3 direction = (pos2 - pos1).normalized;
-            capsuleObj.transform.rotation = Quaternion.LookRotation(direction);
-
-            // Set collider properties
-            capsule.radius = radius;
-            capsule.height = Vector3.Distance(pos1, pos2) * capsuleLengthFactor;
-            capsule.direction = 2; // Z-axis
-            capsule.isTrigger = true;
-
-            // Debug.Log($"Placed collider at {midPoint} with height {capsule.height}");
-            NewRailMoveDetection railScript = capsuleObj.AddComponent<NewRailMoveDetection>();
-            railScript.cartIterations = cart_Iterations; // Adjust default values if needed
-            railScript.roughIterations = rough_Iterations;
-            railScript.ignoreWaitTime = ignore_WaitTime;
         }
-    }
-
-    // Draw colliders for debugging
-    private void OnDrawGizmos()
-    {
-        SplineContainer splineContainer = GetComponent<SplineContainer>();
-        if (splineContainer == null) return;
-
-        Gizmos.color = Color.green;
-        float step = 1f / splineSegments;
-
-        for (int i = 0; i < splineSegments; i++)
+        finally 
         {
-            float t1 = i * step;
-            float t2 = (i + 1) * step;
-
-            Vector3 pos1 = splineContainer.EvaluatePosition(t1);
-            Vector3 pos2 = splineContainer.EvaluatePosition(t2);
-
-            Gizmos.DrawLine(pos1, pos2);
-            Gizmos.DrawWireSphere(pos1, radius);
+            nativeSpline.Dispose();
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -81,6 +82,14 @@ public class AnimationsManager : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, RotationSmoothingFactor * Time.deltaTime);
 
             }
+        }
+        else if (player.OnDashPanelInertia() && player.OnLoopDeLoop)
+        {
+            // Debug.Log("Active");
+            Quaternion targetRotation = Quaternion.LookRotation(forward, player.transform.up);
+
+            // Smoothly interpolate from the current rotation to the target rotation.
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, RotationSmoothingFactor * Time.deltaTime);
         }
     }
     

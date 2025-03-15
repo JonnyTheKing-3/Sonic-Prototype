@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -9,6 +10,11 @@ public class bumper : MonoBehaviour
     public float bumperForce;
     public float speedPlayerThresholdBeforePlayerMoves;
     private SonicMovement player;
+
+    public enum CameraAngleChange { none, FaceBumperDirection, FaceDownwards }
+
+    public CameraAngleChange cameraAngleChange = CameraAngleChange.none;
+
 
     void Start()
     {
@@ -20,6 +26,7 @@ public class bumper : MonoBehaviour
     {
         if (other.CompareTag("Player Trigger Collider"))
         {   
+            player.CurrentDashPanel = null;
             player.CurrentBumper = this;
             
             // Setup player so bumper time can function smoothly
@@ -39,6 +46,21 @@ public class bumper : MonoBehaviour
             StartCoroutine(delayBeforeResetingReadyToJump());
             // setup animatior
             player.animManager.transform.forward = transform.up;
+
+            // Switch camera angle if desired
+            switch (cameraAngleChange)
+            {
+                case CameraAngleChange.none:
+                    break;
+
+                default:
+                    CameraFollow cameraFollow = Camera.main.transform.parent.GetComponent<CameraFollow>();
+
+                    Vector3 dir = cameraAngleChange == CameraAngleChange.FaceBumperDirection ? transform.up : Vector3.down;
+                    
+                    cameraFollow.SetTemporaryCameraDirection(Quaternion.LookRotation(dir), 1.5f);
+                    break;
+            }
         }
     }
 
