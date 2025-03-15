@@ -7,15 +7,18 @@ using Unity.VisualScripting;
 [RequireComponent(typeof(SplineContainer))]
 public class SplineMeshCollider : MonoBehaviour
 {
+    [Tooltip("How big the collider for the rail is")]
     public float radius = 0.5f; // Collider thickness
+
+    [Tooltip("How accurate the colliders are to the segment. Try to keep this number on the lower end because of performance issues. I'd suggest getting a decent collider coverage, but it doesn't have to be super accurate because it's only used for detection, not actual rail movement")]
     public int splineSegments = 50; // Number of colliders along the spline
     public float capsuleLengthFactor = 1.2f; // Capsule length multiplier
 
     public bool ignoreRail;
 
     [Header("SETTINGS FOR NEWRAIL")]
-    public int cart_Iterations = 25; // Adjust default values if needed
-    public float rough_Iterations = 0.04f;
+    [Tooltip("Higher = Better accuracy when landing on rail. Lower = better performance")] public int cart_Iterations = 25; // Adjust default values if needed
+    [Tooltip("Higher = Better accuracy when landing on rail. Lower = better performance")] public float rough_Iterations = 0.04f;
     public float ignore_WaitTime = 0.5f;
 
 

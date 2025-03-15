@@ -8,11 +8,14 @@ using UnityEngine.Rendering;
 public class bumper : MonoBehaviour
 {
     public float bumperForce;
+
+    [Tooltip("Once player decreases speed to this point, player is allowed to move. If you don't want to restrict the players movement, just make this number really large")]
     public float speedPlayerThresholdBeforePlayerMoves;
     private SonicMovement player;
 
     public enum CameraAngleChange { none, FaceBumperDirection, FaceDownwards }
 
+    [Tooltip("Which direction the camera switches to after hitting the bumper. None makes the camera not be affected")]
     public CameraAngleChange cameraAngleChange = CameraAngleChange.none;
 
 
@@ -64,6 +67,7 @@ public class bumper : MonoBehaviour
         }
     }
 
+    // Used in order to not trigger animations and gravity early
     IEnumerator delayBeforeResetingReadyToJump()
     {
         yield return new WaitForSeconds(player.jumpCooldown);
