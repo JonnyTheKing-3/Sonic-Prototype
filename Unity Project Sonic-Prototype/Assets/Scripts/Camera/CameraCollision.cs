@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// MODIFY THIS SCRIPT TO YOUR NEED :)
 public class CameraCollision : MonoBehaviour
 {
     public float minDistance = 1.0f;
