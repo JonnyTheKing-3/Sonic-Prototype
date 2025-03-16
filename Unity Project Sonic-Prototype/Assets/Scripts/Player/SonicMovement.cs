@@ -58,8 +58,8 @@ public class SonicMovement : MonoBehaviour
     public float shortHopForce;
     public float gravity;
     public float TimeAllowedToPerformShortHop;  //.058 (2-5 frames) is around the average time for most games
-    [Range(0,1)]public float blendFactorJumpingUpHill = .5f;
-    [Range(0,1)]public float blendFactorJumpingDownHill = .3f;
+    [Tooltip("How close the jump is related to the slope")] [Range(0,1)]public float blendFactorJumpingUpHill = .5f;
+    [Tooltip("How close the jump is related to the slope")] [Range(0,1)]public float blendFactorJumpingDownHill = .3f;
     public float jumpCooldown; // time to reset readyToJump
     [Space] // below is for jump locking
     public float jumpIgnoreDuration = 0.15f;
@@ -87,8 +87,7 @@ public class SonicMovement : MonoBehaviour
     [Tooltip("Homing speed is really fast. This slows it down... Or speeds it up if the value is below zero")] public float hommingSpeedLimiter;
     public float NoTargethomingSpeed;
     public float ImpulseAfterAttack;
-    public float ImpulseAfterAttackStrongMomentum;
-    public float ImpulseAfterAttackWeakMomentum;
+    [Tooltip("A cool idea would be to have different momentums based on what is being hit! Simply use tags or scripts that keep track!")] public float ImpulseAfterAttackMomentum;
     public float homingAttackDistance;
     [SerializeField] private LayerMask HomingAttackLayer;
     [SerializeField] private float PlayerDistWeight = 1f;       // How strongly the distance from the player affects it's standing in being the target for a homing attack
@@ -185,10 +184,10 @@ public class SonicMovement : MonoBehaviour
         // getting references
         rb = GetComponent<Rigidbody>();
         triggerColliderForJumpTime = GetComponent<CapsuleCollider>();
+        cam = Camera.main;
 
         // initiating values
         movementState = MovementState.Regular;
-        cam = Camera.main;
         CanHomingAttack = true;
         ShortHopping = false;
         readyToJump = true;
@@ -936,17 +935,15 @@ public bool wasOnRail;
             if (distance < 2f)
             {
                 /*
-                // Replace .5f with ImpulseAfterAttackWeakMomentum or ImpulseAfterAttackWeakMomentum (depending on how much momentum you want to keep)
-                // to keep momentum for the direction the player last inputted.
-                // Replacing .5f by 0 makes it so the player shoots upwards only
-                // All of the options mentioned above will be useful for future uses depending on whether it's speed section, or platforming, or light combat, or anything else
-                */
+                 * If you want different momentums, you could manipulate the momentum based on the target hit. You could also make it so that each target has their own designated impulse
+                 * What I would do is have a list of the target types and have a designated number for each!
+                 */
                 if (Target.TryGetComponent<DestroyAfterHoming>(out DestroyAfterHoming hit))
                 {
                     hit.DestroyTarget();
                 }
                 rb.linearVelocity = Vector3.zero;
-                rb.AddForce((Vector3.up + (LastSpeedDirection * ImpulseAfterAttackWeakMomentum)) * ImpulseAfterAttack, ForceMode.Impulse);
+                rb.AddForce((Vector3.up + (LastSpeedDirection * ImpulseAfterAttackMomentum)) * ImpulseAfterAttack, ForceMode.Impulse);
                 animManager.TriggerHomingAttackTrickAnimation();
                 // Debug.Log("Do trick");
                 movementState = MovementState.Regular;

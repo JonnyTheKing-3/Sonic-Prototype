@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class dashpanel : MonoBehaviour
 {
+    public bool switchCameraAngle = false;
     [Tooltip("If unchecked, the speed pased from the panel will be the player's GoingDownHillSpeed")]
     public bool CustomSpeedForThisPanel = false;
 
@@ -12,7 +13,6 @@ public class dashpanel : MonoBehaviour
     public float TimePanelWasTouched;
     private SonicMovement player;
 
-    public bool switchCameraAngle = false;
 
     void Start()
     {

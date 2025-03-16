@@ -34,6 +34,7 @@ public class LoopDeLoopCart : MonoBehaviour
     }
 
     private int lastScalar;
+
     void Update()
     {
         // Only do any of this if the player is on THIS loop. 

@@ -9,8 +9,8 @@ using Unity.Collections;
 public class SplineTubeVisualizerLocal : MonoBehaviour
 {
     [Header("Tube Settings")]
-    public float tubeRadius = 0.5f;    // Radius of the tube
-    public int pathSegments = 50;      // Number of samples along the spline
+    [Tooltip("Higher = Better accuracy when landing on rail. Lower = better performance")]public float tubeRadius = 0.5f;    // Radius of the tube
+    [Tooltip("Higher = Better accuracy when landing on rail. Lower = better performance")] public int pathSegments = 50;      // Number of samples along the spline
     public int radialSegments = 8;     // Number of vertices in each circular ring
     public Material tubeMaterial;      // Optional material
 

@@ -20,13 +20,15 @@ public class Ring : MonoBehaviour
         //Debug.Log("Tounched something: " + other.tag);
         if (other.CompareTag("Player") || other.CompareTag("Player Trigger Collider"))
         {
-            other.transform.root.GetComponentInChildren<SonicMovement>().BoostMeter += ringRefill;
-            // Debug.Log("Ring fill: " + other.transform.root.GetComponentInChildren<SonicMovement>().BoostMeter);
-            if (other.transform.root.GetComponentInChildren<SonicMovement>().BoostMeter > 1)  // limit boost meter refill
-            { other.transform.root.GetComponentInChildren<SonicMovement>().BoostMeter = 1;}
-            // Debug.Log("After mod: " + other.transform.root.GetComponentInChildren<SonicMovement>().BoostMeter);
+            SonicMovement player = other.transform.root.GetComponentInChildren<SonicMovement>();
+
+            // refill boost and limit boost meter refill
+            player.BoostMeter += ringRefill;
+            if (player.BoostMeter > 1) { player.BoostMeter = 1;} 
+
             Destroy(gameObject);
-            // Add to ring counter later
+
+            // ADD TO RING COUNTER UI
         }
     }
 }

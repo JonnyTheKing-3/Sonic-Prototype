@@ -7,18 +7,18 @@ public class CameraLoopDeLoop : MonoBehaviour
     public CinemachineSplineCart cameraLoopCart;
 
     public bool ActivateCameraLoopPath = false;
+    [Tooltip("The vertical offset the camera will end at when leaving the loop in relation to the end speed direction of the loop")] public float afterLoopCamOffset;
 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         ThisLoopsCart = transform.root.GetComponentInChildren<LoopDeLoopCart>();
         cameraLoopCart = GetComponent<CinemachineSplineCart>();
     }
 
-    // Update is called once per frame
     void Update()
     {
+        
         if (ThisLoopsCart.player.loopInfo == ThisLoopsCart && ThisLoopsCart.OnlyForwardDirection)
         {
             ThisLoopsCart.ActivateCameraLoopPath = true;
