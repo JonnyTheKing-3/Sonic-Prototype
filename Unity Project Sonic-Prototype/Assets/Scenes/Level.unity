@@ -5492,6 +5492,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1091787020}
     m_Modifications:
+    - target: {fileID: 3254248315193858687, guid: 5a9f2a0978fcce84690577699dbbb78e, type: 3}
+      propertyPath: afterLoopCamOffset
+      value: -25
+      objectReference: {fileID: 0}
     - target: {fileID: 4753226732204580331, guid: 5a9f2a0978fcce84690577699dbbb78e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 70.5
