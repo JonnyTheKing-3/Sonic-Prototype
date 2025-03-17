@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using NUnit.Framework;
 using Unity.VisualScripting;
+using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -25,8 +27,11 @@ public class AnimationsManager : MonoBehaviour
     
     [Header("REFERENCES")] 
     public Animator animator;
-    
     public SonicMovement player;
+    public GameObject SpinBallVFX;
+
+    [Header("Extra")]
+    public float SpinballOffset;
 
     void Start()
     {
@@ -44,6 +49,10 @@ public class AnimationsManager : MonoBehaviour
         else
         {
             transform.position = player.transform.position + (player.transform.up * groundOffset);
+            if (SpinBallVFX != null) 
+            {
+                SpinBallVFX.transform.position = player.transform.position + (player.transform.up * SpinballOffset);
+            }
         }   
     
         // Determine the raw forward direction:
@@ -100,6 +109,7 @@ public class AnimationsManager : MonoBehaviour
         switch (player.movementState)
         {
             case SonicMovement.MovementState.Regular:
+                if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("StompWait", false);
@@ -129,9 +139,18 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("OnDelay", PlayerBoxTrigger.inDelay);
                 
                 animator.speed = .75f;
+
+                if (SpinBallVFX != null) 
+                {
+                    SpinBallVFX.SetActive(true);
+                    float speedForShader = player.StartingSpinDash ? player.ChargedSpeed/20f : player.CurrentSpeedMagnitude/8f;
+                    SpinBallVFX.transform.GetChild(0).GetComponent<Renderer>().sharedMaterial.SetFloat("_Speed", speedForShader);
+                }
+               
                 break;
             
             case SonicMovement.MovementState.Boosting:
+                if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
                 animator.SetBool("Boosting", true);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("OnBumperForce", false);
@@ -142,6 +161,7 @@ public class AnimationsManager : MonoBehaviour
                 break;
             
             case SonicMovement.MovementState.HomingAttacking:
+                if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("OnDelay", false);
@@ -151,6 +171,7 @@ public class AnimationsManager : MonoBehaviour
                 break;
             
             case SonicMovement.MovementState.Stomp:
+                if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
                 animator.SetBool("Stomping", true);
                 animator.SetBool("OnDelay", false);
                 animator.SetBool("OnBumperForce", false);
@@ -163,6 +184,8 @@ public class AnimationsManager : MonoBehaviour
                 break;
             
             case SonicMovement.MovementState.Sliding:
+                if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
+                SpinBallVFX.SetActive(false);
                 animator.SetBool("Sliding", true);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("OnBumperForce", false);
@@ -172,6 +195,7 @@ public class AnimationsManager : MonoBehaviour
                 break;
             
             case SonicMovement.MovementState.RailGrinding:
+                if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("StompWait", false);
                 animator.SetBool("Sliding", false);
@@ -182,6 +206,7 @@ public class AnimationsManager : MonoBehaviour
                 break;
         
             case SonicMovement.MovementState.OnBumperInertia:
+                if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
                 animator.SetBool("grounded", false);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("StompWait", false);
