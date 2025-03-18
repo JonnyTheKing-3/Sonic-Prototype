@@ -328,6 +328,8 @@ public bool wasOnRail;
         // homing attack
         if (!grounded && Input.GetKeyDown(homingAttackKey) && CanHomingAttack) // We shouldn't do a homing attack from the ground
         {
+            if (animManager.HomingAttackTrail.enabled == false) { animManager.HomingAttackTrail.enabled = true; }
+
             // Freeze the player to make sure homing attack starts without any forces attached
             rb.linearVelocity = Vector3.zero;
             
@@ -947,6 +949,9 @@ public bool wasOnRail;
                 animManager.TriggerHomingAttackTrickAnimation();
                 // Debug.Log("Do trick");
                 movementState = MovementState.Regular;
+                
+                animManager.HomingAttackTrail.Clear();
+                animManager.HomingAttackTrail.enabled = false;
             }
         }
         // Otherwise, homing attack towards direction player is facing then transition to regular movement
@@ -956,6 +961,9 @@ public bool wasOnRail;
             rb.AddForce(LastSpeedDirection.normalized * NoTargethomingSpeed, ForceMode.Impulse);
             CanHomingAttack = false; // If the player homing attacked and didn't hit anything, don't allow another homing attack until the player retouches the ground
             movementState = MovementState.Regular;
+            
+            animManager.HomingAttackTrail.Clear();
+            animManager.HomingAttackTrail.enabled = false;
         }
     }
 
