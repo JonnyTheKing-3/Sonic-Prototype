@@ -174,6 +174,8 @@ public class SonicMovement : MonoBehaviour
 
     [SerializeField] private TMP_Text speedText;
 
+    [SerializeField] private TrailRenderer boostTrail;
+
     
     [Header("EXTRA")] 
     [SerializeField] private bool ShowSpeed = true;
@@ -340,10 +342,17 @@ public bool wasOnRail;
         }
 
         // Boost
-        if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f && movementState != MovementState.RailGrinding) { movementState = MovementState.Boosting; }
+        if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f && movementState != MovementState.RailGrinding) 
+        {
+            // boostTrail.enabled = true;
+            movementState = MovementState.Boosting; 
+        }
         else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting))
         {
             // If we're on rail, don't go to normal
+            // boostTrail.Clear();
+            // boostTrail.enabled = false;
+
             if (movementState == MovementState.RailGrinding) { return;}
             
             movementState = MovementState.Regular;

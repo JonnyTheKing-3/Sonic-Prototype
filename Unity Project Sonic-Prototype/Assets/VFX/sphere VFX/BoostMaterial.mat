@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: BoostMaterial
-  m_Shader: {fileID: -6465566751694194690, guid: e9bf0e748acc7dc4780beabe678a04a3, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 0990634f75b1ed743ad95e74f5bd4555, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -128,9 +128,10 @@ Material:
     - _Surface: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
-    - _alpha: 1
+    - _alpha: 0.66
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BoomColor: {r: 0, g: 0.3046528, b: 0.70440245, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlowColor: {r: 0, g: 0.025906801, b: 1, a: 0}
