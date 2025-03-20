@@ -174,7 +174,7 @@ public class SonicMovement : MonoBehaviour
 
     [SerializeField] private TMP_Text speedText;
 
-    [SerializeField] private TrailRenderer boostTrail;
+    [SerializeField] private GameObject boostVFX;
 
     
     [Header("EXTRA")] 
@@ -344,15 +344,14 @@ public bool wasOnRail;
         // Boost
         if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f && movementState != MovementState.RailGrinding) 
         {
-            // boostTrail.enabled = true;
+            // boostVFX.SetActive(true);
             movementState = MovementState.Boosting; 
         }
         else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting))
         {
-            // If we're on rail, don't go to normal
-            // boostTrail.Clear();
-            // boostTrail.enabled = false;
+            // boostVFX.SetActive(false);
 
+            // If we're on rail, don't go to normal
             if (movementState == MovementState.RailGrinding) { return;}
             
             movementState = MovementState.Regular;
@@ -1092,12 +1091,16 @@ public bool wasOnRail;
     private void Stomp()
     {
         rb.linearVelocity = Vector3.down * StompSpeed;
+        if (animManager.stompTrail.enabled == false) { Debug.Log("Turn ON trail"); animManager.stompTrail.enabled = true; }
         
+
+
         // Rail takes priority
         DetectRail();
         
         if (grounded)
         {
+            if (animManager.stompTrail.enabled == true) { Debug.Log("Turn off"); animManager.stompTrail.Clear(); animManager.stompTrail.enabled = false; }
             rb.linearVelocity = Vector3.zero;
             InStompWaitTime = true;
             StartCoroutine(AfterStompWait());

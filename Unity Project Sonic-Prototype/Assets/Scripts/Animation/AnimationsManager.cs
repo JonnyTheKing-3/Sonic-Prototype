@@ -32,7 +32,7 @@ public class AnimationsManager : MonoBehaviour
     public GameObject SpinBallVFX;
 
     public TrailRenderer HomingAttackTrail;
-    // public TrailRenderer sonicBoostTrail;
+    public TrailRenderer stompTrail;
 
 
     void Start()
@@ -115,8 +115,6 @@ public class AnimationsManager : MonoBehaviour
         {
             case SonicMovement.MovementState.Regular:
                 if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
-                HomingAttackTrail.enabled = false;
-                // sonicBoostTrail.enabled = false;
 
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", false);
@@ -141,8 +139,6 @@ public class AnimationsManager : MonoBehaviour
                 break;
 
             case SonicMovement.MovementState.Spindashing:
-                HomingAttackTrail.enabled = false;
-                // sonicBoostTrail.enabled = false;
 
                 animator.SetBool("Boosting", false);
                 animator.SetBool("SpinDashing", true);
@@ -162,9 +158,7 @@ public class AnimationsManager : MonoBehaviour
             
             case SonicMovement.MovementState.Boosting:
                 if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
-                HomingAttackTrail.enabled = false;
-                // sonicBoostTrail.enabled = true;
-
+                
                 animator.SetBool("Boosting", true);
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("OnBumperForce", false);
@@ -187,8 +181,6 @@ public class AnimationsManager : MonoBehaviour
             
             case SonicMovement.MovementState.Stomp:
                 if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
-                HomingAttackTrail.enabled = false;
-                // sonicBoostTrail.enabled = false;
 
                 animator.SetBool("Stomping", true);
                 animator.SetBool("OnDelay", false);
@@ -203,8 +195,6 @@ public class AnimationsManager : MonoBehaviour
             
             case SonicMovement.MovementState.Sliding:
                 if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
-                HomingAttackTrail.enabled = false;
-                 // sonicBoostTrail.enabled = false;
 
                 animator.SetBool("Sliding", true);
                 animator.SetBool("SpinDashing", false);
@@ -216,8 +206,6 @@ public class AnimationsManager : MonoBehaviour
             
             case SonicMovement.MovementState.RailGrinding:
                 if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
-                HomingAttackTrail.enabled = false;
-                // sonicBoostTrail.enabled = false;
 
                 animator.SetBool("SpinDashing", false);
                 animator.SetBool("StompWait", false);
@@ -230,8 +218,6 @@ public class AnimationsManager : MonoBehaviour
         
             case SonicMovement.MovementState.OnBumperInertia:
                 if (SpinBallVFX != null) {SpinBallVFX.SetActive(false);}
-                HomingAttackTrail.enabled = false;
-                // sonicBoostTrail.enabled = false;
 
                 animator.SetBool("grounded", false);
                 animator.SetBool("SpinDashing", false);
