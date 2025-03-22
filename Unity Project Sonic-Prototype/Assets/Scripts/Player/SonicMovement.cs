@@ -344,12 +344,12 @@ public bool wasOnRail;
         // Boost
         if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f && movementState != MovementState.RailGrinding) 
         {
-            // boostVFX.SetActive(true);
+            boostVFX.SetActive(true);
             movementState = MovementState.Boosting; 
         }
         else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting))
         {
-            // boostVFX.SetActive(false);
+            boostVFX.SetActive(false);
 
             // If we're on rail, don't go to normal
             if (movementState == MovementState.RailGrinding) { return;}
