@@ -247,6 +247,8 @@ public class SonicMovement : MonoBehaviour
 public bool wasOnRail;
     private void MyInput()
     {
+        if (movementState != MovementState.Boosting && movementState != MovementState.RailGrinding)  {boostVFX.SetActive(false);}
+
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
         if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || movementState == MovementState.OnBumperInertia 
         ||  InStompWaitTime) { return;}
@@ -1091,16 +1093,24 @@ public bool wasOnRail;
     private void Stomp()
     {
         rb.linearVelocity = Vector3.down * StompSpeed;
-        if (animManager.stompTrail.enabled == false) { Debug.Log("Turn ON trail"); animManager.stompTrail.enabled = true; }
-        
-
+        if (animManager.stompTrail.enabled == false) 
+        { 
+            //Debug.Log("Turn ON trail"); 
+            animManager.stompTrail.enabled = true; 
+        }
 
         // Rail takes priority
         DetectRail();
         
         if (grounded)
         {
-            if (animManager.stompTrail.enabled == true) { Debug.Log("Turn off"); animManager.stompTrail.Clear(); animManager.stompTrail.enabled = false; }
+            if (animManager.stompTrail.enabled == true) 
+            {
+                // Debug.Log("Turn off"); 
+                animManager.stompTrail.Clear(); 
+                animManager.stompTrail.enabled = false; 
+            }
+
             rb.linearVelocity = Vector3.zero;
             InStompWaitTime = true;
             StartCoroutine(AfterStompWait());
@@ -1214,8 +1224,12 @@ public bool wasOnRail;
         {
             CurrentCart.transform.parent.GetChild(0).GetComponentInChildren<SplineMeshCollider>().ignoreRail = true;
             CurrentCart = null;
+            
+            if (Input.GetKey(BoostKey) && BoostMeter > 0f) {boostVFX.SetActive(false);}
+            
             movementState = MovementState.Regular;
             rb.linearVelocity = lastRailDirection * RailStartSpeed;
+            
         }
         
     }
@@ -1304,10 +1318,15 @@ public bool wasOnRail;
         // If we're on a rail, simulate boost
         if (Input.GetKey(BoostKey) && BoostMeter > 0f)
         {
+            boostVFX.SetActive(true);
             DesiredSpeed = BoostSpeed;
             RailStartSpeed = BoostSpeed;
             RailStartSpeed *= TowardsEndPoint ? 1 : -1;
             BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
+        }
+        else
+        {
+            boostVFX.SetActive(false);
         }
     }
 
@@ -1319,7 +1338,6 @@ public bool wasOnRail;
             rb.linearVelocity -= CurrentBumper.transform.up.normalized * Mathf.Abs(gravity) * Time.deltaTime;
 
 //             Debug.Log(rb.linearVelocity.magnitude);
-
 
             // if the player's speed goes down by a certain amount, then turn off bumper time
             // We also add a min distance to make sure a new bumper check doesn't accidently stop bumper when it makes velocity 0

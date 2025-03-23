@@ -34,6 +34,8 @@ public class AnimationsManager : MonoBehaviour
     public TrailRenderer HomingAttackTrail;
     public TrailRenderer stompTrail;
 
+    public Transform boostParticles;
+
 
     void Start()
     {
@@ -110,6 +112,11 @@ public class AnimationsManager : MonoBehaviour
     void Update()
     {
         SetupModelPositionAndRotation();
+
+        if (!Mathf.Approximately(boostParticles.localEulerAngles.y, 0f) && player.movementState != SonicMovement.MovementState.RailGrinding)
+        {
+            boostParticles.localRotation = Quaternion.Euler(0, 0f, 0f);
+        }
 
         switch (player.movementState)
         {
@@ -214,6 +221,11 @@ public class AnimationsManager : MonoBehaviour
                 animator.SetBool("OnDelay", false);
                 animator.SetBool("RailGrinding", true);
                 animator.SetBool("OnBumperForce", false);
+                animator.SetBool("Boosting", false);
+    
+                boostParticles.localRotation = Quaternion.Euler(0, -90f, 0f);
+                
+
                 break;
         
             case SonicMovement.MovementState.OnBumperInertia:
