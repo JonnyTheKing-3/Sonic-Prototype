@@ -174,6 +174,8 @@ public class SonicMovement : MonoBehaviour
 
     [SerializeField] private TMP_Text speedText;
 
+    [SerializeField] private GameObject boostVFX;
+
     
     [Header("EXTRA")] 
     [SerializeField] private bool ShowSpeed = true;
@@ -245,6 +247,10 @@ public class SonicMovement : MonoBehaviour
 public bool wasOnRail;
     private void MyInput()
     {
+        // Turning off some VFX
+        if (movementState != MovementState.Boosting && movementState != MovementState.RailGrinding)  {boostVFX.SetActive(false);}
+        if (movementState != MovementState.Stomp)  {animManager.stompTrail.enabled = false;}
+
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
         if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || movementState == MovementState.OnBumperInertia 
         ||  InStompWaitTime) { return;}
@@ -328,6 +334,8 @@ public bool wasOnRail;
         // homing attack
         if (!grounded && Input.GetKeyDown(homingAttackKey) && CanHomingAttack) // We shouldn't do a homing attack from the ground
         {
+            if (animManager.HomingAttackTrail.enabled == false) { animManager.HomingAttackTrail.enabled = true; }
+
             // Freeze the player to make sure homing attack starts without any forces attached
             rb.linearVelocity = Vector3.zero;
             
@@ -338,9 +346,15 @@ public bool wasOnRail;
         }
 
         // Boost
-        if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f && movementState != MovementState.RailGrinding) { movementState = MovementState.Boosting; }
+        if (Input.GetKeyDown(BoostKey) && BoostMeter > 0f && movementState != MovementState.RailGrinding) 
+        {
+            boostVFX.SetActive(true);
+            movementState = MovementState.Boosting; 
+        }
         else if (Input.GetKeyUp(BoostKey) || (BoostMeter <= 0f && movementState == MovementState.Boosting))
         {
+            boostVFX.SetActive(false);
+
             // If we're on rail, don't go to normal
             if (movementState == MovementState.RailGrinding) { return;}
             
@@ -947,6 +961,9 @@ public bool wasOnRail;
                 animManager.TriggerHomingAttackTrickAnimation();
                 // Debug.Log("Do trick");
                 movementState = MovementState.Regular;
+                
+                animManager.HomingAttackTrail.Clear();
+                animManager.HomingAttackTrail.enabled = false;
             }
         }
         // Otherwise, homing attack towards direction player is facing then transition to regular movement
@@ -956,6 +973,9 @@ public bool wasOnRail;
             rb.AddForce(LastSpeedDirection.normalized * NoTargethomingSpeed, ForceMode.Impulse);
             CanHomingAttack = false; // If the player homing attacked and didn't hit anything, don't allow another homing attack until the player retouches the ground
             movementState = MovementState.Regular;
+            
+            animManager.HomingAttackTrail.Clear();
+            animManager.HomingAttackTrail.enabled = false;
         }
     }
 
@@ -1075,12 +1095,24 @@ public bool wasOnRail;
     private void Stomp()
     {
         rb.linearVelocity = Vector3.down * StompSpeed;
-        
+        if (animManager.stompTrail.enabled == false) 
+        { 
+            //Debug.Log("Turn ON trail"); 
+            animManager.stompTrail.enabled = true; 
+        }
+
         // Rail takes priority
         DetectRail();
         
         if (grounded)
         {
+            if (animManager.stompTrail.enabled == true) 
+            {
+                // Debug.Log("Turn off"); 
+                animManager.stompTrail.Clear(); 
+                animManager.stompTrail.enabled = false; 
+            }
+
             rb.linearVelocity = Vector3.zero;
             InStompWaitTime = true;
             StartCoroutine(AfterStompWait());
@@ -1194,8 +1226,12 @@ public bool wasOnRail;
         {
             CurrentCart.transform.parent.GetChild(0).GetComponentInChildren<SplineMeshCollider>().ignoreRail = true;
             CurrentCart = null;
+            
+            if (Input.GetKey(BoostKey) && BoostMeter > 0f) {boostVFX.SetActive(false);}
+            
             movementState = MovementState.Regular;
             rb.linearVelocity = lastRailDirection * RailStartSpeed;
+            
         }
         
     }
@@ -1284,10 +1320,15 @@ public bool wasOnRail;
         // If we're on a rail, simulate boost
         if (Input.GetKey(BoostKey) && BoostMeter > 0f)
         {
+            boostVFX.SetActive(true);
             DesiredSpeed = BoostSpeed;
             RailStartSpeed = BoostSpeed;
             RailStartSpeed *= TowardsEndPoint ? 1 : -1;
             BoostMeter = Mathf.MoveTowards(BoostMeter, 0f, (BoostConsumption/100) * Time.deltaTime);
+        }
+        else
+        {
+            boostVFX.SetActive(false);
         }
     }
 
@@ -1299,7 +1340,6 @@ public bool wasOnRail;
             rb.linearVelocity -= CurrentBumper.transform.up.normalized * Mathf.Abs(gravity) * Time.deltaTime;
 
 //             Debug.Log(rb.linearVelocity.magnitude);
-
 
             // if the player's speed goes down by a certain amount, then turn off bumper time
             // We also add a min distance to make sure a new bumper check doesn't accidently stop bumper when it makes velocity 0

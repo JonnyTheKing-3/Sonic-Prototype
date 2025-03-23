@@ -32,6 +32,7 @@ public class dashpanel : MonoBehaviour
             player.transform.position = transform.position;
             player.grounded = true;
             player.readyToJump = true;
+            player.animManager.animator.SetTrigger("HitDashPannel");
             player.movementState = SonicMovement.MovementState.Regular;
 
             // make input 0 so that moveplayer in sonicmovement doesn't interfere

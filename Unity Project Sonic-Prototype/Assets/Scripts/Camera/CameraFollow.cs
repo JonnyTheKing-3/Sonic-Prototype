@@ -193,7 +193,7 @@ public class CameraFollow : MonoBehaviour
 
         // Calculate the target rotation based on the player's velocity
         Vector3 rightDir = Vector3.Cross(velocityAfterLoop, Vector3.up);
-        Debug.Log(camPath.afterLoopCamOffset);
+//         Debug.Log(camPath.afterLoopCamOffset);
         Vector3 upOffset = Vector3.Cross(rightDir, velocityAfterLoop).normalized * camPath.afterLoopCamOffset;
         velocityAfterLoop += upOffset;
         velocityAfterLoop.Normalize();
