@@ -247,7 +247,9 @@ public class SonicMovement : MonoBehaviour
 public bool wasOnRail;
     private void MyInput()
     {
+        // Turning off some VFX
         if (movementState != MovementState.Boosting && movementState != MovementState.RailGrinding)  {boostVFX.SetActive(false);}
+        if (movementState != MovementState.Stomp)  {animManager.stompTrail.enabled = false;}
 
         // Don't accept any input during these moments. This makes it easy to avoid any potential interruptions
         if (movementState == MovementState.HomingAttacking || movementState == MovementState.Stomp || movementState == MovementState.OnBumperInertia 

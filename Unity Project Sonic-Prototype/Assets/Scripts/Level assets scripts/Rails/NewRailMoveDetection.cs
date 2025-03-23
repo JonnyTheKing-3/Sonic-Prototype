@@ -68,6 +68,9 @@ public class NewRailMoveDetection : MonoBehaviour
         other.CurrentCart = cart;
         cart.PositionUnits = PathIndexUnit.Distance;
         other.movementState = SonicMovement.MovementState.RailGrinding;
+        other.readyToJump = false; 
+        other.ResetJump();
+        other.grounded = false;
         
     }
     
