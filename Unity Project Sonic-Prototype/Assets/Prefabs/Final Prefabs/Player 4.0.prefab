@@ -1236,7 +1236,7 @@ MonoBehaviour:
   groundStickingDistance: 2.5
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 264
+    m_Bits: 1800
   GroundStickingOffset: 1
   AngleWhereSpeedIsRequired: 181
   SpeedRequiredForHighAngles: 65
@@ -6843,8 +6843,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.003002515, y: 0.005704401, z: 0.0041639903}
-  m_Center: {x: -0.002002436, y: 0.0015991956, z: -0.000137142}
+  m_Size: {x: 0.0028506794, y: 0.0017928042, z: 0.0039104302}
+  m_Center: {x: -0.0019265197, y: -0.000356597, z: -0.0002639207}
 --- !u!114 &4841126611850374303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6908,8 +6908,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0029196872, y: 0.0062530045, z: 0.0041639903}
-  m_Center: {x: -0.001961017, y: 0.0018734949, z: -0.00013714201}
+  m_Size: {x: 0.0018914697, y: 0.0019019042, z: 0.0034783557}
+  m_Center: {x: -0.0024889337, y: -0.000988125, z: 0.00020567441}
 --- !u!114 &4709846032801910053
 MonoBehaviour:
   m_ObjectHideFlags: 0

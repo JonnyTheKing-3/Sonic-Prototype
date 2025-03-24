@@ -6611,6 +6611,34 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: LevelMusic.Path
+      value: event:/Ambience
+      objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: playAmbienceOnStart
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: LevelMusic.Guid.Data1
+      value: 1266691696
+      objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: LevelMusic.Guid.Data2
+      value: 1320448651
+      objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: LevelMusic.Guid.Data3
+      value: 1657127595
+      objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: LevelMusic.Guid.Data4
+      value: -1844055338
+      objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: playLevelMusicOnStart
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

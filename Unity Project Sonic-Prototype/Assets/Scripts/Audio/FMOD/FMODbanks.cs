@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FMOD.Studio;
 using FMODUnity;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -10,24 +11,26 @@ public class FMODbanks : MonoBehaviour
     public static FMODbanks Instance { get; private set; }
 
     [SerializeField] public bool playMusicOnStart;
+    [SerializeField] public bool playLevelMusicOnStart;
     [SerializeField] public bool playAmbienceOnStart;
 
     [Header("SFX")]
 
     [Header("Player")]
-    public EventReference FootStepsSFX; // Kind of works
-    public EventReference jumpSFX;  // Works Good
-    public EventReference homingAttackSFX; // Works
+    public EventReference FootStepsSFX; // Works good
+    public EventReference jumpSFX;  // Works good
+    public EventReference homingAttackSFX; // Works 
     public EventReference homingLockOnSFX; // Not iplemented but here if anyone wants to use it :)
     public EventReference SpinDashSFX; // Works
     [Space]
-    public EventReference SpinChargeSFX;  // Works Good
+    public EventReference SpinChargeSFX;  // Works good
     public EventReference SlideSFX; // Works good
-    public EventReference PowerBoostSFX; // Works BUT, we get a 10 second fade out warning if we allowfadeout
+    public EventReference PowerBoostSFX; // Works good
 
 
     [Header("Music/Ambience/Environment")]
     public EventReference Music; // Not implemented yet, but works with other event, so it's good
+    public EventReference LevelMusic;
     public EventReference Ambience; // Works Good
 
     [Header("Level Objects")]
@@ -36,6 +39,7 @@ public class FMODbanks : MonoBehaviour
     public EventReference DashPanelSFX; // Not implemented yet, but works with other event, so it's good
 
 
+    private EventInstance footstepInstance;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -49,14 +53,21 @@ public class FMODbanks : MonoBehaviour
         }
 
         if (playMusicOnStart) { PlayMusic();}
+        if (playLevelMusicOnStart) { PlayLevelMusic();}
         if (playAmbienceOnStart) { PlayAmbience();}
+
+
+        footstepInstance = RuntimeManager.CreateInstance(FootStepsSFX);
 
     }
     
-    public void PlayFootStepSFX(GameObject OriginOfSound)
+    public void PlayFootStepSFX(GameObject OriginOfSound, float material)
     {
-        RuntimeManager.PlayOneShotAttached(FootStepsSFX, OriginOfSound);
+        footstepInstance.setParameterByName("Material", material);
+        footstepInstance.start();
     }
+    
+    
     public void PlayJumpSFX(GameObject OriginOfSound)
     {
         RuntimeManager.PlayOneShotAttached(jumpSFX, OriginOfSound);
@@ -182,10 +193,13 @@ public class FMODbanks : MonoBehaviour
         musicInstance = RuntimeManager.CreateInstance(Music);
         musicInstance.start();
     }
-    public void SetParameterOfMusicToOne()
+
+    public static EventInstance levelmusicInstance;
+    public void PlayLevelMusic()
     {
-        // Set the parameter value
-        musicInstance.setParameterByName("Music", 1);
+        // Create the EventInstance for hover sound and start it
+        levelmusicInstance = RuntimeManager.CreateInstance(LevelMusic);
+        levelmusicInstance.start();
     }
 
     public static EventInstance ambienceInstance;
@@ -211,6 +225,12 @@ public class FMODbanks : MonoBehaviour
 
         musicInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         musicInstance.release();
+
+        levelmusicInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        levelmusicInstance.release();
+
+        footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        footstepInstance.release();
     }
     
     public void OnDestroy()
@@ -218,5 +238,9 @@ public class FMODbanks : MonoBehaviour
         // Make sure to release the instance when it's no longer needed
         musicInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         musicInstance.release();
+
+        levelmusicInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        levelmusicInstance.release();
+
     }
 }

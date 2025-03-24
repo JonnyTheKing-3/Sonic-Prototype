@@ -12,6 +12,7 @@ public class PlayerBoxTrigger : MonoBehaviour
     void Start()
     {
         player = transform.root.GetComponentInChildren<SonicMovement>();
+        whatIsGround = player.whatIsGround;
     }
 
     void OnTriggerStay(Collider other)
