@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1042520992452440073
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3573750423629069955}
+  - component: {fileID: 6103204415770775859}
+  m_Layer: 0
+  m_Name: Audio Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3573750423629069955
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042520992452440073}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 228.70001, y: 59.67, z: 169.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6103204415770775859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042520992452440073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf76746c14ea78148a39512ec73d5154, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playMusicOnStart: 0
+  playAmbienceOnStart: 0
+  FootStepsSFX:
+    Guid:
+      Data1: -1319197024
+      Data2: 1226206116
+      Data3: -1961954410
+      Data4: 1012405466
+    Path: event:/Sonic/Footsteps
+  jumpSFX:
+    Guid:
+      Data1: -1163262142
+      Data2: 1302694483
+      Data3: -857918079
+      Data4: -2020587413
+    Path: event:/Sonic/Jump
+  homingAttackSFX:
+    Guid:
+      Data1: 904689780
+      Data2: 1271142010
+      Data3: 419599763
+      Data4: 1980535120
+    Path: event:/Sonic/Homing Attack
+  homingLockOnSFX:
+    Guid:
+      Data1: 1908190533
+      Data2: 1145477451
+      Data3: 132181676
+      Data4: 1530936817
+    Path: event:/Sonic/Homing Attack Lock On
+  SpinDashSFX:
+    Guid:
+      Data1: -1710973795
+      Data2: 1249223307
+      Data3: 558136710
+      Data4: 194978920
+    Path: event:/Sonic/Spin Dash Attack
+  SpinChargeSFX:
+    Guid:
+      Data1: 2000796796
+      Data2: 1192826181
+      Data3: -1754578791
+      Data4: 1698420510
+    Path: event:/Sonic/Spin-Dash Charge
+  SlideSFX:
+    Guid:
+      Data1: 1390210819
+      Data2: 1175528842
+      Data3: 1580586658
+      Data4: 1494060495
+    Path: event:/Sonic/Slide
+  PowerBoostSFX:
+    Guid:
+      Data1: 1871550290
+      Data2: 1224496944
+      Data3: -787856501
+      Data4: 1417886489
+    Path: event:/Sonic/Power Boost
+  Music:
+    Guid:
+      Data1: 160705788
+      Data2: 1185154976
+      Data3: -1942533461
+      Data4: -547086522
+    Path: event:/Music
+  Ambience:
+    Guid:
+      Data1: 1266691696
+      Data2: 1320448651
+      Data3: 1657127595
+      Data4: -1844055338
+    Path: event:/Ambience
+  BumperSFX:
+    Guid:
+      Data1: 1340111218
+      Data2: 1268062913
+      Data3: -500986743
+      Data4: -698442234
+    Path: event:/Obstacles/Bouncepad
+  GrindRailSFX:
+    Guid:
+      Data1: -1809686925
+      Data2: 1278068933
+      Data3: 1840594322
+      Data4: -1446584591
+    Path: event:/Obstacles/Grind Rail
+  DashPanelSFX:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 

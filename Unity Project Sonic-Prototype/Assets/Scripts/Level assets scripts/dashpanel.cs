@@ -24,7 +24,8 @@ public class dashpanel : MonoBehaviour
     {
         if (other.CompareTag("Player Trigger Collider"))
         {   
-//             Debug.Log("touched player");
+            // FMODbanks.Instance.PlayDashPanelSFX(gameObject);
+            // Debug.Log("touched player");
             player.CurrentDashPanel = this;
             TimePanelWasTouched = Time.time;
             

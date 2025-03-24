@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{e501a75f-8554-4e10-9472-9a2228b7d329}">
+		<property name="assetPath">
+			<value>GR - Grind.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>4.3750113378684805</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{addb91fc-622f-4de5-8a75-4b3b043e4986}</destination>
+		</relationship>
+	</object>
+</objects>

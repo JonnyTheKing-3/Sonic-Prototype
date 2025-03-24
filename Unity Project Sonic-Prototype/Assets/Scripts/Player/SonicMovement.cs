@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
 using System.Security.Cryptography;
 using System;
 using System.Data.Common;
+// using NUnit.Framework;
 
 public class SonicMovement : MonoBehaviour
 {
@@ -224,7 +225,18 @@ public class SonicMovement : MonoBehaviour
     {
         MyInput();
 
-        // Debug.Log("UPDATE");
+        // Apply SFX
+        if (movementState == MovementState.Sliding && !FMODbanks.SlideInstance.isValid()) { FMODbanks.Instance.StartSlideSFX();}
+        else if (movementState != MovementState.Sliding && FMODbanks.SlideInstance.isValid()) { FMODbanks.Instance.StopSlideSFX();}
+
+        if (boostVFX.activeInHierarchy && !FMODbanks.PowerBoostInstance.isValid()) { FMODbanks.Instance.StartBoostSFX();}
+        else if (!boostVFX.activeInHierarchy && FMODbanks.PowerBoostInstance.isValid()) { FMODbanks.Instance.StopBoostSFX();}
+
+        if (movementState == MovementState.RailGrinding && !FMODbanks.grindrailInstance.isValid()) { FMODbanks.Instance.StartGrindRailSFX();}
+        else if (movementState != MovementState.RailGrinding && FMODbanks.grindrailInstance.isValid()) { FMODbanks.Instance.StopGrindRailSFX();}
+
+
+
         // Show the right gfx. I'll switch this type of thing for a model with animations later
         if (movementState == MovementState.Regular) 
         { GFX.SetActive(true); SpinBallCharge.SetActive(false); SpinBallForm.SetActive(false); BoostForm.SetActive(false); }
@@ -244,7 +256,7 @@ public class SonicMovement : MonoBehaviour
         else { speedText.text = ""; }        
     }
 
-public bool wasOnRail;
+    public bool wasOnRail;
     private void MyInput()
     {
         // Turning off some VFX
@@ -270,6 +282,8 @@ public bool wasOnRail;
         // Jump
         if (Input.GetKeyDown(jumpKey) && (readyToJump && grounded || movementState == MovementState.RailGrinding))
         {
+            FMODbanks.Instance.PlayJumpSFX(gameObject);
+
             // If we're jumping off a rail, make cart null and ignore the rail for a bit so that we have enough time to get out
             if (CurrentCart != null)
             {
@@ -319,6 +333,7 @@ public bool wasOnRail;
                 SpinDashStartTime = false;
                 rb.AddForce(rb.linearVelocity.normalized * InitialImpulseIfMoving, ForceMode.Impulse);
                 ChargedSpeed = rb.linearVelocity.magnitude > DesiredSpeed ? DesiredSpeed: rb.linearVelocity.magnitude;
+                FMODbanks.Instance.PlaySpinDashSFX(gameObject);
                 movementState = MovementState.Spindashing;
                 return;
             }
@@ -334,6 +349,7 @@ public bool wasOnRail;
         // homing attack
         if (!grounded && Input.GetKeyDown(homingAttackKey) && CanHomingAttack) // We shouldn't do a homing attack from the ground
         {
+            FMODbanks.Instance.PlayHomingAttackSFX(gameObject);
             if (animManager.HomingAttackTrail.enabled == false) { animManager.HomingAttackTrail.enabled = true; }
 
             // Freeze the player to make sure homing attack starts without any forces attached
@@ -462,6 +478,8 @@ public bool wasOnRail;
     
     private void ChargeSpinDash()
     {
+        if (!FMODbanks.SpinChargeInstance.isValid()) { FMODbanks.Instance.StartSpinChargeSFX();}
+
         if (Input.GetKeyUp(SpindashKey))
         {
             // spin dash start
@@ -475,6 +493,8 @@ public bool wasOnRail;
             
             StartingSpinDash = false;
             StartCoroutine(SpinStartTime());
+            if (FMODbanks.SpinChargeInstance.isValid()) { FMODbanks.Instance.StopSpinChargeSFX();}
+            FMODbanks.Instance.PlaySpinDashSFX(gameObject);
         }
         else
         {
@@ -1320,7 +1340,9 @@ public bool wasOnRail;
         // If we're on a rail, simulate boost
         if (Input.GetKey(BoostKey) && BoostMeter > 0f)
         {
+            if (!boostVFX.activeInHierarchy) { FMODbanks.Instance.StartBoostSFX();}
             boostVFX.SetActive(true);
+
             DesiredSpeed = BoostSpeed;
             RailStartSpeed = BoostSpeed;
             RailStartSpeed *= TowardsEndPoint ? 1 : -1;
@@ -1328,6 +1350,7 @@ public bool wasOnRail;
         }
         else
         {
+            if (boostVFX.activeInHierarchy) { FMODbanks.Instance.StopBoostSFX();}
             boostVFX.SetActive(false);
         }
     }
