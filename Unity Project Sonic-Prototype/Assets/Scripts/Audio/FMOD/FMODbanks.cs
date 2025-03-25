@@ -20,7 +20,7 @@ public class FMODbanks : MonoBehaviour
     public EventReference FootStepsSFX; // Works good
     public EventReference jumpSFX;  // Works good
     public EventReference homingAttackSFX; // Works 
-    public EventReference homingLockOnSFX; // Not iplemented but here if anyone wants to use it :)
+    public EventReference homingLockOnSFX; // Not iplemented but here if anyone wants to use it :) Currently being used for when touching a ring because I don't have that sound right now
     public EventReference SpinDashSFX; // Works
     [Space]
     public EventReference SpinChargeSFX;  // Works good
@@ -30,7 +30,7 @@ public class FMODbanks : MonoBehaviour
 
     [Header("Music/Ambience/Environment")]
     public EventReference Music; // Not implemented yet, but works with other event, so it's good
-    public EventReference LevelMusic;
+    public EventReference LevelMusic; // Using the Regular song right now, but it's here in case someone wants to make a cool track :)
     public EventReference Ambience; // Works Good
 
     [Header("Level Objects")]
@@ -49,7 +49,7 @@ public class FMODbanks : MonoBehaviour
         else
         {
             Instance = this;
-            DontDestroyOnLoad(this.gameObject);
+            // DontDestroyOnLoad(this.gameObject);
         }
 
         if (playMusicOnStart) { PlayMusic();}
@@ -228,6 +228,9 @@ public class FMODbanks : MonoBehaviour
 
         levelmusicInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         levelmusicInstance.release();
+
+        ambienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        ambienceInstance.release();
 
         footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         footstepInstance.release();

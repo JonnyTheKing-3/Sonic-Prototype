@@ -19,7 +19,7 @@ MonoBehaviour:
     Data3: 558136710
     Data4: 194978920
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -47,7 +47,7 @@ MonoBehaviour:
     Data3: 837723552
     Data4: -2081111207
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -55,26 +55,6 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 2500
---- !u!114 &-7669282457179875830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.bank
-  m_EditorClassIdentifier: 
-  Path: SonicTechDemoFMOD-20250323T212048Z-001/SonicTechDemoFMOD/Build/Desktop/Master.bank
-  Name: Master
-  StudioPath: bank:/Master
-  lastModified: 638783407353921322
-  FileSizes:
-  - Name: Desktop
-    Value: 1074
-  Exists: 1
 --- !u!114 &-6532942565083821459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,6 +79,26 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &-5979568699374504889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Sonic.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Sonic.bank
+  Name: Sonic
+  StudioPath: bank:/Sonic
+  lastModified: 638784976002066255
+  FileSizes:
+  - Name: Desktop
+    Value: 468224
+  Exists: 1
 --- !u!114 &-5357495139739798957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,7 +118,7 @@ MonoBehaviour:
     Data3: -1961954410
     Data4: 1012405466
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -174,9 +174,9 @@ MonoBehaviour:
     Data3: -857918079
     Data4: -2020587413
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
-  Is3D: 1
+  Is3D: 0
   IsOneShot: 1
   Parameters: []
   MinDistance: 1
@@ -201,7 +201,7 @@ MonoBehaviour:
     Data3: -500986743
     Data4: -698442234
   Banks:
-  - {fileID: -360431149853896659}
+  - {fileID: 1561477076266561827}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -209,47 +209,7 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 995
---- !u!114 &-583582862394691250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Sonic.bank
-  m_EditorClassIdentifier: 
-  Path: SonicTechDemoFMOD-20250323T212048Z-001/SonicTechDemoFMOD/Build/Desktop/Sonic.bank
-  Name: Sonic
-  StudioPath: bank:/Sonic
-  lastModified: 638783407357291893
-  FileSizes:
-  - Name: Desktop
-    Value: 468416
-  Exists: 1
---- !u!114 &-360431149853896659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Obstacles.bank
-  m_EditorClassIdentifier: 
-  Path: SonicTechDemoFMOD-20250323T212048Z-001/SonicTechDemoFMOD/Build/Desktop/Obstacles.bank
-  Name: Obstacles
-  StudioPath: bank:/Obstacles
-  lastModified: 638783407355139074
-  FileSizes:
-  - Name: Desktop
-    Value: 190368
-  Exists: 1
---- !u!114 &-242012646438004581
+--- !u!114 &-1293366707045110790
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -261,14 +221,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: bank:/Background.bank
   m_EditorClassIdentifier: 
-  Path: SonicTechDemoFMOD-20250323T212048Z-001/SonicTechDemoFMOD/Build/Desktop/Background.bank
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Background.bank
   Name: Background
   StudioPath: bank:/Background
-  lastModified: 638783407353897420
+  lastModified: 638784976003001814
   FileSizes:
   - Name: Desktop
-    Value: 971360
+    Value: 3674592
   Exists: 1
+--- !u!114 &-746796271412222619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Obstacles/Boost Panel
+  m_EditorClassIdentifier: 
+  Path: event:/Obstacles/Boost Panel
+  Guid:
+    Data1: 1764306753
+    Data2: 1253506519
+    Data3: 1329231540
+    Data4: -2033202528
+  Banks:
+  - {fileID: 1561477076266561827}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 690
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,11 +269,12 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: 
   EditorBanks:
-  - {fileID: 7370247764991394437}
-  - {fileID: -242012646438004581}
-  - {fileID: -7669282457179875830}
-  - {fileID: -360431149853896659}
-  - {fileID: -583582862394691250}
+  - {fileID: 7496029239419313641}
+  - {fileID: -1293366707045110790}
+  - {fileID: 5604416787112096608}
+  - {fileID: 2182353828123325649}
+  - {fileID: 1561477076266561827}
+  - {fileID: -5979568699374504889}
   EditorEvents:
   - {fileID: 8169333117251852882}
   - {fileID: 7012115286251366436}
@@ -301,12 +289,13 @@ MonoBehaviour:
   - {fileID: 6128670168543416985}
   - {fileID: -9172884796377443079}
   - {fileID: -5357495139739798957}
+  - {fileID: -746796271412222619}
   EditorParameters: []
   MasterBanks:
-  - {fileID: -7669282457179875830}
+  - {fileID: 5604416787112096608}
   StringsBanks:
-  - {fileID: 7370247764991394437}
-  cacheTime: 638783407357291893
+  - {fileID: 7496029239419313641}
+  cacheTime: 638784976003350826
   cacheVersion: 131846
 --- !u!114 &977758423630196765
 MonoBehaviour:
@@ -327,7 +316,7 @@ MonoBehaviour:
     Data3: 1840594322
     Data4: -1446584591
   Banks:
-  - {fileID: -360431149853896659}
+  - {fileID: 1561477076266561827}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -378,7 +367,7 @@ MonoBehaviour:
     Data3: 132181676
     Data4: 1530936817
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -386,6 +375,26 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 328
+--- !u!114 &1561477076266561827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Obstacles.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Obstacles.bank
+  Name: Obstacles
+  StudioPath: bank:/Obstacles
+  lastModified: 638784976002619992
+  FileSizes:
+  - Name: Desktop
+    Value: 199872
+  Exists: 1
 --- !u!114 &1724558667933496786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,6 +418,26 @@ MonoBehaviour:
   Type: 0
   IsGlobal: 0
   Labels: []
+  Exists: 1
+--- !u!114 &2182353828123325649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Music.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Music.bank
+  Name: Music
+  StudioPath: bank:/Music
+  lastModified: 638784976003350826
+  FileSizes:
+  - Name: Desktop
+    Value: 2704800
   Exists: 1
 --- !u!114 &5190195820257350634
 MonoBehaviour:
@@ -434,6 +463,26 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &5604416787112096608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 638784976002251424
+  FileSizes:
+  - Name: Desktop
+    Value: 1036
+  Exists: 1
 --- !u!114 &6128670168543416985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,7 +502,7 @@ MonoBehaviour:
     Data3: -1754578791
     Data4: 1698420510
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -481,7 +530,7 @@ MonoBehaviour:
     Data3: -787856501
     Data4: 1417886489
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -508,14 +557,15 @@ MonoBehaviour:
     Data3: -1942533461
     Data4: -547086522
   Banks:
-  - {fileID: -242012646438004581}
-  IsStream: 0
+  - {fileID: -1293366707045110790}
+  - {fileID: 2182353828123325649}
+  IsStream: 1
   Is3D: 0
-  IsOneShot: 1
+  IsOneShot: 0
   Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 0
+  Length: 225000
 --- !u!114 &7256099666336177119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -535,7 +585,7 @@ MonoBehaviour:
     Data3: 1580586658
     Data4: 1494060495
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -544,7 +594,7 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 6455
---- !u!114 &7370247764991394437
+--- !u!114 &7496029239419313641
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -556,13 +606,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: bank:/Master.strings.bank
   m_EditorClassIdentifier: 
-  Path: SonicTechDemoFMOD-20250323T212048Z-001/SonicTechDemoFMOD/Build/Desktop/Master.strings.bank
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638783407353948556
+  lastModified: 638784976002424924
   FileSizes:
   - Name: Desktop
-    Value: 1702
+    Value: 1788
   Exists: 1
 --- !u!114 &7848687624509663831
 MonoBehaviour:
@@ -607,7 +657,7 @@ MonoBehaviour:
     Data3: 1657127595
     Data4: -1844055338
   Banks:
-  - {fileID: -242012646438004581}
+  - {fileID: -1293366707045110790}
   IsStream: 1
   Is3D: 1
   IsOneShot: 0
@@ -635,7 +685,7 @@ MonoBehaviour:
     Data3: 419599763
     Data4: 1980535120
   Banks:
-  - {fileID: -583582862394691250}
+  - {fileID: -5979568699374504889}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1

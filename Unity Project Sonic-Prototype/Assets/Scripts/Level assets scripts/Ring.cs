@@ -17,6 +17,7 @@ public class Ring : MonoBehaviour
     // If the player touches the ring, refill boost meter a bit and destroy ring
     private void OnTriggerEnter(Collider other)
     {
+        FMODbanks.Instance.PlayHomingLockOnSFX(gameObject);
         //Debug.Log("Tounched something: " + other.tag);
         if (other.CompareTag("Player") || other.CompareTag("Player Trigger Collider"))
         {

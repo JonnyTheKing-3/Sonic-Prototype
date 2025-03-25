@@ -1001,6 +1001,10 @@ PrefabInstance:
       propertyPath: playerMoveScript
       value: 
       objectReference: {fileID: 183416889}
+    - target: {fileID: 5710349567419722312, guid: 33e5478753f218b40838c43aa584c242, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -30
+      objectReference: {fileID: 0}
     - target: {fileID: 7877415240665992593, guid: 33e5478753f218b40838c43aa584c242, type: 3}
       propertyPath: m_Name
       value: CameraBase
@@ -2629,6 +2633,10 @@ PrefabInstance:
     - target: {fileID: 3573750423629069955, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
+      propertyPath: playMusicOnStart
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6103204415770775859, guid: dafdb87c5f4b00e4a8cec8f399c2f29e, type: 3}
       propertyPath: playAmbienceOnStart

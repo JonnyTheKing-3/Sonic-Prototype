@@ -380,8 +380,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: SonicTechDemoFMOD-20250323T212048Z-001/SonicTechDemoFMOD/SonicTechDemo.fspro
-  sourceBankPath: SonicTechDemoFMOD-20250323T212048Z-001/SonicTechDemoFMOD/Build
+  sourceProjectPath: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/SonicTechDemo.fspro
+  sourceBankPath: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
@@ -406,6 +406,7 @@ MonoBehaviour:
   - Master
   Banks:
   - Background
+  - Music
   - Obstacles
   - Sonic
   BanksToLoad: []

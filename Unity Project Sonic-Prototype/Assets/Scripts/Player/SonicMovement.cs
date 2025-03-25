@@ -309,6 +309,7 @@ public class SonicMovement : MonoBehaviour
         // Stomp
         if (Input.GetKeyDown(StompKey) && movementState == MovementState.Regular && surfaceState == SurfaceState.Air)
         {
+            FMODbanks.Instance.PlayHomingAttackSFX(gameObject);
             rb.linearVelocity = Vector3.zero;
             movementState = MovementState.Stomp;
             return;

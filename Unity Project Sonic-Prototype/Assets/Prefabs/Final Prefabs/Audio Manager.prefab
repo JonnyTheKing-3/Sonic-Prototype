@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playMusicOnStart: 0
+  playLevelMusicOnStart: 0
   playAmbienceOnStart: 0
   FootStepsSFX:
     Guid:
@@ -109,6 +110,13 @@ MonoBehaviour:
       Data3: -1942533461
       Data4: -547086522
     Path: event:/Music
+  LevelMusic:
+    Guid:
+      Data1: 160705788
+      Data2: 1185154976
+      Data3: -1942533461
+      Data4: -547086522
+    Path: event:/Music
   Ambience:
     Guid:
       Data1: 1266691696
@@ -132,8 +140,8 @@ MonoBehaviour:
     Path: event:/Obstacles/Grind Rail
   DashPanelSFX:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: 1764306753
+      Data2: 1253506519
+      Data3: 1329231540
+      Data4: -2033202528
+    Path: event:/Obstacles/Boost Panel

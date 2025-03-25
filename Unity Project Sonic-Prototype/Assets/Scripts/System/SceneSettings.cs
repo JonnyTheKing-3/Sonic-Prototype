@@ -12,7 +12,7 @@ public class TimeControl : MonoBehaviour
         {
             timeScale += .1f;
         }
-        if (Input.GetKeyDown(DecreaseTimer))
+        if (Input.GetKeyDown(DecreaseTimer) && timeScale >= .2f)
         {
             timeScale -= .1f;
         }
