@@ -5,9 +5,25 @@ public class ReloadScene : MonoBehaviour
 {
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        // Loads sample scene (Asset scene)
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            FMODbanks.Instance.OnSceneSwitch();
+            SceneManager.LoadScene(0);
+        }
+
+        // Loads level
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            FMODbanks.Instance.OnSceneSwitch();
+            SceneManager.LoadScene(1);
+        }
+
+        // Loads forest
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            FMODbanks.Instance.OnSceneSwitch();
+            SceneManager.LoadScene(2);
         }
     }
 }
