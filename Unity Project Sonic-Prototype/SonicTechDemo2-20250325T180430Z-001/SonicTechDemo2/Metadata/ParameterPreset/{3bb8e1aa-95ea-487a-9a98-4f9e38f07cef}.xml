@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="ParameterPreset" id="{3bb8e1aa-95ea-487a-9a98-4f9e38f07cef}">
+		<property name="name">
+			<value>Slide Speed</value>
+		</property>
+		<relationship name="folder">
+			<destination>{0b939147-2d6e-41ca-938a-9056cc458e7b}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{b233e322-5a7e-4103-b51a-7da169ab181c}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{b233e322-5a7e-4103-b51a-7da169ab181c}">
+		<property name="initialValue">
+			<value>1</value>
+		</property>
+	</object>
+</objects>

@@ -40,6 +40,7 @@ public class CameraFollow : MonoBehaviour
     public CameraState cameraState;
 
     public Vector3 velocityAfterLoop;
+    private Vector3 CameraLocalSetup;
 
     void Start()
     {
@@ -55,6 +56,8 @@ public class CameraFollow : MonoBehaviour
         playerScript = PlayerObj.GetComponent<SonicMovement>();
         cameraState = CameraState.Regular;
         camPath = null;
+
+        CameraLocalSetup = new Vector3(Camera.main.transform.localPosition.x, Camera.main.transform.localPosition.y, Camera.main.transform.localPosition.z);
     }
 
     public void SetTemporaryCameraDirection(Quaternion newRotation, float duration)
@@ -213,7 +216,7 @@ public class CameraFollow : MonoBehaviour
             transform.rotation = nextRot;
 
             // move and rotate camera object
-            CameraObj.transform.localPosition = Vector3.Lerp(startCamObjPos, new Vector3(0f, 0f, -20f), t);
+            CameraObj.transform.localPosition = Vector3.Lerp(startCamObjPos, CameraLocalSetup, t);
             CameraObj.transform.localRotation = Quaternion.Slerp(startCamObjRot, Quaternion.identity, t);
 
             yield return null;

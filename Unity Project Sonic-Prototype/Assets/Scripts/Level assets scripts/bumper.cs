@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using Unity.VisualScripting;
-using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -29,6 +28,7 @@ public class bumper : MonoBehaviour
     {
         if (other.CompareTag("Player Trigger Collider"))
         {   
+            FMODbanks.Instance.PlayBumperSFX(gameObject);
             player.CurrentDashPanel = null;
             player.CurrentBumper = this;
             

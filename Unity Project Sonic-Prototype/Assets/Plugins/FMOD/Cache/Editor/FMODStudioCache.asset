@@ -1,0 +1,695 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9172884796377443079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Spin Dash Attack
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Spin Dash Attack
+  Guid:
+    Data1: -1710973795
+    Data2: 1249223307
+    Data3: 558136710
+    Data4: 194978920
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 1367277417647800985}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-8140554678238714132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Boost Loop
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Boost Loop
+  Guid:
+    Data1: -133682146
+    Data2: 1248784904
+    Data3: 837723552
+    Data4: -2081111207
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 2500
+--- !u!114 &-6532942565083821459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Spin-Dash Charge/Charge
+  m_EditorClassIdentifier: 
+  Name: Charge
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2049054144
+    data2: 374773844
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &-5979568699374504889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Sonic.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Sonic.bank
+  Name: Sonic
+  StudioPath: bank:/Sonic
+  lastModified: 638784976002066255
+  FileSizes:
+  - Name: Desktop
+    Value: 468224
+  Exists: 1
+--- !u!114 &-5357495139739798957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Footsteps
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Footsteps
+  Guid:
+    Data1: -1319197024
+    Data2: 1226206116
+    Data3: -1961954410
+    Data4: 1012405466
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -4190249360346022584}
+  - {fileID: 1724558667933496786}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-4190249360346022584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Footsteps/Material
+  m_EditorClassIdentifier: 
+  Name: Material
+  StudioPath: 
+  Min: 0
+  Max: 2
+  Default: 0
+  ID:
+    data1: 1174182477
+    data2: 3891431275
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Grass
+  - Stone
+  - Dirt
+  Exists: 1
+--- !u!114 &-4165583862530360329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Jump
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Jump
+  Guid:
+    Data1: -1163262142
+    Data2: 1302694483
+    Data3: -857918079
+    Data4: -2020587413
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 1000
+--- !u!114 &-3420548673237020802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Obstacles/Bouncepad
+  m_EditorClassIdentifier: 
+  Path: event:/Obstacles/Bouncepad
+  Guid:
+    Data1: 1340111218
+    Data2: 1268062913
+    Data3: -500986743
+    Data4: -698442234
+  Banks:
+  - {fileID: 1561477076266561827}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 995
+--- !u!114 &-1293366707045110790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Background.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Background.bank
+  Name: Background
+  StudioPath: bank:/Background
+  lastModified: 638784976003001814
+  FileSizes:
+  - Name: Desktop
+    Value: 3674592
+  Exists: 1
+--- !u!114 &-746796271412222619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Obstacles/Boost Panel
+  m_EditorClassIdentifier: 
+  Path: event:/Obstacles/Boost Panel
+  Guid:
+    Data1: 1764306753
+    Data2: 1253506519
+    Data3: 1329231540
+    Data4: -2033202528
+  Banks:
+  - {fileID: 1561477076266561827}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 690
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d32cf7c32a3ed8347bac48ef5ed56d82, type: 3}
+  m_Name: FMODStudioCache
+  m_EditorClassIdentifier: 
+  EditorBanks:
+  - {fileID: 7496029239419313641}
+  - {fileID: -1293366707045110790}
+  - {fileID: 5604416787112096608}
+  - {fileID: 2182353828123325649}
+  - {fileID: 1561477076266561827}
+  - {fileID: -5979568699374504889}
+  EditorEvents:
+  - {fileID: 8169333117251852882}
+  - {fileID: 7012115286251366436}
+  - {fileID: -3420548673237020802}
+  - {fileID: 977758423630196765}
+  - {fileID: 7256099666336177119}
+  - {fileID: -8140554678238714132}
+  - {fileID: -4165583862530360329}
+  - {fileID: 1465249612408402604}
+  - {fileID: 6591282099983069125}
+  - {fileID: 8516618067628476930}
+  - {fileID: 6128670168543416985}
+  - {fileID: -9172884796377443079}
+  - {fileID: -5357495139739798957}
+  - {fileID: -746796271412222619}
+  EditorParameters: []
+  MasterBanks:
+  - {fileID: 5604416787112096608}
+  StringsBanks:
+  - {fileID: 7496029239419313641}
+  cacheTime: 638784976003350826
+  cacheVersion: 131846
+--- !u!114 &977758423630196765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Obstacles/Grind Rail
+  m_EditorClassIdentifier: 
+  Path: event:/Obstacles/Grind Rail
+  Guid:
+    Data1: -1809686925
+    Data2: 1278068933
+    Data3: 1840594322
+    Data4: -1446584591
+  Banks:
+  - {fileID: 1561477076266561827}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 6492
+--- !u!114 &1367277417647800985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Spin Dash Attack/Charge
+  m_EditorClassIdentifier: 
+  Name: Charge
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2049054144
+    data2: 374773844
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &1465249612408402604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Homing Attack Lock On
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Homing Attack Lock On
+  Guid:
+    Data1: 1908190533
+    Data2: 1145477451
+    Data3: 132181676
+    Data4: 1530936817
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 328
+--- !u!114 &1561477076266561827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Obstacles.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Obstacles.bank
+  Name: Obstacles
+  StudioPath: bank:/Obstacles
+  lastModified: 638784976002619992
+  FileSizes:
+  - Name: Desktop
+    Value: 199872
+  Exists: 1
+--- !u!114 &1724558667933496786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Footsteps/Speed
+  m_EditorClassIdentifier: 
+  Name: Speed
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 3977518771
+    data2: 2619823606
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &2182353828123325649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Music.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Music.bank
+  Name: Music
+  StudioPath: bank:/Music
+  lastModified: 638784976003350826
+  FileSizes:
+  - Name: Desktop
+    Value: 2704800
+  Exists: 1
+--- !u!114 &5190195820257350634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Ambience/Speed
+  m_EditorClassIdentifier: 
+  Name: Speed
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 3977518771
+    data2: 2619823606
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &5604416787112096608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 638784976002251424
+  FileSizes:
+  - Name: Desktop
+    Value: 1036
+  Exists: 1
+--- !u!114 &6128670168543416985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Spin-Dash Charge
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Spin-Dash Charge
+  Guid:
+    Data1: 2000796796
+    Data2: 1192826181
+    Data3: -1754578791
+    Data4: 1698420510
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -6532942565083821459}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &6591282099983069125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Power Boost
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Power Boost
+  Guid:
+    Data1: 1871550290
+    Data2: 1224496944
+    Data3: -787856501
+    Data4: 1417886489
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 7800
+--- !u!114 &7012115286251366436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Music
+  m_EditorClassIdentifier: 
+  Path: event:/Music
+  Guid:
+    Data1: 160705788
+    Data2: 1185154976
+    Data3: -1942533461
+    Data4: -547086522
+  Banks:
+  - {fileID: -1293366707045110790}
+  - {fileID: 2182353828123325649}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 225000
+--- !u!114 &7256099666336177119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Slide
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Slide
+  Guid:
+    Data1: 1390210819
+    Data2: 1175528842
+    Data3: 1580586658
+    Data4: 1494060495
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 7848687624509663831}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 6455
+--- !u!114 &7496029239419313641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: 
+  Path: SonicTechDemo2-20250325T180430Z-001/SonicTechDemo2/Build/Desktop/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 638784976002424924
+  FileSizes:
+  - Name: Desktop
+    Value: 1788
+  Exists: 1
+--- !u!114 &7848687624509663831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Slide/Slide Speed
+  m_EditorClassIdentifier: 
+  Name: Slide Speed
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 1
+  ID:
+    data1: 472039536
+    data2: 3631929194
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &8169333117251852882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience
+  m_EditorClassIdentifier: 
+  Path: event:/Ambience
+  Guid:
+    Data1: 1266691696
+    Data2: 1320448651
+    Data3: 1657127595
+    Data4: -1844055338
+  Banks:
+  - {fileID: -1293366707045110790}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 5190195820257350634}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 19000
+--- !u!114 &8516618067628476930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sonic/Homing Attack
+  m_EditorClassIdentifier: 
+  Path: event:/Sonic/Homing Attack
+  Guid:
+    Data1: 904689780
+    Data2: 1271142010
+    Data3: 419599763
+    Data4: 1980535120
+  Banks:
+  - {fileID: -5979568699374504889}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 750

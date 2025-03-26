@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{f16f36d3-b7c4-4b81-8b64-c41444498f9d}">
+		<property name="assetPath">
+			<value>BoostPanel.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.70058956916099768</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{addb91fc-622f-4de5-8a75-4b3b043e4986}</destination>
+		</relationship>
+	</object>
+</objects>
