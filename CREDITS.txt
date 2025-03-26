@@ -1,0 +1,40 @@
+In the process of making this project, I used some assets and got help. Below is the credits for that. 
+
+CREDITS:
+- 3d Sonic model with animations:
+"Sonic Forces Sonic Rig" (https://skfb.ly/oZEV8) by NO DONT EAT ME CASEOH (Ferris wheel) is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+- rings:
+"Sonic Ring" (https://skfb.ly/6DpE9) by Shuaib_Ahmed is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+- boost meter wheel:
+Unity3D School (https://www.youtube.com/watch?v=AyuQXfgVk3U)
+
+- rotatetowards:
+There was a light tweak I needed to do to make the movement feel good and Josh's sonic video helped with that. The tweak was using the rotatetowards method rather than things like addforce or movetowards. Here's the video: https://www.youtube.com/watch?v=zH5piGCvk5I&t=610s
+
+- Music and SFX:
+Luke Eleu Hardisty (Discord: keleumusic). I implemented it, but he did everything Audio-wise (music and SFX)
+
+
+- Cinemachine and Spline:
+**Cinemachine** by Unity Technologies – used under the Unity Companion License.  
+[https://unity.com/unity/features/editor/art-and-design/cinemachine](https://unity.com/unity/features/editor/art-and-design/cinemachine)
+**Splines** by Unity Technologies – used under the Unity Companion License.  
+[https://unity.com/releases/editor/whats-new/unity-2023-1#splines](https://unity.com/releases/editor/whats-new/unity-2023-1#splines)
+
+I also used the Simple UI Elements asset pack from MadFireOn
+
+
+- Forest: 
+Used the Lowpoly Environment - Nature Free - MEDIEVAL FANTASY SERIES asset pack (Polytope Studio)
+and SpaderBomb's How to make an open world video (https://www.youtube.com/watch?v=WbZpj8WcjN0)
+
+- Camerafollow and collision: 
+While I tweaked the camera A LOT, especially for the level tools camera work, I used Filmstorm's Free 3rd Person Camera Setup & Camera Collision Tutorial as a base, it saved me the time of making the 3rd person camera myself, giving me the opportunity to start the sonic movement faster :). 
+Here's the video: https://www.youtube.com/watch?v=LbDQHv9z-F0&t=703s
+
+- VFX help: 
+I'm not the best at VFX, so I did my best to make the VFX. To do so, I reached out to people for tips, and checked out references. 
+A video I used was the Unity Shader Graph - Stylized Trails Tutorial video by Gabriel Aguiar Prod. (https://www.youtube.com/watch?v=wvK6MNlmCCE&t=2s). Also, I followed UnofficialGames "Unity - Shader Graph - Sonic Spin Dash VFX" to make the spinball form (https://www.youtube.com/watch?v=ks4yYgx5uNI).
+Last but not least, a few people helped guide me in learning VFX. They were Spaderbomb as metioned above and Sarah Dakdouk.
