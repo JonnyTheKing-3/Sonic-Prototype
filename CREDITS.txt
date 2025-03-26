@@ -40,3 +40,13 @@ Here's the video: https://www.youtube.com/watch?v=LbDQHv9z-F0&t=703s
 I'm not the best at VFX, so I did my best to make the VFX. To do so, I reached out to people for tips, and checked out references. 
 A video I used was the Unity Shader Graph - Stylized Trails Tutorial video by Gabriel Aguiar Prod. (https://www.youtube.com/watch?v=wvK6MNlmCCE&t=2s). Also, I followed UnofficialGames "Unity - Shader Graph - Sonic Spin Dash VFX" to make the spinball form (https://www.youtube.com/watch?v=ks4yYgx5uNI).
 Last but not least, a few people helped guide me in learning VFX. They were Spaderbomb as metioned above and Sarah Dakdouk.
+
+
+Just a heads up:
+This is a fan-made project created for fun and learning. It's not affiliated with or endorsed by SEGA in any way.
+
+Sonic the Hedgehog and related characters are trademarks of SEGA Holdings Co., Ltd.
+
+Everything here is shared for non-commercial use only — so feel free to play around with it, modify it, learn from it, or build your own fan projects. Just please don’t sell it or use it to make money.
+
+If you use or modify parts of this project, make sure to credit everyone above and me (Jonathan Garcia Rodriguez). 😊
