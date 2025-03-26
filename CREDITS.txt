@@ -12,6 +12,7 @@ Unity3D School (https://www.youtube.com/watch?v=AyuQXfgVk3U)
 
 - rotatetowards:
 There was a light tweak I needed to do to make the movement feel good and Josh's sonic video helped with that. The tweak was using the rotatetowards method rather than things like addforce or movetowards. Here's the video: https://www.youtube.com/watch?v=zH5piGCvk5I&t=610s
+I tried to search for Josh's last name or something like an official page, but I only came along his discord which is actually on the description of the video above. If Josh is reading this, thanks
 
 - Music and SFX:
 Luke Eleu Hardisty (Discord: keleumusic). I implemented it, but he did everything Audio-wise (music and SFX)
@@ -23,7 +24,7 @@ Luke Eleu Hardisty (Discord: keleumusic). I implemented it, but he did everythin
 **Splines** by Unity Technologies – used under the Unity Companion License.  
 [https://unity.com/releases/editor/whats-new/unity-2023-1#splines](https://unity.com/releases/editor/whats-new/unity-2023-1#splines)
 
-I also used the Simple UI Elements asset pack from MadFireOn
+I also used the Simple UI Elements asset pack from MadFireOn. Please support them!
 
 
 - Forest: 
@@ -31,6 +32,7 @@ Used the Lowpoly Environment - Nature Free - MEDIEVAL FANTASY SERIES asset pack 
 and SpaderBomb's How to make an open world video (https://www.youtube.com/watch?v=WbZpj8WcjN0)
 
 - Camerafollow and collision: 
+Motion files provided by Filmstorm Pty Ltd - filmstorm.net
 While I tweaked the camera A LOT, especially for the level tools camera work, I used Filmstorm's Free 3rd Person Camera Setup & Camera Collision Tutorial as a base, it saved me the time of making the 3rd person camera myself, giving me the opportunity to start the sonic movement faster :). 
 Here's the video: https://www.youtube.com/watch?v=LbDQHv9z-F0&t=703s
 
