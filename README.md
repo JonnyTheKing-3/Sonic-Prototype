@@ -23,8 +23,8 @@ CONTROLS:
 Currently it's set up like so, but in the editor you can modify everything:
 
 - WASD = movement
-- Arrow keys/mouse = camera movement (non-ajustable, but you can modify the code to get your prefered setup!)
-- Spance = Jump
+- Arrow keys/mouse = camera movement (non-adjustable, but you can modify the code to get your preferred setup!)
+- Space = Jump
 - P = homing attack
 - O = Spindash
 - I = Boost
