@@ -18,9 +18,11 @@ Feel free to contact me through my socials below for any questions or if you'd l
 - GMAIL: jonathangrcrdrgz@gmail.com
 - Linkedin: https://www.linkedin.com/in/jonathangrcrdrgz/
 
+
 DEMO:
-You can find the demo in my portfolio, as well as other projects I've made and am working on :) 
-Portfolio: https://jonathangrcrdrgz.wixsite.com/jtkportfolio
+You can find the demo in my portfolio linked right below, as well as other projects I've made and am working on :) 
+https://jonathangrcrdrgz.wixsite.com/jtkportfolio
+
 
 CONTROLS:
 Currently it's set up like so, but in the editor you can modify everything:
