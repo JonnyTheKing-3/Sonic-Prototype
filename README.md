@@ -19,6 +19,9 @@ Feel free to contact me through my socials below for any questions or if you'd l
 - Linkedin: https://www.linkedin.com/in/jonathangrcrdrgz/
 
 
+
+
+
 DEMO:
 You can find the demo in my portfolio linked right below, as well as other projects I've made and am working on :) 
 https://jonathangrcrdrgz.wixsite.com/jtkportfolio
