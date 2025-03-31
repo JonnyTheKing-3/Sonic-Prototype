@@ -1,9 +1,6 @@
 # Sonic-Prototype
 Unity Prototype for a Sonic-style game
 
-DEMO:
-You can find the demo in my portfolio linked right below, as well as other projects I've made and am working on :) 
-https://jonathangrcrdrgz.wixsite.com/jtkportfolio
 ---
 
 ### Just a heads up!
@@ -20,6 +17,10 @@ Feel free to contact me through my socials below for any questions or if you'd l
 - Discord: jonnytheking_3 (Preferred)
 - GMAIL: jonathangrcrdrgz@gmail.com
 - Linkedin: https://www.linkedin.com/in/jonathangrcrdrgz/
+
+DEMO:
+You can find the demo in my portfolio linked right below, as well as other projects I've made and am working on :) 
+https://jonathangrcrdrgz.wixsite.com/jtkportfolio
 
 
 CONTROLS:
